@@ -1,12 +1,16 @@
 {
-  "name": "Hello World",
+  "name": "Edit with Emacs",
   "version": "1.0",
-  "description": "The first extension that I made.",
+  "description": "Allow user to edit web-pages with Emacs.",
   "browser_action": {
-    "default_icon": "icon.png",
+    "default_icon": "emacs23-16x16.png",
     "popup": "popup.html"
   },
   "permissions": [
-    "http://api.flickr.com/"
+    "tabs",
+    "http://127.0.0.1/*",
+    "http://*/*",
+    "https://*/*"
+    // "file://*/*" requires a newer Chrome?
   ]
 }
