@@ -1,0 +1,23 @@
+<HTML><HEAD><META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<TITLE>Text Area Test</TITLE>
+<SCRIPT language="JavaScript">
+function seeTextArea (form) {
+	alert (form.myarea.value);
+
+}
+</SCRIPT>
+<STYLE></STYLE></HEAD><BODY>
+<FORM name="myform">
+<INPUT type="button" name="button3" value="Test" onclick="seeTextArea(this.form)">
+<TEXTAREA name="body" cols="40" rows="5" id="foo">
+</TEXTAREA>
+</FORM>
+
+<FORM name="myform2">
+<INPUT type="button" name="button4" value="Test" onclick="seeTextArea(this.form)">
+<TEXTAREA name="body" cols="40" rows="5" id="foo">
+</TEXTAREA>
+</FORM>
+
+
+</BODY></HTML>
