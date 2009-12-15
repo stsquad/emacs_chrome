@@ -42,7 +42,7 @@ function editTextArea(event) {
 
 	if (text_edit_id == edit_id)
 	{
-	    content = text.innerText;
+	    content = text.value;
 	    console.log("  content:"+content);
 	    port.postMessage({message: "edit_request", values: content});
 	}
