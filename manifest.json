@@ -16,7 +16,7 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*", "file://*/*"],
-      "js": ["jquery-1.3.2.js", "textareas.js"]
+      "js": ["textareas.js"]
     }
   ]
 }

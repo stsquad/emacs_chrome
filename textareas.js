@@ -27,28 +27,6 @@ function editTextArea(event) {
     console.log("editTextArea:"+edit_id);
 }
 
-/*    
-function findTextAreas() {
-
-    console.log("Finding text area (jQuery Version)");
-
-    text_id=0;
-    
-    // Try the jQuery way
-    $('textarea').each ( function() {
-	id_string="eta_"+text_id;
-	$(this).attr({ emacs_chrome_id: id_string });
-	$(this).after('<a id='+id_string+'\'></a>');
-	// Get the anchor element
-	a = $(this)[0].nextSibling;
-	a.innerHTML='<img src="'+editImgURL+'>';
-	a.addEventListener("click", id_string, editTextArea);
-	text_id++;
-    } )
-	    
-}
-*/
-
 function findTextAreas() {
 
     console.log("Finding text area (Pure HTML Version)");
