@@ -6,12 +6,11 @@
  * clicked it communicates with the master extension page to send an
  * edit request.
  *
- * This uses jQuery for handy stuff
  */
  
 var editImgURL = chrome.extension.getURL("gumdrop.png");
-var editImgTag = "<img src=\""+editImgURL+"\">";
-
+var port = chrome.extension.connect();
+ 
 /*
  updateTextArea
 
@@ -21,10 +20,32 @@ function updateTextArea(edit_id) {
     console.log("updateTextArea");
 }
 
+/*
+ editTextArea
+
+ Called when the edit button on a page is clicked, once done
+ it finds the appropriate text area, extracts it's text and
+ fires a message to the main extension to trigger the editing
+*/
+ 
 function editTextArea(event) {
     var img = event.currentTarget;
     var edit_id = img.getAttribute("edit_id");
     console.log("editTextArea:"+edit_id);
+
+    var texts = document.getElementsByTagName('textarea');
+
+    for (var i=0; i<texts.length; i++) {
+	var text = texts[i];
+	var text_edit_id = text.getAttribute("edit_id");
+
+	if (text_edit_id == edit_id)
+	{
+	    content = text.innerText;
+	    console.log("  content:"+content);
+	    port.postMessage({message: "edit_request", values: content});
+	}
+    }
 }
 
 function findTextAreas() {
