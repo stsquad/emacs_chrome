@@ -37,6 +37,7 @@ function editTextArea(event) {
 
     for (var i=0; i<texts.length; i++) {
 	var text = texts[i];
+
 	var text_edit_id = text.getAttribute("edit_id");
 
 	if (text_edit_id == edit_id)
@@ -56,6 +57,13 @@ function findTextAreas() {
 
     for (var i=0; i<texts.length; i++) {
 	var text = texts[i];
+
+	// We don't want to tag all text boxen, especially if they are hidden
+	var display = text.style.getPropertyCSSValue('display');
+	if (display && display.cssText=="none")
+	{
+	    continue;
+	}
 
 	// Set attribute of text box so we can find it
 	var edit_id = "eta_"+i;
