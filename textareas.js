@@ -18,8 +18,23 @@ console.log("testareas.js: port is "+port);
 
  Called when we want to update the text area with our updated text
 */
-function updateTextArea(msg) {
-    console.log("updateTextArea: got"+msg);
+function updateTextArea(msg, port) {
+    var cmd = msg.cmd;
+    var id = msg.id;
+    var content = msg.text;
+
+    var texts = document.getElementsByTagName('textarea');
+
+    for (var i=0; i<texts.length; i++) {
+	var text = texts[i];
+
+	var text_edit_id = text.getAttribute("edit_id");
+
+	if (text_edit_id == id)
+	{
+	    text.value = content;
+	}
+    }
 }
 
 port.onMessage.addListener(updateTextArea);
