@@ -44,7 +44,7 @@ function editTextArea(event) {
 	{
 	    content = text.value;
 	    console.log("  content:"+content);
-	    port.postMessage({message: "edit_request", values: content});
+	    port.postMessage({cmd: "edit_request", text: content, id: edit_id});
 	}
     }
 }

@@ -54,7 +54,7 @@ class Handler(BaseHTTPRequestHandler):
             # spawn editor...
             print "Spawning editor... ", f.name
 
-            p = subprocess.Popen(["/usr/bin/emacs", f.name], close_fds=True)
+            p = subprocess.Popen(["/usr/bin/emacsclient", f.name], close_fds=True)
 
             # hold connection open until editor finishes
             p.wait()
