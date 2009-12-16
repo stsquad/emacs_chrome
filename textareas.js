@@ -10,15 +10,19 @@
  
 var editImgURL = chrome.extension.getURL("gumdrop.png");
 var port = chrome.extension.connect();
- 
+
+console.log("testareas.js: port is "+port);
+
 /*
  updateTextArea
 
  Called when we want to update the text area with our updated text
 */
-function updateTextArea(edit_id) {
-    console.log("updateTextArea");
+function updateTextArea(msg) {
+    console.log("updateTextArea: got"+msg);
 }
+
+port.onMessage.addListener(updateTextArea);
 
 /*
  editTextArea
@@ -42,9 +46,14 @@ function editTextArea(event) {
 
 	if (text_edit_id == edit_id)
 	{
-	    content = text.value;
-	    console.log("  content:"+content);
-	    port.postMessage({cmd: "edit_request", text: content, id: edit_id});
+	    var edit_msg = {
+		msg: "edit",
+		text: text.value,
+		id: edit_id
+	    };
+	    
+	    console.log("  edit_msg:"+edit_msg);
+	    port.postMessage(edit_msg);
 	}
     }
 }
