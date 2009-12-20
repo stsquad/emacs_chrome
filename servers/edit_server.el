@@ -10,6 +10,9 @@
 ;;
 ;;
 
+; still debugging
+(setq debug-on-error 't)
+
 (defvar edit-server-port 9292
   "Port the edit server listens too")
 
@@ -19,6 +22,8 @@
 (defvar edit-server-current-proc 'nil
   "Network process associated with the current edit, made local when
   the edit buffer is create")
+
+
 
 (defun edit-server-start nil
   "Start the edit server"
@@ -56,17 +61,17 @@
 
     ;;Get the content from the headers, we don't actually much care
     ;;about the headers for now. I suspect this would break on Windows
-    (let ((content (cdr (split-string http "\n\n"))))
+    (let ((content (cdr (split-string string "\n\n"))))
       (edit-server-create-edit-buffer proc content))))
 
 (defun edit-server-create-edit-buffer(proc string)
   "Create an edit buffer, place content in it and setup the call
 backs"
   (switch-to-buffer "edit-text-buffer")
-  (insert 'string)
-  (set (make-variable-buffer-local edit-server-current-proc) proc)
+  (set (make-local-variable 'edit-server-current-proc) 'proc)
   (local-set-key (kbd "C-x k") 'edit-server-done)
-  (local-set-key ((kbd "C-x C-s") 'edit-server-done)))
+  (local-set-key (kbd "C-x C-s") 'edit-server-done)
+  (insert string))
 
 ;
 ; HTTP/1.0 200 OK
