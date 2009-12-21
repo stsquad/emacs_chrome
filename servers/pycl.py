@@ -17,10 +17,13 @@
 import cgi, urlparse
 import subprocess
 import tempfile, time
-import os
+import os, sys
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
+temp_has_delete=True
+
 class Handler(BaseHTTPRequestHandler):
+    global temp_has_delete
 
     def do_GET(self):
         self.send_error(404, "Not Found: %s" % self.path)
@@ -47,14 +50,21 @@ class Handler(BaseHTTPRequestHandler):
             print l
 
             # write text into file
-            f = tempfile.NamedTemporaryFile(delete=False, suffix='.txt')
+            if temp_has_delete==True:
+                f = tempfile.NamedTemporaryFile(delete=False, suffix='.txt')
+                fname = f.name
+            else:
+                tf = tempfile.mkstemp(suffix='.txt')
+                f = os.fdopen(tf[0],"w")
+                fname = tf[1]
+
             f.write(body)
             f.close()
 
             # spawn editor...
-            print "Spawning editor... ", f.name
+            print "Spawning editor... ", fname
 
-            p = subprocess.Popen(["/usr/bin/emacsclient", "-c", f.name], close_fds=True)
+            p = subprocess.Popen(["/usr/bin/emacsclient", "-c", fname], close_fds=True)
 
             # hold connection open until editor finishes
             p.wait()
@@ -62,25 +72,28 @@ class Handler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.end_headers()
 
-            f = file(f.name, 'r')
+            f = file(fname, 'r')
             s = f.read()
             f.close()
+
             try:
                 os.unlink(fname)
             except :
+                print "Unable to unlink:", fname
                 pass
 
             self.wfile.write(s)
         except :
+            print "Error: ", sys.exc_info()[0]
             self.send_error(404, "Not Found: %s" % self.path)
     
 def main():
+    global temp_has_delete
     import platform
     t = platform.python_version_tuple()
     if int(t[0]) == 2 and int(t[1]) < 6:
-        print "Python 2.6+ required"
-        # uses tempfile.NamedTemporaryFile delete param
-        return
+        temp_has_delete = False;
+        print "Handling lack of delete for NamedTemporaryFile:", temp_has_delete
     try:
         httpserv = HTTPServer(('localhost', 9292), Handler)
         httpserv.table = {}
