@@ -23,7 +23,34 @@
 
 (defvar edit-server-current-proc 'nil
   "Network process associated with the current edit, made local when
-  the edit buffer is create")
+ the edit buffer is created")
+
+(defvar edit-server-current-frame 'nil
+  "The frame created for a new edit-server process, made local when
+ then edit buffer is created")
+
+;; Mode magic
+;
+; We want to re-map some of the keys to trigger edit-server-done
+; instead of the usual emacs like behaviour. However using
+; local-set-key will affect all buffers of the same mode, hence we
+; define a special (derived) mode for handling editing of text areas.
+;
+
+(defvar edit-server-text-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-x k") 'edit-server-done)
+    (define-key map (kbd "C-x C-s") 'edit-server-done)
+  map)
+"Keymap for `edit-server-text-mode'.")
+
+(define-derived-mode edit-server-text-mode text-mode "Edit Server Text Mode"
+  "A derived version of text-mode with a few common Emacs keystrokes
+rebound to more functions that can deal with the response to the
+edit-server request")
+
+;; Edit Server socket code
+;
 
 (defun edit-server-start nil
   "Start the edit server"
@@ -36,24 +63,28 @@
      :host 'local ; only listen to local connections
      :service edit-server-port
      :filter 'edit-server-filter
-     :server 't)))
+     :server 't)
+    (message "Created a new edit-server process")))
 
 (defun edit-server-stop nil
   "Stop the edit server"
   (interactive)
-  (delete-process "edit-server"))
-
+  (if (process-status "edit-server")
+      (delete-process "edit-server")
+    (message "No edit server running")))
 
 (defun edit-server-filter (proc request)
   "Called each time something connects to the edit server"
-  (message (format "edit-server-filter: got %sEOF" request))
+  ;(message (format "edit-server-filter: got %sEOF" request))
 
   ;; Get the content from the headers, we don't actually much care
   ;; about the headers for now. I suspect this would break on Windows
   ;;
   ;; As we split on \n\n we need to re-assemble to take into account
   ;; any multiple new lines in our content part.
-  (let* ((after-headers (cdr (split-string request "\n\n")))
+  (let* ((split-request (split-string request "\n\n"))
+	 (headers (car split-request))
+	 (after-headers (cdr split-request))
 	 (content (car after-headers))
 	 (rest (cdr after-headers)))
     (if rest
@@ -63,15 +94,19 @@
     (edit-server-create-edit-buffer proc content)))
 
 (defun edit-server-create-edit-buffer(proc string)
-  "Create an edit buffer, place content in it and setup the call
-backs"
-  (switch-to-buffer "edit-text-buffer")
-  (set (make-local-variable 'edit-server-current-proc) proc)
-; Can't do this, affects all buffers of same major mode, will need to
-; create a special mode to do this.
-;  (local-set-key (kbd "C-x k") 'edit-server-done)
-;  (local-set-key (kbd "C-x C-s") 'edit-server-done)
-  (insert string))
+  "Create an edit buffer, place content in it and save the network
+  process for the final call back"
+  (let ((name (generate-new-buffer-name "edit-server-text-buffer")))
+    (switch-to-buffer-other-frame name)
+;    (switch-to-buffer name)
+
+    (with-current-buffer name
+      (set (make-local-variable 'edit-server-current-proc) proc)
+      (set (make-local-variable 'edit-server-current-frame) (selected-frame))
+      (if string
+	  (insert string)
+	(insert "Empty text box (this may be a bug)"))
+      (edit-server-text-mode))))
 
 ;
 ; Send the response back to the browser as a properly formed
@@ -82,21 +117,25 @@ backs"
   "Send a response back to the calling process with a string"
   (interactive)
   (message "edit-server-send-response")
-  (let ((response-header (concat
+  (if proc
+      (let ((response-header (concat
 			  "HTTP/1.0 200 OK\n"
 			  "Server: Emacs\n"
 			  "Date: "
 			  (format-time-string
 			   "%a, %d %b %Y %H:%M:%S GMT\n"
 			   (current-time)))))
-    (process-send-string proc response-header)
-    (process-send-string proc "\n")
-    (process-send-string proc string)
-    (process-send-eof proc)))
+	(process-send-string proc response-header)
+	(process-send-string proc "\n")
+	(process-send-string proc string)
+	(process-send-eof proc))
+    (message "edit-server-send-response: null proc (bug?)")))
 
 (defun edit-server-done()
   "Once someone is done with editing their text edit-server-done is
   called and the response is sent back to the browser"
   (interactive)
-  (edit-server-send-response edit-server-current-proc (buffer-string)))
+  (edit-server-send-response edit-server-current-proc (buffer-string))
+  (delete-frame edit-server-current-frame)
+  (kill-buffer))
 
