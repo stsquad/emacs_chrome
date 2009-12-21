@@ -92,10 +92,17 @@ backs"
   "Send a response back to the calling process with a string"
   (interactive)
   (message "edit-server-send-response")
-  (process-send-string proc "HTTP/1.0 200 OK\n")
-  (process-send-string proc "Server: Emacs\n")
-  (process-send-string proc "\n")
-  (process-send-string proc string))
+  (let ((response-header (concat
+			  "HTTP/1.0 200 OK\n"
+			  "Server: Emacs\n"
+			  "Date: "
+			  (format-time-string
+			   "%a, %d %b %Y %H:%M:%S GMT\n"
+			   (current-time)))))
+    (process-send-string proc response-header)
+    (process-send-string proc "\n")
+    (process-send-string proc string)
+    (process-send-eof proc)))
 
 (defun edit-server-done()
   "Once someone is done with editing their text edit-server-done is
