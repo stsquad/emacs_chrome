@@ -1,0 +1,12 @@
+Servers
+=======
+
+Because the Chrome(ium) security model doesn't allow for extensions
+spawning processes we can't just exec() the editor process. Instead we
+have to implement an "edit server" which listens to XmlHttp requests
+on port 9292 (default) and then sends a response when the edit is
+complete. A number are included here:
+
+* pycl.py - Original version, works
+* edit_server.el - An Emacs Lisp implementation, under development (patches welcome)
+
