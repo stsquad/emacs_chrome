@@ -21,9 +21,6 @@
 (defvar edit-server-port 9292
   "Port the edit server listens too")
 
-(defvar edit-server-clients '() 
-  "alist where KEY is a client process and VALUE is the string")
-
 (defvar edit-server-current-proc 'nil
   "Network process associated with the current edit, made local when
   the edit buffer is create")
@@ -39,34 +36,31 @@
      :host 'local ; only listen to local connections
      :service edit-server-port
      :filter 'edit-server-filter
-     :server 't) 
-    (setq edit-server-clients '())))
+     :server 't)))
 
 (defun edit-server-stop nil
   "Stop the edit server"
   (interactive)
-  (while edit-server-clients
-    (delete-process (car (car edit-server-clients)))
-    (setq edit-server-clients (cdr edit-server-clients)))
   (delete-process "edit-server"))
 
 
-(defun edit-server-filter (proc string)
+(defun edit-server-filter (proc request)
   "Called each time something connects to the edit server"
-  (message (format "edit-server-filter: got %s" string))
-  (let ((pending (assoc proc edit-server-clients))
-        message
-        index)
-    ;;create entry if required
-    (unless pending
-      (setq edir-server-clients (cons (cons proc "") edit-server-clients))
-      (setq pending  (assoc proc edit-server-clients)))
+  (message (format "edit-server-filter: got %sEOF" request))
 
-    ;;Get the content from the headers, we don't actually much care
-    ;;about the headers for now. I suspect this would break on Windows
-;    (let ((content (cdr (split-string string "\n\n"))))
-;      (edit-server-create-edit-buffer proc content))))
-    (edit-server-send-response proc "You got a response")))
+  ;; Get the content from the headers, we don't actually much care
+  ;; about the headers for now. I suspect this would break on Windows
+  ;;
+  ;; As we split on \n\n we need to re-assemble to take into account
+  ;; any multiple new lines in our content part.
+  (let* ((after-headers (cdr (split-string request "\n\n")))
+	 (content (car after-headers))
+	 (rest (cdr after-headers)))
+    (if rest
+	(dolist (x rest)
+	  (setq content (concat content "\n\n" x))))
+
+    (edit-server-create-edit-buffer proc content)))
 
 (defun edit-server-create-edit-buffer(proc string)
   "Create an edit buffer, place content in it and setup the call
@@ -80,12 +74,8 @@ backs"
   (insert string))
 
 ;
-; HTTP/1.0 200 OK
-; Server: BaseHTTP/0.3 Python/2.6.4
-; Date: Fri, 18 Dec 2009 19:00:28 GMT
-; 
-; This is a test
-; For the text
+; Send the response back to the browser as a properly formed
+; HTTP/1.0 200 OK message
 ;
 
 (defun edit-server-send-response (proc string)
@@ -109,12 +99,4 @@ backs"
   called and the response is sent back to the browser"
   (interactive)
   (edit-server-send-response edit-server-current-proc (buffer-string)))
-    
-
-; What do I need this for?
-(defun edit-server-sentinel (proc msg)
-  (delq proc edit-server-clients)
-  (message (format "client %s has quit" proc)))
-
-
 
