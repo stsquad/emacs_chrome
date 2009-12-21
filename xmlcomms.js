@@ -5,8 +5,6 @@
  *
  */
 
-var reply_port = null;
-
 // This is the edit server address
 var urlPrefix = "http://127.0.0.1:9292/"
  
@@ -20,7 +18,7 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 // Handle and edit request coming from the content page script
 //
 // Package up the text to be edited and send it to the edit server
-function handleContentMessages(msg)
+function handleContentMessages(msg, tab_port)
 {
     console.log("handleContentMessages called:"+msg);
     var cmd = msg.cmd;
@@ -31,6 +29,8 @@ function handleContentMessages(msg)
     var url = urlPrefix + cmd + "/";
     url = url + id;
 
+    console.log(" page URL:"+tab_port.tab.url);
+    console.log(" tab_port:"+tab_port.portId_);
     console.log(" request URL:"+url);
     
     xhr.open("POST", url, true);
@@ -46,7 +46,7 @@ function handleContentMessages(msg)
 	    };
 
 	    //port.postMessage(tab.id, update_msg);
-	    reply_port.postMessage(update_msg);
+	    tab_port.postMessage(update_msg);
         }
     }
     
@@ -56,9 +56,9 @@ function handleContentMessages(msg)
 
 function contentTalking(port)
 {
-    console.log("contentTalking:"+port);
-    reply_port = port;// will this cause a problem with multiple tabs connecting at once?
-    port.onMessage.addListener(handleContentMessages);
+    port.onMessage.addListener(function(msg, port) {
+	handleContentMessages(msg,port);
+    });
 }
 
 // Hook up whenever someone connects to the extension comms port
