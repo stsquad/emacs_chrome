@@ -29,6 +29,9 @@
   "The frame created for a new edit-server process, made local when
  then edit buffer is created")
 
+(defvar edit-server-clients '() 
+  "alist where KEY is a client process and VALUE is the string")
+
 ;; Mode magic
 ;
 ; We want to re-map some of the keys to trigger edit-server-done
@@ -64,25 +67,34 @@ edit-server request")
      :service edit-server-port
      :filter 'edit-server-filter
      :server 't)
+    (setq edit-server-clients '())
     (message "Created a new edit-server process")))
 
 (defun edit-server-stop nil
   "Stop the edit server"
   (interactive)
+  (while edit-server-clients
+    (delete-process (car (car edit-server-clients)))
+    (setq edit-server-clients (cdr edit-server-clients)))
   (if (process-status "edit-server")
       (delete-process "edit-server")
     (message "No edit server running")))
 
-(defun edit-server-filter (proc request)
-  "Called each time something connects to the edit server"
-  ;(message (format "edit-server-filter: got %sEOF" request))
+; Write log entries
+(defun edit-server-log (string &optional client)
+  "If a *edit-server* buffer exists, write STRING to it for logging purposes."
+  (if (get-buffer "*edit-server*")
+      (with-current-buffer "*edit-server*"
+	(goto-char (point-max))
+	(insert (current-time-string)
+		(if client (format " %s:" client) " ")
+		string)
+	(or (bolp) (newline)))))
 
-  ;; Get the content from the headers, we don't actually much care
-  ;; about the headers for now. I suspect this would break on Windows
-  ;;
-  ;; As we split on \n\n we need to re-assemble to take into account
-  ;; any multiple new lines in our content part.
-  (let* ((split-request (split-string request "\n\n"))
+
+(defun edit-server-split-request (msg)
+  "Split the request into headers/content"
+  (let* ((split-request (split-string msg "\n\n"))
 	 (headers (car split-request))
 	 (after-headers (cdr split-request))
 	 (content (car after-headers))
@@ -90,8 +102,33 @@ edit-server request")
     (if rest
 	(dolist (x rest)
 	  (setq content (concat content "\n\n" x))))
+  (list headers content)))
 
-    (edit-server-create-edit-buffer proc content)))
+
+(defun edit-server-filter (proc string)
+  "Called each time something connects to the edit server"
+
+  (let ((pending (assoc proc edit-server-clients))
+        message)
+    ;;create entry if required
+    (unless pending
+      (setq edit-server-clients (cons (cons proc "") edit-server-clients))
+      (setq pending  (assoc proc edit-server-clients)))
+    (setq message (concat (cdr pending) string))
+
+    (edit-server-log (format "edit-server-filter: s:%s" string))
+    (edit-server-log (format "edit-server-filter: m:%s" message))
+
+    ;; Get the content from the headers, we don't actually much care
+    ;; about the headers for now. I suspect this would break on Windows
+    ;;
+    ;; As we split on \n\n we need to re-assemble to take into account
+    ;; any multiple new lines in our content part.
+    (let* ((split-request (edit-server-split-request message))
+	   (headers (car split-request))
+	   (content (car (cdr split-request))))
+
+      (edit-server-create-edit-buffer proc content))))
 
 (defun edit-server-create-edit-buffer(proc string)
   "Create an edit buffer, place content in it and save the network
