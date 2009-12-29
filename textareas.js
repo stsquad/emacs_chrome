@@ -67,7 +67,7 @@ function editTextArea(event) {
 		id: edit_id
 	    };
 	    
-	    console.log("  edit_msg:"+edit_msg);
+	    console.log("  edit_msg:"+JSON.stringify(edit_msg));
 	    port.postMessage(edit_msg);
 	}
     }

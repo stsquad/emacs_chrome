@@ -20,8 +20,8 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 // Package up the text to be edited and send it to the edit server
 function handleContentMessages(msg, tab_port)
 {
-    console.log("handleContentMessages called:"+msg);
-    var cmd = msg.cmd;
+    console.log("handleContentMessages called:"+JSON.stringify(msg));
+    var cmd = msg.msg;
     var id = msg.id;
     var text = msg.text;
 
@@ -36,7 +36,7 @@ function handleContentMessages(msg, tab_port)
     xhr.open("POST", url, true);
     
     xhr.onreadystatechange = function() {
-        console.log("State change!");
+        console.log("State change:"+ xhr.readyState + " status:"+xhr.status);
         if(xhr.readyState == 4 && xhr.status == 200) {
 
 	    var update_msg = {
