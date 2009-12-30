@@ -1,5 +1,5 @@
 /*
- * TextArea.js
+ * TextAreas.js
  *
  * This "content" script finds TextArea's in the DOM and tags them
  * with a unique ID and edit button. When the button is
@@ -11,7 +11,7 @@
 var editImgURL = chrome.extension.getURL("gumdrop.png");
 var port = chrome.extension.connect();
 
-console.log("testareas.js: port is "+port);
+console.log("textareas.js: port is "+port);
 
 /*
  updateTextArea
