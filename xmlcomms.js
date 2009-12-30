@@ -9,10 +9,10 @@
 var urlPrefix = "http://127.0.0.1:9292/"
  
 // Called when the user clicks on the browser action.
+// When clicked send a message to the current active port:
 chrome.browserAction.onClicked.addListener(function(tab) {
-  console.log("Thingy clicked!");
-  chrome.tabs.executeScript(tab.id, {file: "textareas.js", allFrames: false});
-  console.log("Run update");
+  console.log("Edit button clicked: "+JSON.stringify(tab));
+  chrome.tabs.sendRequest(tab.id, {msg: "find_edit"});
 });
 
 // Handle and edit request coming from the content page script

@@ -18,13 +18,8 @@ console.log("textareas.js: port is "+port);
 
  Called when we want to update the text area with our updated text
 */
-function updateTextArea(msg, port) {
-    var cmd = msg.cmd;
-    var id = msg.id;
-    var content = msg.text;
-
+function updateTextArea(id, content) {
     var texts = document.getElementsByTagName('textarea');
-
     for (var i=0; i<texts.length; i++) {
 	var text = texts[i];
 
@@ -37,7 +32,44 @@ function updateTextArea(msg, port) {
     }
 }
 
-port.onMessage.addListener(updateTextArea);
+/*
+  Find the current active text area and spawn an edit for it
+*/
+function findActiveTextArea() {
+    var texts = document.getElementsByTagName('textarea');
+    // For now hardwire
+    var text = texts[0];
+
+    // And spawn the request
+    var text_edit_id = text.getAttribute("edit_id");
+    var edit_msg = {
+	msg: "edit",
+	text: text.value,
+	id: text_edit_id
+    };
+
+    console.log("  findActiveTextArea:"+JSON.stringify(edit_msg));
+    port.postMessage(edit_msg);
+}
+
+/* Message handling multiplexer */
+function textareas_message_handler(msg, port) {
+    console.log("textareas_message_handler: "+JSON.stringify(msg));
+
+    // What was the bidding?
+    var cmd = msg.msg;
+    if (cmd == "find_edit") {
+	console.log("find_edit: request");
+    } else if (cmd == "update") {
+	var id = msg.id;
+	var content = msg.text;
+	updateTextArea(id, content);
+    } else {
+	console.log("textareas_message_handler: un-handled message:"+cmd);
+    }
+}
+
+port.onMessage.addListener(textareas_message_handler);
 
 /*
  editTextArea
@@ -102,5 +134,6 @@ function findTextAreas() {
     }
 }
 
-	    
+
+// Called when content script loaded
 findTextAreas();
