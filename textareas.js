@@ -11,7 +11,7 @@
 var editImgURL = chrome.extension.getURL("gumdrop.png");
 var port = chrome.extension.connect();
 
-console.log("textareas.js: port is "+port);
+console.log("textareas.js: port is "+JSON.stringify(port));
 
 /*
  updateTextArea
@@ -37,7 +37,7 @@ function updateTextArea(id, content) {
 */
 function findActiveTextArea() {
     var texts = document.getElementsByTagName('textarea');
-    // For now hardwire
+    // For now hardwire to first element
     var text = texts[0];
 
     // And spawn the request
@@ -59,7 +59,7 @@ function textareas_message_handler(msg, port) {
     // What was the bidding?
     var cmd = msg.msg;
     if (cmd == "find_edit") {
-	console.log("find_edit: request");
+	findActiveTextArea();
     } else if (cmd == "update") {
 	var id = msg.id;
 	var content = msg.text;
@@ -69,7 +69,13 @@ function textareas_message_handler(msg, port) {
     }
 }
 
+// Hook up the incoming message handler for both return messages
+// as well as direct messages from main extension.
+
 port.onMessage.addListener(textareas_message_handler);
+chrome.extension.onConnect.addListener(function(iport) {
+	iport.onMessage.addListener(textareas_message_handler);
+    });
 
 /*
  editTextArea

@@ -9,10 +9,19 @@
 var urlPrefix = "http://127.0.0.1:9292/"
  
 // Called when the user clicks on the browser action.
-// When clicked send a message to the current active port:
+//    
+// When clicked we send a message to the current active tab's
+// content script. It will then use heuristics to decide which text
+// area to spawn an edit request for.
 chrome.browserAction.onClicked.addListener(function(tab) {
-  console.log("Edit button clicked: "+JSON.stringify(tab));
-  chrome.tabs.sendRequest(tab.id, {msg: "find_edit"});
+  console.log("Edit button clicked");
+  
+  var find_msg = {
+      msg: "find_edit"
+  };
+  var tab_port = chrome.tabs.connect(tab.id);
+  
+  tab_port.postMessage(find_msg);
 });
 
 // Handle and edit request coming from the content page script
