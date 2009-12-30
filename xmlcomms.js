@@ -37,16 +37,25 @@ function handleContentMessages(msg, tab_port)
     
     xhr.onreadystatechange = function() {
         console.log("State change:"+ xhr.readyState + " status:"+xhr.status);
-        if(xhr.readyState == 4 && xhr.status == 200) {
+	// readyState 4=HTTP response complete
+        if(xhr.readyState == 4) {
+	    if (xhr.status == 200) {
+		
+		var update_msg = {
+		    msg: "update",
+		    text: xhr.responseText,
+		    id: id
+		};
 
-	    var update_msg = {
-		msg: "update",
-		text: xhr.responseText,
-		id: id
-	    };
-
-	    //port.postMessage(tab.id, update_msg);
-	    tab_port.postMessage(update_msg);
+		chrome.browserAction.setTitle({title:"Last Edit request a success"});
+		tab_port.postMessage(update_msg);
+	    } else if (xhr.status == 0) {
+		// Is the edit server actually running?
+		console.log("failed to spawn editor");
+		chrome.browserAction.setTitle({title:"Error: is edit server running?"});
+	    } else {
+		console.log("Un-handled response: "+xhr.status); 
+	    }
         }
     }
     
