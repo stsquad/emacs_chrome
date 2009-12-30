@@ -1,6 +1,6 @@
 {
   "name": "Edit with Emacs",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Allow user to edit web-pages with Emacs.",
   "browser_action": {
     "default_icon": "emacs23-16x16.png"
@@ -11,7 +11,6 @@
     "http://127.0.0.1/*",
     "http://*/*",
     "https://*/*"
-    // "file://*/*" requires a newer Chrome?
   ],
   "content_scripts": [
     {
