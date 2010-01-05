@@ -10,6 +10,7 @@
  
 var editImgURL = chrome.extension.getURL("gumdrop.png");
 var port = chrome.extension.connect();
+var page_edit_id = 0;
 
 console.log("textareas.js: port is "+JSON.stringify(port));
 
@@ -113,9 +114,10 @@ function editTextArea(event) {
 
 function findTextAreas() {
 
-    console.log("Finding text area (Pure HTML Version)");
+    console.log("findTextAreas() running");
 	   
     var texts = document.getElementsByTagName('textarea');
+    var tagged = 0;
 
     for (var i=0; i<texts.length; i++) {
 	var text = texts[i];
@@ -127,8 +129,16 @@ function findTextAreas() {
 	    continue;
 	}
 
+	// Also skip textareas we have already tagged
+	var existing_id = text.getAttribute("edit_id");
+	if (existing_id)
+	{
+	    console.log("  skipping tagged textarea:" +existing_id);
+	    continue;
+	}
+
 	// Set attribute of text box so we can find it
-	var edit_id = "eta_"+i;
+	var edit_id = "eta_"+page_edit_id;
 	text.setAttribute("edit_id", edit_id);
 
 	// Add a clickable edit img to trigger edit events
@@ -137,9 +147,20 @@ function findTextAreas() {
 	image.src = editImgURL;
 	text.parentNode.insertBefore(image, text.nextSibling);
 	image.addEventListener('click', editTextArea, false);
+
+	// Inc
+	page_edit_id = page_edit_id + 1;
+	tagged = tagged + 1;
     }
+
+    console.log("findTextAreas: tagged "+tagged+" boxes, page_edit_id now "+page_edit_id);
 }
 
+/*
+ We want to search for text areas when the page is first loaded as well as after any additional
+ XHR events made by the page which may load additional elements
+*/
 
 // Called when content script loaded
 findTextAreas();
+console.log("textareas.js loaded: "+document.readyState);
