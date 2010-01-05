@@ -1,6 +1,6 @@
 {
   "name": "Edit with Emacs",
-  "version": "1.1",
+  "version": "1.2",
   "description": "Allow user to edit web-pages with Emacs.",
   "browser_action": {
     "default_icon": "emacs23-16x16.png"
@@ -15,7 +15,9 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*", "file://*/*"],
-      "js": ["textareas.js"]
+      "js": ["textareas.js"],
+      "run_at": "document_idle",
+      "all_frames": true
     }
   ]
 }
