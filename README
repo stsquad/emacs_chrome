@@ -8,7 +8,7 @@ server (see servers/ directory) which spawns and edit process which
 eventually sends the updated text back to the browser.
 
 I use it to edit pages using Emacs although there is no reason why
-other editors can't be spawned from the various scripts.
+other editors could not be spawned from the various scripts.
 
 History
 =======
@@ -16,9 +16,7 @@ History
 Dave Hilley [1] wrote the original proof of concept that showed it
 could be done. I [2] then hacked around with the Javascript to make
 the behaviour more like the classic It's All Text add-on available to
-Firefox. It's my first attempt at a Chrome extension and I've only
-done a little Javascript before so it's currently rough and ready. IN
-the spirit of FLOSS software patches are always welcome.
+Firefox. 
 
 [1] http://www.thegibson.org/blog/archives/689
 [2] http://www.bennee.com/~alex
@@ -28,9 +26,17 @@ Authors
 
 David Hilley
 Alex Bennee
-
+Riccardo Murri
 
 License
 =======
 
 The extension is licensed under the GPL Version 3.
+
+Homepage/Development
+====================
+
+In the spirit of FLOSS software patches are always welcome.
+Development of this extension is hosted on github at:
+
+http://github.com/stsquad/emacs_chrome
