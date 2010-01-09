@@ -7,7 +7,10 @@
 
 // This is the edit server address
 var urlPrefix = "http://127.0.0.1:9292/"
- 
+
+// Initial message
+chrome.browserAction.setTitle({title:"Awaiting edit request"});
+
 // Called when the user clicks on the browser action.
 //    
 // When clicked we send a message to the current active tab's
@@ -57,17 +60,23 @@ function handleContentMessages(msg, tab_port)
 		};
 
 		chrome.browserAction.setTitle({title:"Last Edit request a success"});
+		chrome.browserAction.setIcon({path:"emacs23-16x16.png"});
 		tab_port.postMessage(update_msg);
 	    } else if (xhr.status == 0) {
 		// Is the edit server actually running?
 		console.log("failed to spawn editor");
 		chrome.browserAction.setTitle({title:"Error: is edit server running?"});
+		chrome.browserAction.setIcon({path:"emacs23-16x16-red.png"});
 	    } else {
 		console.log("Un-handled response: "+xhr.status); 
 	    }
         }
     }
-    
+
+    // reset the display before sending request..
+    chrome.browserAction.setTitle({title:"Edit request sent"});
+    chrome.browserAction.setIcon({path:"emacs23-16x16.png"});
+
     xhr.setRequestHeader("Content-type", "text/plain");
     xhr.send(text);
 }
