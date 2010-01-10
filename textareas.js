@@ -36,22 +36,28 @@ function updateTextArea(id, content) {
 /*
   Find the current active text area and spawn an edit for it
 */
-function findActiveTextArea() {
-    var texts = document.getElementsByTagName('textarea');
-    // For now hardwire to first element
-    var text = texts[0];
+(function(){
+     var focusedEdit = null;
 
-    // And spawn the request
-    var text_edit_id = text.getAttribute("edit_id");
-    var edit_msg = {
-	msg: "edit",
-	text: text.value,
-	id: text_edit_id
-    };
+     findActiveTextArea = function() {
+		 var text = focusedEdit;
 
-    console.log("  findActiveTextArea:"+JSON.stringify(edit_msg));
-    port.postMessage(edit_msg);
-}
+		 // And spawn the request
+		 var text_edit_id = text.getAttribute("edit_id");
+		 var edit_msg = {
+			 msg: "edit",
+			 text: text.value,
+			 id: text_edit_id
+		 };
+
+		 console.log("  findActiveTextArea:"+JSON.stringify(edit_msg));
+		 port.postMessage(edit_msg);
+	 };
+
+	 setFocused = function(){
+		 focusedEdit = this;		
+	 };
+ })();
 
 /* Message handling multiplexer */
 function textareas_message_handler(msg, port) {
@@ -140,6 +146,7 @@ function findTextAreas() {
 	// Set attribute of text box so we can find it
 	var edit_id = "eta_"+page_edit_id;
 	text.setAttribute("edit_id", edit_id);
+	text.addEventListener('focus', setFocused);
 
 	// Add a clickable edit img to trigger edit events
 	var image = document.createElement('img');
