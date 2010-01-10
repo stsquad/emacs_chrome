@@ -15,6 +15,51 @@ var page_edit_id = 0;
 console.log("textareas.js: port is "+JSON.stringify(port));
 
 /*
+  tagTextArea
+
+  Any textarea we edit needs to be tagged with a unique ID so
+  when the get the edit response we know what to fill in. This
+  gets called several times not least as some text boxes can
+  appear in the document after first load.
+*/
+function tagTextArea(text)
+{
+    console.log("tagTextArea:"+text);
+
+    // We don't want to tag all text boxen, especially if they are hidden
+    var display = text.style.getPropertyCSSValue('display');
+    if (display && display.cssText=="none")
+    {
+	console.log("  invisible text box");
+	return;
+    }
+
+    // Also skip textareas we have already tagged
+    var existing_id = text.getAttribute("edit_id");
+    if (existing_id)
+    {
+	console.log("  skipping tagged textarea:" +existing_id);
+	return;
+    }
+
+    // Set attribute of text box so we can find it
+    var edit_id = "eta_"+page_edit_id;
+    text.setAttribute("edit_id", edit_id);
+    text.addEventListener('focus', setFocused);
+
+    // Add a clickable edit img to trigger edit events
+    var image = document.createElement('img');
+    image.setAttribute("edit_id", edit_id);
+    image.src = editImgURL;
+    text.parentNode.insertBefore(image, text.nextSibling);
+    image.addEventListener('click', editTextArea, false);
+
+    // Inc
+    page_edit_id = page_edit_id + 1;
+}
+  
+
+/*
  updateTextArea
 
  Called when we want to update the text area with our updated text
@@ -41,6 +86,7 @@ function updateTextArea(id, content) {
 
      findActiveTextArea = function() {
 		 var text = focusedEdit;
+		 tagTextArea(text);
 
 		 // And spawn the request
 		 var text_edit_id = text.getAttribute("edit_id");
@@ -123,44 +169,13 @@ function findTextAreas() {
     console.log("findTextAreas() running");
 	   
     var texts = document.getElementsByTagName('textarea');
-    var tagged = 0;
 
     for (var i=0; i<texts.length; i++) {
 	var text = texts[i];
-
-	// We don't want to tag all text boxen, especially if they are hidden
-	var display = text.style.getPropertyCSSValue('display');
-	if (display && display.cssText=="none")
-	{
-	    continue;
-	}
-
-	// Also skip textareas we have already tagged
-	var existing_id = text.getAttribute("edit_id");
-	if (existing_id)
-	{
-	    console.log("  skipping tagged textarea:" +existing_id);
-	    continue;
-	}
-
-	// Set attribute of text box so we can find it
-	var edit_id = "eta_"+page_edit_id;
-	text.setAttribute("edit_id", edit_id);
-	text.addEventListener('focus', setFocused);
-
-	// Add a clickable edit img to trigger edit events
-	var image = document.createElement('img');
-	image.setAttribute("edit_id", edit_id);
-	image.src = editImgURL;
-	text.parentNode.insertBefore(image, text.nextSibling);
-	image.addEventListener('click', editTextArea, false);
-
-	// Inc
-	page_edit_id = page_edit_id + 1;
-	tagged = tagged + 1;
+	tagTextArea(text);
     }
 
-    console.log("findTextAreas: tagged "+tagged+" boxes, page_edit_id now "+page_edit_id);
+    console.log("findTextAreas: page_edit_id now "+page_edit_id);
 }
 
 /*
