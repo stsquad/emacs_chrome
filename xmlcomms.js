@@ -6,10 +6,24 @@
  */
 
 // This is the edit server address
-var urlPrefix = "http://127.0.0.1:9292/"
+var urlPrefix = "http://127.0.0.1:9292/";
 
+/*
+ * Give some feedback to the user via the icon/hover text.
+ */
+function updateUserFeedback(string, redIcon)
+{
+    console.log("updateUserFeedback: "+string);
+    chrome.browserAction.setTitle({title:string});
+    if (redIcon) {
+	chrome.browserAction.setIcon({path:"emacs23-16x16-red.png"});
+    } else {
+    	chrome.browserAction.setIcon({path:"emacs23-16x16.png"});
+    }
+}
+    
 // Initial message
-chrome.browserAction.setTitle({title:"Awaiting edit request"});
+updateUserFeedback("Awaiting edit request", false);
 
 // Called when the user clicks on the browser action.
 //    
@@ -17,7 +31,6 @@ chrome.browserAction.setTitle({title:"Awaiting edit request"});
 // content script. It will then use heuristics to decide which text
 // area to spawn an edit request for.
 chrome.browserAction.onClicked.addListener(function(tab) {
-  console.log("Edit button clicked");
   
   var find_msg = {
       msg: "find_edit"
@@ -25,6 +38,7 @@ chrome.browserAction.onClicked.addListener(function(tab) {
   var tab_port = chrome.tabs.connect(tab.id);
   
   tab_port.postMessage(find_msg);
+  updateUserFeedback("sent request to content script", false);
 });
 
 // Handle and edit request coming from the content page script
@@ -59,23 +73,19 @@ function handleContentMessages(msg, tab_port)
 		    id: id
 		};
 
-		chrome.browserAction.setTitle({title:"Last Edit request a success"});
-		chrome.browserAction.setIcon({path:"emacs23-16x16.png"});
+		updateUserFeedback("Last Edit request a success", false);
 		tab_port.postMessage(update_msg);
 	    } else if (xhr.status == 0) {
 		// Is the edit server actually running?
-		console.log("failed to spawn editor");
-		chrome.browserAction.setTitle({title:"Error: is edit server running?"});
-		chrome.browserAction.setIcon({path:"emacs23-16x16-red.png"});
+		updateUserFeedback("Error: is edit server running?", true);
 	    } else {
-		console.log("Un-handled response: "+xhr.status); 
+		updateUserFeedback("Un-handled response: "+xhr.status, true); 
 	    }
         }
     }
 
     // reset the display before sending request..
-    chrome.browserAction.setTitle({title:"Edit request sent"});
-    chrome.browserAction.setIcon({path:"emacs23-16x16.png"});
+    updateUserFeedback("Edit request sent", false);
 
     xhr.setRequestHeader("Content-type", "text/plain");
     xhr.send(text);
