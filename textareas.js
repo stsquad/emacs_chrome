@@ -85,24 +85,31 @@ function updateTextArea(id, content) {
      var focusedEdit = null;
 
      findActiveTextArea = function() {
-		 var text = focusedEdit;
-		 tagTextArea(text);
+	 var text;
 
-		 // And spawn the request
-		 var text_edit_id = text.getAttribute("edit_id");
-		 var edit_msg = {
-			 msg: "edit",
-			 text: text.value,
-			 id: text_edit_id
-		 };
+	 if (focusedEdit) {
+	     text = focusedEdit;
+	 } else {
+	     console.log("  findActiveTextArea: focusedEdit not set");
+	 }
+	     
+	 tagTextArea(text);
 
-		 console.log("  findActiveTextArea:"+JSON.stringify(edit_msg));
-		 port.postMessage(edit_msg);
+	 // And spawn the request
+	 var text_edit_id = text.getAttribute("edit_id");
+	 var edit_msg = {
+	     msg: "edit",
+	     text: text.value,
+	     id: text_edit_id
 	 };
 
-	 setFocused = function(){
-		 focusedEdit = this;		
-	 };
+	 console.log("  findActiveTextArea:"+JSON.stringify(edit_msg));
+	 port.postMessage(edit_msg);
+     };
+
+     setFocused = function(){
+	 focusedEdit = this;		
+     };
  })();
 
 /* Message handling multiplexer */
