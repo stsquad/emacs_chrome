@@ -302,8 +302,19 @@ When called interactively, use prefix arg to abort editing."
           (run-hooks 'edit-server-done-hook)
           (edit-server-send-response proc t))
       ;; send back edited content
-      (run-hooks 'edit-server-done-hook)
-      (edit-server-send-response edit-server-proc t))
+      (save-restriction
+	(widen)
+	(buffer-disable-undo)
+	;; ensure any format encoding is done (like longlines)
+	(dolist (format buffer-file-format)
+	  (format-encode-region (point-min) (point-max) format))
+	;; send back
+	(run-hooks 'edit-server-done-hook)
+	(edit-server-send-response edit-server-proc t)
+	;; restore formats (only useful if we keep the buffer)
+	(dolist (format buffer-file-format)
+	  (format-decode-region (point-min) (point-max) format))
+	(buffer-enable-undo)))
     (if edit-server-frame (delete-frame edit-server-frame))
     ;; delete-frame may change the current buffer
     (unless nokill (kill-buffer buffer))
