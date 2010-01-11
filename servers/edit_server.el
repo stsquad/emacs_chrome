@@ -14,9 +14,9 @@
 ;; Licensed under GPLv3
 ;;
 
-; still debugging
-(setq debug-on-error 't)
-(setq edebug-all-defs 't)
+;; uncomment to debug
+;(setq debug-on-error 't)
+;(setq edebug-all-defs 't)
 
 ;; Customization
 (defcustom edit-server-port 9292
@@ -29,7 +29,27 @@
   :group 'edit-server
   :type 'boolean)
 
+(defcustom edit-server-verbose nil
+  "If not nil, log connections and progress also to the echo area."
+  :group 'edit-server
+  :type 'boolean)
+
+(defcustom edit-server-done-hook nil
+  "Hook run when done editing a buffer for the Emacs HTTP edit-server.
+Current buffer holds the text that is about to be sent back to the client."
+  :group 'edit-server
+  :type 'hook)
+
 ;; Vars
+(defconst edit-server-process-buffer-name " *edit-server*"
+  "Template name of the edit-server process buffers.")
+
+(defconst edit-server-log-buffer-name "*edit-server-log*"
+  "Template name of the edit-server process buffers.")
+
+(defconst edit-server-edit-buffer-name "TEXTAREA"
+  "Template name of the edit-server text editing buffers.")
+
 (defvar edit-server-proc 'nil
   "Network process associated with the current edit, made local when
  the edit buffer is created")
@@ -41,8 +61,19 @@
 (defvar edit-server-clients '() 
   "List of all client processes associated with the server process.")
 
-(defconst edit-server-buffer-name " *edit-server*"
-  "Template name of the edit-server process buffers")
+(defvar edit-server-phase nil 
+  "Symbol indicating the state of the HTTP request parsing.")
+
+(defvar edit-server-received nil 
+  "Number of bytes received so far in the client buffer. 
+Depending on the character encoding, may be different from the buffer length.")
+
+(defvar edit-server-request nil 
+  "The HTTP request (GET, HEAD, POST) received.")
+
+(defvar edit-server-content-length nil 
+  "The value gotten from the HTTP `Content-Length' header.")
+
 
 ;; Mode magic
 ;
@@ -52,40 +83,46 @@
 ; define a special (derived) mode for handling editing of text areas.
 ;
 
-(defvar edit-server-text-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-x #") 'edit-server-done)
-    ;; XXX: should rather invoke 'edit-server-abort when the buffer is deleted,
-    ;; and send the original content back to the HTTP client
-    (define-key map (kbd "C-x k") 'edit-server-abort)
-    (define-key map (kbd "C-x C-s") 'edit-server-done)
-  map)
-"Keymap for `edit-server-text-mode'.")
-
-;; XXX: make it a minor mode? server-mode is minor
 (define-derived-mode edit-server-text-mode text-mode "Edit Server Text Mode"
   "A derived version of text-mode with a few common Emacs keystrokes
 rebound to more functions that can deal with the response to the
-edit-server request")
+edit-server request.
+
+Any of the following keys will close the buffer and send the text
+to the HTTP client: C-x #, C-x C-s, C-c C-c.
+
+If any of the above isused with a prefix argument, the
+unmodified text is sent back instead.
+"
+  :group 'edit-server)
+(define-key edit-server-text-mode-map (kbd "C-x #") 'edit-server-done)
+(define-key edit-server-text-mode-map (kbd "C-x C-s") 'edit-server-done)
+(define-key edit-server-text-mode-map (kbd "C-c C-c") 'edit-server-done)
+
 
 ;; Edit Server socket code
 ;
 
-(defun edit-server-start nil
-  "Start the edit server"
-  (interactive)
+(defun edit-server-start (&optional verbose) 
+  "Start the edit server.
+
+If argument VERBOSE is non-nil, logs all server activity to buffer `*edit-server-log*'.
+When called interactivity, a prefix argument will cause it to be verbose.
+"
+  (interactive "P")
   (if (process-status "edit-server")
       (message "An edit-server process is already running")
     (make-network-process
      :name "edit-server"
-     :buffer edit-server-buffer-name
+     :buffer edit-server-process-buffer-name
      :family 'ipv4
      :host 'local ; only listen to local connections
      :service edit-server-port
      :log 'edit-server-accept
      :server 't)
     (setq edit-server-clients '())
-    (message "Created a new edit-server process")))
+    (if verbose (get-buffer-create edit-server-log-buffer-name))
+    (edit-server-log nil "Created a new edit-server process")))
 
 (defun edit-server-stop nil
   "Stop the edit server"
@@ -96,23 +133,31 @@ edit-server request")
   (if (process-status "edit-server")
       (delete-process "edit-server")
     (message "No edit server running"))
-  (if (get-buffer edit-server-buffer-name)
-      (kill-buffer edit-server-buffer-name)))
+  (if (get-buffer edit-server-process-buffer-name)
+      (kill-buffer edit-server-process-buffer-name)))
 
-; Write log entries
-(defun edit-server-log (string &optional client)
-  "If a `*edit-server-log*' buffer exists, write STRING to it for logging purposes."
-  (if (get-buffer " *edit-server-log*")
-      (with-current-buffer " *edit-server-log*"
-        (goto-char (point-max))
-        (insert (current-time-string)
-                (if client (format " %s:" client) " ")
-                string)
-        (or (bolp) (newline)))))
+(defun edit-server-log (proc fmt &rest args)
+  "If a `*edit-server-log*' buffer exists, write STRING to it for logging purposes.
+If `edit-server-verbose' is non-nil, then STRING is also echoed to the message line."
+  (let ((string (apply 'format fmt args)))
+    (if edit-server-verbose
+        (message string))
+    (if (get-buffer edit-server-log-buffer-name)
+        (with-current-buffer edit-server-log-buffer-name
+          (goto-char (point-max))
+          (insert (current-time-string) 
+                  " " 
+                  (if (processp proc)
+                      (concat 
+                       (buffer-name (process-buffer proc))
+                       ": ")
+                    "") ; nil is not acceptable to 'insert
+                  string)
+          (or (bolp) (newline))))))
 
 (defun edit-server-accept (server client msg)
   "Accept a new client connection."
-  (let ((buffer (generate-new-buffer edit-server-buffer-name)))
+  (let ((buffer (generate-new-buffer edit-server-process-buffer-name)))
     (buffer-disable-undo buffer)
     (set-process-buffer client buffer)
     (set-process-filter client 'edit-server-filter)
@@ -122,7 +167,8 @@ edit-server request")
       (set (make-local-variable 'edit-server-received) 0)
       (set (make-local-variable 'edit-server-request) nil))
       (set (make-local-variable 'edit-server-content-length) nil))
-    (add-to-list 'edit-server-clients client))
+    (add-to-list 'edit-server-clients client)
+    (edit-server-log client msg))
 
 (defun edit-server-filter (proc string)
   "Process data received from the client."
@@ -139,8 +185,9 @@ edit-server request")
       (save-excursion
         (goto-char (point-min))
         (when (re-search-forward "^\\([A-Z]+\\)\\s-+\\(\\S-+\\)\\s-+\\(HTTP/[0-9\.]+\\)\r?\n" nil t)
-          (message "edit-server: Got HTTP `%s' request, processing in buffer `%s'..." 
-                   (match-string 1) (current-buffer))
+          (edit-server-log proc 
+                           "Got HTTP `%s' request, processing in buffer `%s'..." 
+                           (match-string 1) (current-buffer))
           (setq edit-server-request (match-string 1))
           (setq edit-server-content-length nil)
           (setq edit-server-phase 'head))))
@@ -166,8 +213,9 @@ edit-server request")
     (when (eq edit-server-phase 'body)
       (if (and edit-server-content-length
                (> edit-server-content-length edit-server-received))
-          (message "edit-server: Received %d bytes of %d ..." 
-                   edit-server-received edit-server-content-length)
+          (edit-server-log proc 
+                           "Received %d bytes of %d ..." 
+                           edit-server-received edit-server-content-length)
         ;; all content trasnferred - process request now
         (cond
          ((string= edit-server-request "POST")
@@ -183,10 +231,11 @@ edit-server request")
 (defun edit-server-create-edit-buffer(proc)
   "Create an edit buffer, place content in it and save the network
   process for the final call back"
-  (let ((buffer (generate-new-buffer "TEXTAREA")))
+  (let ((buffer (generate-new-buffer edit-server-edit-buffer-name)))
     (copy-to-buffer buffer (point-min) (point-max))
     (with-current-buffer buffer
       (edit-server-text-mode)
+      (add-hook 'kill-buffer-hook 'edit-server-abort* nil t)
       (buffer-enable-undo)
       (set (make-local-variable 'edit-server-proc) proc)
       (set (make-local-variable 'edit-server-frame) 
@@ -195,14 +244,17 @@ edit-server request")
           (raise-frame edit-server-frame)
         (pop-to-buffer buffer)))))
 
-(defun edit-server-send-response (proc &optional string close)
+(defun edit-server-send-response (proc &optional body close)
   "Send an HTTP 200 OK response back to process PROC.
-Optional second argument STRING specifies the response content.
+Optional second argument BODY specifies the response content:
+  - If nil, the HTTP response will have null content.
+  - If a string, the string is sent as response content.
+  - Any other value will cause the contents of the current 
+    buffer to be sent.
 If optional third argument CLOSE is non-nil, then process PROC
 and its buffer are killed with `edit-server-kill-client'."
   (interactive)
-  (message "edit-server-send-response")
-  (if proc
+  (if (processp proc)
       (let ((response-header (concat
                           "HTTP/1.0 200 OK\n"
                           "Server: Emacs\n"
@@ -212,12 +264,15 @@ and its buffer are killed with `edit-server-kill-client'."
                            (current-time)))))
         (process-send-string proc response-header)
         (process-send-string proc "\n")
-        (if string
-            (process-send-string proc string))
+        (cond
+         ((stringp body) (process-send-string proc body))
+         ((not body) nil)
+         (t (process-send-region proc (point-min) (point-max))))
         (process-send-eof proc)
         (if close 
-            (edit-server-kill-client proc)))
-    (message "edit-server-send-response: null proc (bug?)")))
+            (edit-server-kill-client proc))
+        (edit-server-log proc "Editing done, sent HTTP OK response."))
+    (message "edit-server-send-response: invalid proc (bug?)")))
 
 (defun edit-server-kill-client (proc)
   "Kill client process PROC and remove it from the list."
@@ -226,30 +281,45 @@ and its buffer are killed with `edit-server-kill-client'."
     (kill-buffer procbuf)
     (setq edit-server-clients (delq procbuf edit-server-clients))))
 
-(defun edit-server-done ()
-  "Once someone is done with editing their text edit-server-done is
-  called and the response is sent back to the browser"
-  (interactive)
+(defun edit-server-done (&optional abort nokill)
+  "Finish editing: send HTTP response back, close client and editing buffers.
+
+The current contents of the buffer are sent back to the HTTP
+client, unless argument ABORT is non-nil, in which case then the
+original text is sent back.
+If optional second argument NOKILL is non-nil, then the editing
+buffer is not killed.
+
+When called interactively, use prefix arg to abort editing."
+  (interactive "P")
   (let ((buffer (current-buffer))
         (proc edit-server-proc)
         (procbuf (process-buffer edit-server-proc)))
     ;; edit-server-* vars are buffer-local, so they must be used before issuing kill-buffer
-    (edit-server-send-response edit-server-proc (buffer-string))
+    (if abort
+        ;; send back original content
+        (with-current-buffer procbuf
+          (run-hooks 'edit-server-done-hook)
+          (edit-server-send-response proc t))
+      ;; send back edited content
+      (run-hooks 'edit-server-done-hook)
+      (edit-server-send-response edit-server-proc t))
     (if edit-server-frame (delete-frame edit-server-frame))
     ;; delete-frame may change the current buffer
-    (kill-buffer buffer)
+    (unless nokill (kill-buffer buffer))
     (edit-server-kill-client proc)))
 
 (defun edit-server-abort ()
-  "Send the original text back to the browser."
+  "Discard editing and send the original text back to the browser."
   (interactive)
-  (let ((buffer (current-buffer))
-        (proc edit-server-proc)
-        (procbuf (process-buffer edit-server-proc)))
-    ;; edit-server-* vars are buffer-local, so they must be used before issuing kill-buffer
-    (with-current-buffer procbuf
-      (edit-server-send-response proc (buffer-string)))
-    (if edit-server-frame (delete-frame edit-server-frame))
-    ;; delete-frame may change the current buffer
-    (kill-buffer buffer)
-    (edit-server-kill-client proc)))
+  (edit-server-done t))
+
+(defun edit-server-abort* ()
+  "Discard editing and send the original text back to the browser,
+but don't kill the editing buffer."
+  (interactive)
+  (edit-server-done t t))
+
+(provide 'edit-server)
+
+;;; edit-server.el ends here
