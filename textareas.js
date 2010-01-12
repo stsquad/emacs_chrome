@@ -183,6 +183,7 @@ function findTextAreas() {
     }
 
     console.log("findTextAreas: page_edit_id now "+page_edit_id);
+    return true;
 }
 
 /*
@@ -190,6 +191,12 @@ function findTextAreas() {
  XHR events made by the page which may load additional elements
 */
 
-// Called when content script loaded
+/* called when content script loaded */
 findTextAreas();
 console.log("textareas.js loaded: "+document.readyState);
+
+/* called upon further document mods */
+document.addEventListener("DOMNodeInserted", (function () {
+    findTextAreas();
+    return true;
+}), false);
