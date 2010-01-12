@@ -12,8 +12,6 @@ var editImgURL = chrome.extension.getURL("gumdrop.png");
 var port = chrome.extension.connect();
 var page_edit_id = 0;
 
-console.log("textareas.js: port is "+JSON.stringify(port));
-
 /*
   tagTextArea
 
@@ -24,13 +22,10 @@ console.log("textareas.js: port is "+JSON.stringify(port));
 */
 function tagTextArea(text)
 {
-    console.log("tagTextArea:"+text);
-
     // We don't want to tag all text boxen, especially if they are hidden
     var display = text.style.getPropertyCSSValue('display');
     if (display && display.cssText=="none")
     {
-	console.log("  invisible text box");
 	return;
     }
 
@@ -38,7 +33,6 @@ function tagTextArea(text)
     var existing_id = text.getAttribute("edit_id");
     if (existing_id)
     {
-	console.log("  skipping tagged textarea:" +existing_id);
 	return;
     }
 
@@ -89,9 +83,7 @@ function updateTextArea(id, content) {
 
 	 if (focusedEdit) {
 	     text = focusedEdit;
-	 } else {
-	     console.log("  findActiveTextArea: focusedEdit not set");
-	 }
+	 } 
 	     
 	 tagTextArea(text);
 
@@ -102,8 +94,6 @@ function updateTextArea(id, content) {
 	     text: text.value,
 	     id: text_edit_id
 	 };
-
-	 console.log("  findActiveTextArea:"+JSON.stringify(edit_msg));
 	 port.postMessage(edit_msg);
      };
 
@@ -114,8 +104,6 @@ function updateTextArea(id, content) {
 
 /* Message handling multiplexer */
 function textareas_message_handler(msg, port) {
-    console.log("textareas_message_handler: "+JSON.stringify(msg));
-
     // What was the bidding?
     var cmd = msg.msg;
     if (cmd == "find_edit") {
@@ -148,7 +136,6 @@ chrome.extension.onConnect.addListener(function(iport) {
 function editTextArea(event) {
     var img = event.currentTarget;
     var edit_id = img.getAttribute("edit_id");
-    console.log("editTextArea:"+edit_id);
 
     var texts = document.getElementsByTagName('textarea');
 
@@ -165,16 +152,12 @@ function editTextArea(event) {
 		id: edit_id
 	    };
 	    
-	    console.log("  edit_msg:"+JSON.stringify(edit_msg));
 	    port.postMessage(edit_msg);
 	}
     }
 }
 
 function findTextAreas() {
-
-    console.log("findTextAreas() running");
-	   
     var texts = document.getElementsByTagName('textarea');
 
     for (var i=0; i<texts.length; i++) {
@@ -182,7 +165,6 @@ function findTextAreas() {
 	tagTextArea(text);
     }
 
-    console.log("findTextAreas: page_edit_id now "+page_edit_id);
     return true;
 }
 
@@ -193,7 +175,6 @@ function findTextAreas() {
 
 /* called when content script loaded */
 findTextAreas();
-console.log("textareas.js loaded: "+document.readyState);
 
 /* called upon further document mods */
 document.addEventListener("DOMNodeInserted", (function () {
