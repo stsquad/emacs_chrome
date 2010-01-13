@@ -3,6 +3,8 @@
  *
  * This handles making XMLHttp calls to the remote end
  *
+ * This file is part of emacs_chrome (http://github.com/stsquad/emacs_chrome)
+ * and licensed under the GPLv3. See the COPYING file for details
  */
 
 // This is the edit server address
