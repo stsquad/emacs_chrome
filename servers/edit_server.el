@@ -239,7 +239,8 @@ If `edit-server-verbose' is non-nil, then STRING is also echoed to the message l
       (buffer-enable-undo)
       (set (make-local-variable 'edit-server-proc) proc)
       (set (make-local-variable 'edit-server-frame) 
-           (if edit-server-new-frame (make-frame) nil))
+           (if edit-server-new-frame
+	       (make-frame-on-display (getenv "DISPLAY")) nil))
       (if edit-server-new-frame
           (raise-frame edit-server-frame)
         (pop-to-buffer buffer)))))
