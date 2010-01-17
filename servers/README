@@ -5,8 +5,40 @@ Because the Chrome(ium) security model doesn't allow for extensions
 spawning processes we can't just exec() the editor process. Instead we
 have to implement an "edit server" which listens to XmlHttp requests
 on port 9292 (default) and then sends a response when the edit is
-complete. A number are included here:
+complete. We include a couple here:
 
-* pycl.py - Original version, works
-* edit_server.el - An Emacs Lisp implementation, under development (patches welcome)
+* pycl.py - Original version, only edit one file at a time
+* edit_server.el - An native Emacs Lisp implementation
 
+There is another project called TextAid which does a similar thing to
+Edit with Emacs. It's edit server is implemented in perl and be found
+at:
+
+* http://opencoder.net/edit-server
+
+As the edit server concept is fairly simple we will try and keep them
+compatible with each other.
+
+How it works
+============
+
+The browser sends a request to the edit server of the form:
+
+http://${HOSTNAME}:${HOSTPORT}/${CMD}/${ID}&url=${URL}
+
+HOSTNAME is usually localhost, i.e. 127.0.0.1
+HOSTPORT is the server port, in our case defaults to 9292
+CMD is the command to the edit server, currently only "edit" is used
+ID is the id of the text area that is being edited (e.g. "eta_1")
+URL is the (optional) URL of the page the text area is on
+
+After the headers the data is the current contents of the text area
+
+Once the edit is complete the server sends an HTTP 200 (OK) response
+with the data containing the new text area text. Any other response
+will result in the text area not being updated.
+
+The optional URL allows the edit server to create more identifiable
+names for the buffers/temp files to help the user keep track. We may
+expand the information passed in future as additional HTTP GET style
+parameters.
