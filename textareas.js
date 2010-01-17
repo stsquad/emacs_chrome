@@ -75,28 +75,33 @@ function updateTextArea(id, content) {
 }
 
 /*
-  Find the current active text area and spawn an edit for it
+  sendTextArea
+
+  Send the text area to the main part of the extension to be passed
+  on to the external editor. Eventually 
+*/
+
+function sendTextArea(text) {
+    var text_edit_id = text.getAttribute("edit_id");
+    // And spawn the request
+    var edit_msg = {
+	msg: "edit",
+	text: text.value,
+	id: text_edit_id
+    };
+    port.postMessage(edit_msg);
+}
+
+/*
+  Handle focused text area
 */
 (function(){
      var focusedEdit = null;
 
      findActiveTextArea = function() {
-	 var text;
-
 	 if (focusedEdit) {
-	     text = focusedEdit;
+	     sendTextArea(focusedEdit);
 	 } 
-	     
-	 tagTextArea(text);
-
-	 // And spawn the request
-	 var text_edit_id = text.getAttribute("edit_id");
-	 var edit_msg = {
-	     msg: "edit",
-	     text: text.value,
-	     id: text_edit_id
-	 };
-	 port.postMessage(edit_msg);
      };
 
      setFocused = function(){
@@ -143,18 +148,11 @@ function editTextArea(event) {
 
     for (var i=0; i<texts.length; i++) {
 	var text = texts[i];
-
 	var text_edit_id = text.getAttribute("edit_id");
 
 	if (text_edit_id == edit_id)
 	{
-	    var edit_msg = {
-		msg: "edit",
-		text: text.value,
-		id: edit_id
-	    };
-	    
-	    port.postMessage(edit_msg);
+	    sendTextArea(text);
 	}
     }
 }
@@ -171,8 +169,9 @@ function findTextAreas() {
 }
 
 /*
- We want to search for text areas when the page is first loaded as well as after any additional
- XHR events made by the page which may load additional elements
+ We want to search for text areas when the page is first loaded as well
+ as after any additional XHR events made by the page which may load
+ additional elements (such as Gmail).
 */
 
 /* called when content script loaded */
