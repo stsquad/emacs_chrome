@@ -252,6 +252,7 @@ If `edit-server-verbose' is non-nil, then STRING is also echoed to the message l
   (let ((buffer (generate-new-buffer edit-server-edit-buffer-name)))
     (copy-to-buffer buffer (point-min) (point-max))
     (with-current-buffer buffer
+      (not-modified)
       (edit-server-text-mode)
       (add-hook 'kill-buffer-hook 'edit-server-abort* nil t)
       (buffer-enable-undo)
