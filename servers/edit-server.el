@@ -8,6 +8,14 @@
 ;; http://www.emacswiki.org/emacs/EmacsEchoServer
 ;; http://nullprogram.com/blog/2009/05/17/
 ;;
+;; To use it ensure the file is in your load-path and add something
+;; like:
+;;
+;; (if (and (daemonp) (locate-library "edit-server"))
+;;     (progn
+;;       (require 'edit-server)
+;;       (edit-server-start)))
+;;
 ;; (C) 2009 Alex Bennee (alex@bennee.com)
 ;; (C) 2010 Riccardo Murri (riccardo.murri@gmail.com)
 ;;
@@ -49,6 +57,15 @@ Current buffer holds the text that is about to be sent back to the client."
 
 (defconst edit-server-edit-buffer-name "TEXTAREA"
   "Template name of the edit-server text editing buffers.")
+
+(defconst edit-server-new-frame-title "Emacs TEXTAREA"
+  "Template name of the emacs frame's title.")
+
+(defconst edit-server-new-frame-width 80
+  "The emacs frame's width.")
+
+(defconst edit-server-new-frame-height 25
+  "The emacs frame's height.")
 
 (defvar edit-server-proc 'nil
   "Network process associated with the current edit, made local when
@@ -98,6 +115,7 @@ unmodified text is sent back instead.
 (define-key edit-server-text-mode-map (kbd "C-x #") 'edit-server-done)
 (define-key edit-server-text-mode-map (kbd "C-x C-s") 'edit-server-done)
 (define-key edit-server-text-mode-map (kbd "C-c C-c") 'edit-server-done)
+(define-key edit-server-text-mode-map (kbd "C-x C-c") 'edit-server-abort)
 
 
 ;; Edit Server socket code
@@ -216,7 +234,7 @@ If `edit-server-verbose' is non-nil, then STRING is also echoed to the message l
           (edit-server-log proc 
                            "Received %d bytes of %d ..." 
                            edit-server-received edit-server-content-length)
-        ;; all content trasnferred - process request now
+        ;; all content transferred - process request now
         (cond
          ((string= edit-server-request "POST")
           ;; create editing buffer, and move content to it
@@ -234,13 +252,16 @@ If `edit-server-verbose' is non-nil, then STRING is also echoed to the message l
   (let ((buffer (generate-new-buffer edit-server-edit-buffer-name)))
     (copy-to-buffer buffer (point-min) (point-max))
     (with-current-buffer buffer
+      (not-modified)
       (edit-server-text-mode)
       (add-hook 'kill-buffer-hook 'edit-server-abort* nil t)
       (buffer-enable-undo)
       (set (make-local-variable 'edit-server-proc) proc)
       (set (make-local-variable 'edit-server-frame) 
            (if edit-server-new-frame
-	       (make-frame-on-display (getenv "DISPLAY")) nil))
+               (make-frame-on-display (getenv "DISPLAY")
+                 `((name . ,edit-server-new-frame-title) (width . ,edit-server-new-frame-width) (height . ,edit-server-new-frame-height)))
+             nil))
       (if edit-server-new-frame
           (raise-frame edit-server-frame)
         (pop-to-buffer buffer)))))

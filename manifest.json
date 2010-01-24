@@ -10,6 +10,11 @@
     "tabs",
     "http://127.0.0.1/edit/*"
   ],
+  "icons":
+  {
+    "128" : "emacs.png"
+  },
+  "options_page" : "options.html",
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*", "file://*/*"],

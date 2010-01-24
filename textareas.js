@@ -42,6 +42,7 @@ function tagTextArea(text)
     var edit_id = "eta_"+page_edit_id;
     text.setAttribute("edit_id", edit_id);
     text.addEventListener('focus', setFocused);
+    text.addEventListener('dblclick', function(){sendTextArea(this);});
 
     // Add a clickable edit img to trigger edit events
     var image = document.createElement('img');
@@ -49,6 +50,7 @@ function tagTextArea(text)
     image.src = editImgURL;
     text.parentNode.insertBefore(image, text.nextSibling);
     image.addEventListener('click', editTextArea, false);
+    image.addEventListener('mouseover', function(){this.style.cursor='pointer';});
 
     // Inc
     page_edit_id = page_edit_id + 1;
