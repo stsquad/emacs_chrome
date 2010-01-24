@@ -4,11 +4,13 @@ Extension
 
 * Added proper Emacs icon for extension
 * Added options page with instructions and option to change port
+* Allow a simple status test to be run in the options page
 * Change mouse cursor when hovering over edit button
 * Double click on a text area invokes the editor
 
 edit-server.el
 
+* edit-server.el now distributed in-situ with the extension
 * Renamed edit_server to edit-server to follow conventions
 * Stopped C-x C-c from shutting down session (leaving stale TEXTAREA)
 * Added default size and name to new frames
