@@ -42,3 +42,12 @@ The optional URL allows the edit server to create more identifiable
 names for the buffers/temp files to help the user keep track. We may
 expand the information passed in future as additional HTTP GET style
 parameters.
+
+Customizing the look of Emacs
+============
+
+By default, Emacs opens up a new frame upon an edit request. All the
+UI elements are removed to better mimic a bare text box. You can
+customize the default behavior by `M-x customize-group [RET]
+edit-server [RET]`. Or you can set the variables' values directly in
+your ~/.emacs.

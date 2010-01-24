@@ -48,6 +48,21 @@ Current buffer holds the text that is about to be sent back to the client."
   :group 'edit-server
   :type 'hook)
 
+(defcustom edit-server-new-frame-minibuffer nil
+  "Show the emacs frame's minibuffer if set to t; hide if nil."
+  :group 'edit-server
+  :type 'boolean)
+
+(defcustom edit-server-new-frame-menu-bar 0
+  "Show the emacs frame's menu-bar if set to 1; hide if 0."
+  :group 'edit-server
+  :type 'integer)
+
+(defcustom edit-server-new-frame-no-mode-line t
+  "Hide the emacs frame's mode-line."
+  :group 'edit-server
+  :type 'integer)
+
 ;; Vars
 (defconst edit-server-process-buffer-name " *edit-server*"
   "Template name of the edit-server process buffers.")
@@ -260,10 +275,17 @@ If `edit-server-verbose' is non-nil, then STRING is also echoed to the message l
       (set (make-local-variable 'edit-server-frame) 
            (if edit-server-new-frame
                (make-frame-on-display (getenv "DISPLAY")
-                 `((name . ,edit-server-new-frame-title) (width . ,edit-server-new-frame-width) (height . ,edit-server-new-frame-height)))
+                 `((name . ,edit-server-new-frame-title)
+                   (width . ,edit-server-new-frame-width)
+                   (height . ,edit-server-new-frame-height)
+                   (minibuffer . ,edit-server-new-frame-minibuffer)
+                   (menu-bar-lines . ,edit-server-new-frame-menu-bar)))
              nil))
       (if edit-server-new-frame
-          (raise-frame edit-server-frame)
+        (progn
+          (if edit-server-new-frame-no-mode-line
+            (setq mode-line-format nil))
+          (raise-frame edit-server-frame))
         (pop-to-buffer buffer)))))
 
 (defun edit-server-send-response (proc &optional body close)
