@@ -103,12 +103,47 @@ function handleContentMessages(msg, tab_port)
     xhr.send(text);
 }
 
-function contentTalking(port)
+// Handle and edit request coming from the content page script
+//
+// Package up the text to be edited and send it to the edit server
+function handleTestMessages(msg, tab_port)
+{
+    var url = getEditUrl() + "status";
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.onreadystatechange = function() {
+	console.log("State change:"+ xhr.readyState + " status:"+xhr.status);
+	// readyState 4=HTTP response complete
+	if(xhr.readyState == 4) {
+	    if (xhr.status == 200) {
+		tab_port.postMessage({msg: "test_result", text: xhr.responseText});
+	    } else if (xhr.status == 0) {
+		tab_port.postMessage({msg: "test_result", text: "Edit Server Test failed: is it running?"});
+	    } else {
+		tab_port.postMessage({msg: "test_result", text: "Un-handled response: "+xhr.status}); 
+	    }
+	}
+    }
+    xhr.send();
+}
+
+/*
+  Handle all in-coming messages to the extension.
+
+  As other parts of the extension cannot trigger XHR requests they all
+  send message to the main part of the extension to service these requests.
+*/
+ 
+function localMessageHandler(port)
 {
     port.onMessage.addListener(function(msg, port) {
-	handleContentMessages(msg,port);
+        if (msg.msg == "edit") {
+	    handleContentMessages(msg, port);
+	} else if (msg.msg == "test") {
+	    handleTestMessages(msg, port);
+	}
     });
 }
 
 // Hook up whenever someone connects to the extension comms port
-chrome.extension.onConnect.addListener(contentTalking);
+chrome.extension.onConnect.addListener(localMessageHandler);

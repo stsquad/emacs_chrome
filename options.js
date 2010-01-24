@@ -31,3 +31,25 @@ function restore_options() {
   port_box.value = port;
 }
 
+/* Message handling multiplexer */
+function localMessageHandler(msg, port) {
+    // What was the bidding?
+    var cmd = msg.msg;
+    if (cmd == "test_result") {
+	var status = document.getElementById("server_status");
+	status.innerHTML = msg.text;
+    } else {
+	console.log("localMessageHandler: un-handled message:"+cmd);
+    }
+}
+
+// Test for the presence of an Edit Server
+function test_server() {
+    var port = chrome.extension.connect();
+    var status = document.getElementById("server_status");
+    status.innerHTML = "testing...";
+    port.onMessage.addListener(localMessageHandler);
+    port.postMessage({msg: "test"});
+}
+
+

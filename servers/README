@@ -24,21 +24,32 @@ How it works
 
 The browser sends a request to the edit server of the form:
 
-http://${HOSTNAME}:${HOSTPORT}/${CMD}/${ID}&url=${URL}
+http://${HOSTNAME}:${HOSTPORT}/${CMD}
 
 HOSTNAME is usually localhost, i.e. 127.0.0.1
 HOSTPORT is the server port, in our case defaults to 9292
-CMD is the command to the edit server, currently only "edit" is used
-ID is the id of the text area that is being edited (e.g. "eta_1")
-URL is the (optional) URL of the page the text area is on
+CMD is the command to the edit server, it may be one of the following:
 
-After the headers the data is the current contents of the text area
+* edit
+
+Optional parameters: ?id=${ID}&url=${URL}
+
+The edit command is sent as an HTTP POST request. After the headers
+the data is the current contents of the text area.
 
 Once the edit is complete the server sends an HTTP 200 (OK) response
 with the data containing the new text area text. Any other response
 will result in the text area not being updated.
 
 The optional URL allows the edit server to create more identifiable
-names for the buffers/temp files to help the user keep track. We may
-expand the information passed in future as additional HTTP GET style
-parameters.
+names for the buffers/temp files to help the user keep track.
+
+* status
+
+The status command is sent as an HTTP GET request. The intention is to
+use it as a simple test for the status of Edit Server and to be used
+as a "Are you there?" test.
+
+The response is basically a text string describing the state of the
+edit server.
+
