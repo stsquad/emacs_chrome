@@ -112,7 +112,7 @@ function sendTextArea(text) {
  })();
 
 /* Message handling multiplexer */
-function textareas_message_handler(msg, port) {
+function localMessageHandler(msg, port) {
     // What was the bidding?
     var cmd = msg.msg;
     if (cmd == "find_edit") {
@@ -122,16 +122,16 @@ function textareas_message_handler(msg, port) {
 	var content = msg.text;
 	updateTextArea(id, content);
     } else {
-	console.log("textareas_message_handler: un-handled message:"+cmd);
+	console.log("localMessageHandler: un-handled message:"+cmd);
     }
 }
 
 // Hook up the incoming message handler for both return messages
 // as well as direct messages from main extension.
 
-port.onMessage.addListener(textareas_message_handler);
+port.onMessage.addListener(localMessageHandler);
 chrome.extension.onConnect.addListener(function(iport) {
-	iport.onMessage.addListener(textareas_message_handler);
+	iport.onMessage.addListener(localMessageHandler);
     });
 
 /*
