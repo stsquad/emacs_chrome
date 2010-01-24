@@ -8,6 +8,14 @@
 ;; http://www.emacswiki.org/emacs/EmacsEchoServer
 ;; http://nullprogram.com/blog/2009/05/17/
 ;;
+;; To use it ensure the file is in your load-path and add something
+;; like:
+;;
+;; (if (and (daemonp) (locate-library "edit-server"))
+;;     (progn
+;;       (require 'edit-server)
+;;       (edit-server-start)))
+;;
 ;; (C) 2009 Alex Bennee (alex@bennee.com)
 ;; (C) 2010 Riccardo Murri (riccardo.murri@gmail.com)
 ;;
