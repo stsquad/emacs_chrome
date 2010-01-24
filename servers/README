@@ -19,6 +19,16 @@ at:
 As the edit server concept is fairly simple we will try and keep them
 compatible with each other.
 
+Customizing the look of Emacs
+=============================
+
+By default, Emacs opens up a new frame upon an edit request. All the
+UI elements are removed to better mimic a bare text box. You can
+customize the default behavior by `M-x customize-group [RET]
+edit-server [RET]`. Or you can set the variables' values directly in
+your ~/.emacs.
+
+
 How it works
 ============
 
