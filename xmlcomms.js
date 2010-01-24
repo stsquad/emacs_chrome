@@ -1,14 +1,25 @@
 /*
  * xmlcomms.js
  *
- * This handles making XMLHttp calls to the remote end
+ * This handles making XMLHttp calls to the "Edit Server"
+ *
+ * As no other parts of the extension can make xhr requests this
+ * is essentially the gatekeeper to all contact with the Edit
+ * Server.
  *
  * This file is part of emacs_chrome (http://github.com/stsquad/emacs_chrome)
  * and licensed under the GPLv3. See the COPYING file for details
  */
 
-// This is the edit server address
-var urlPrefix = "http://127.0.0.1:";
+// Get the base URL from which we make all requests to the server..
+function getEditUrl()
+{
+    var port = localStorage["edit_server_port"];
+    if (!port) {
+	port = 9292;
+    }
+    return "http://127.0.0.1:" +  port + "/";
+}
 
 /*
  * Give some feedback to the user via the icon/hover text.
@@ -54,13 +65,7 @@ function handleContentMessages(msg, tab_port)
     var text = msg.text;
 
     var xhr = new XMLHttpRequest();
-    var server_port = localStorage["edit_server_port"];
-    if (!server_port) {
-	server_port = 9292;
-    }
-
-    var url = urlPrefix + server_port + "/" + cmd + "/";
-    url = url + id;
+    var url = getEditUrl() + cmd + "/" + id;
 
     console.log(" page URL:"+tab_port.tab.url);
     console.log(" tab_port:"+tab_port.portId_);
