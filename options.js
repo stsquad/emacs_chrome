@@ -1,3 +1,11 @@
+/*
+ * options.js
+ *
+ * This is the JavaScript for the extension options page
+ *
+ * This file is part of emacs_chrome (http://github.com/stsquad/emacs_chrome)
+ * and licensed under the GPLv3. See the COPYING file for details
+ */
 
 // Saves options to localStorage.
 function save_options() {
