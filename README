@@ -3,12 +3,16 @@ About
 
 Emacs Chrome is an extension for Google's Chrome(ium) browser family
 that allows you to edit text areas on your browser in a more full
-featured editor. It does this by sending an XMLHttp request to an edit
-server (see servers/ directory) which spawns and edit process which
-eventually sends the updated text back to the browser.
+featured editor. It does this in conjunction with an "Edit Server"
+which services requests by the browser. This is because extensions
+cannot spawn new processes as a security measure.
 
-I use it to edit pages using Emacs although there is no reason why
-other editors could not be spawned from the various scripts.
+Example edit servers can be found at the project homepage including a
+native elisp version that can be run inside Emacs itself. There is no
+reason why other server scripts could not spawn other editors.
+
+This extension is licensed under the GPL v3 and development versions
+can be found at: http://github.com/stsquad/emacs_chrome
 
 History
 =======
@@ -28,16 +32,4 @@ David Hilley
 Alex Bennee
 Riccardo Murri
 Niels Giesen
-
-License
-=======
-
-The extension is licensed under the GPL Version 3.
-
-Homepage/Development
-====================
-
-In the spirit of FLOSS software patches are always welcome.
-Development of this extension is hosted on github at:
-
-http://github.com/stsquad/emacs_chrome
+Wei Hu
