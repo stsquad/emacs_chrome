@@ -8,7 +8,7 @@
  */
 
 // This is the edit server address
-var urlPrefix = "http://127.0.0.1:9292/";
+var urlPrefix = "http://127.0.0.1:";
 
 /*
  * Give some feedback to the user via the icon/hover text.
@@ -54,7 +54,12 @@ function handleContentMessages(msg, tab_port)
     var text = msg.text;
 
     var xhr = new XMLHttpRequest();
-    var url = urlPrefix + cmd + "/";
+    var server_port = localStorage["edit_server_port"];
+    if (!server_port) {
+	server_port = 9292;
+    }
+
+    var url = urlPrefix + server_port + "/" + cmd + "/";
     url = url + id;
 
     console.log(" page URL:"+tab_port.tab.url);

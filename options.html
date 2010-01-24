@@ -1,0 +1,32 @@
+<html>
+<head><title>Edit with Emacs</title></head>
+<script type="text/javascript" src="options.js"></script>
+<body onload="restore_options()">
+For Edit with Emacs to work you need to be running an "edit server" on
+your local machine. This is because extensions in Chrome(ium) cannot
+directly start new programs. There are several options available to
+you. For Emacs users it is recommended you use the native
+<em>edit-server.el</em> from the
+<a href="http://github.com/stsquad/emacs_chrome/tree/master/servers/">
+project site</a>. One popular way of starting it is for
+<em>emacs --daemon</em>
+invocations is to add the following code to your <em>.emacs</em>:
+<pre>
+ (if (and (daemonp) (locate-library "edit-server"))
+     (progn
+       (require 'edit-server)
+       (edit-server-start)))
+</pre>
+<p>
+Other options exist including an edit server written
+for <a href="https://chrome.google.com/extensions/detail/ppoadiihggafnhokfkpphojggcdigllp">TextAid</a>
+which can be found <a href="http://opencoder.net/edit-server">here</a>.
+<p>
+<hr>
+Edit Server @ 127.0.0.1:
+<input id="port" type="text" name="port"><em>(default is 9292)</em><br>
+<div id="status"></div>
+<button onclick="save_options()">Save</button>
+<hr>
+</body>
+</html>
