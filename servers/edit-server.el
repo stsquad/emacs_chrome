@@ -48,7 +48,7 @@ Current buffer holds the text that is about to be sent back to the client."
   :group 'edit-server
   :type 'hook)
 
-(defcustom edit-server-new-frame-minibuffer nil
+(defcustom edit-server-new-frame-minibuffer t
   "Show the emacs frame's minibuffer if set to t; hide if nil."
   :group 'edit-server
   :type 'boolean)
@@ -58,7 +58,7 @@ Current buffer holds the text that is about to be sent back to the client."
   :group 'edit-server
   :type 'integer)
 
-(defcustom edit-server-new-frame-no-mode-line t
+(defcustom edit-server-new-frame-no-mode-line nil
   "Hide the emacs frame's mode-line."
   :group 'edit-server
   :type 'integer)
