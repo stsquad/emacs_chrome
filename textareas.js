@@ -14,6 +14,7 @@ var editImgURL = chrome.extension.getURL("gumdrop.png");
 var port = chrome.extension.connect();
 var page_edit_id = 0;
 var pageTextAreas = [];
+var findingTextAreas = false;
 
 function updateEvent(thing, event, listener)
 {
@@ -209,14 +210,49 @@ function editTextArea(event) {
     }
 }
 
-function findTextAreas() {
-    var texts = document.getElementsByTagName('textarea');
+function findTextAreasInDocument(doc) {
+    var texts;
+    try {
+	texts = doc.getElementsByTagName('textarea');
+	for (var i=0; i<texts.length; i++) {
+	    tagTextArea(texts[i]);
+	}
+    } catch (err) {
+	// it seems some (I)FRAMES have undefined contentDocuments
+	console.log("findTextAreasInDocument: failed with "+err);
+    }
+}
 
-    for (var i=0; i<texts.length; i++) {
-	var text = texts[i];
-	tagTextArea(text);
+function findTextAreas() {
+
+    // Don't run through this if already finding stuff, lest we trigger events
+    if (findingTextAreas)
+	return;
+
+    findingTextAreas = true;
+
+    findTextAreasInDocument(document);
+
+    // IFRAMEs
+    var iframes = document.getElementsByTagName('iframe');
+    for (i = 0; i < iframes.length; i++) {
+	findTextAreasInDocument(iframes[i].contentDocument);
     }
 
+    // FRAMEs
+    var frames = document.getElementsByTagName('frame');
+    for (i = 0; i < frames.length; i++) {
+	findTextAreasInDocument(frames[i].contentDocument);
+    }
+
+    /* This may not be needed
+    // And finally lets update any events and ensure they have event listeners
+    for (var i=0; i<pageTextAreas.length; i++) {
+	pageTextAreas[i].updateEvents();
+    }
+    */
+
+    findingTextAreas = false;
     return true;
 }
 
