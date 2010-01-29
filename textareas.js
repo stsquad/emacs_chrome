@@ -13,7 +13,64 @@
 var editImgURL = chrome.extension.getURL("gumdrop.png");
 var port = chrome.extension.connect();
 var page_edit_id = 0;
+var pageTextAreas = [];
 
+function updateEvent(thing, event, listener)
+{
+    // First remove the event so we don't stack up multiple ones
+    try {
+	thing && thing.removeEventListener(event, listener);
+    } catch (err) {
+	console.log ("event listener not registered for "+thing + "/"+event);
+    }
+    
+    // And the update again
+    if (thing) {
+	thing.addEventListener(event, listener, false);
+    }
+}
+ 
+/*
+  textAreaTracker
+
+  This object wraps up all the information about a given text area on the page.
+  It allows us to update the listeners and query stuff from one central location.
+*/
+
+function textAreaTracker(text)
+{
+    this.edit_id = "eta_"+page_edit_id;
+    page_edit_id = page_edit_id + 1;
+    this.text = text;
+    this.text.setAttribute("edit_id", this.edit_id);
+
+    // The text areas event handlers we attach
+    this.focusListener = setFocused;
+    this.dblclickListener = function(){sendTextArea(this);};
+    this.text.addEventListener('focus',  this.focusListener);
+    this.text.addEventListener('dblclick', this.dblclickListener);
+    
+    // The img 
+    this.image = document.createElement('img');
+    this.image.style.cursor='pointer';
+    this.image.setAttribute("edit_id", this.edit_id);
+    this.image.src = editImgURL;
+
+    this.clickListener = editTextArea;
+    this.image.addEventListener('click', this.clickListener, false);
+
+    this.text.parentNode.insertBefore(this.image, text.nextSibling);
+
+    // The update function removes and re-adds events
+    this.updateEvents = function()
+    {
+	updateEvent(this.text, 'focus', this.focusListener);
+	updateEvent(this.text, 'dblclick', this.dblclickListener);
+	updateEvent(this.image, 'click', this.clickListener);
+    }
+}
+
+ 
 /*
   tagTextArea
 
@@ -31,29 +88,22 @@ function tagTextArea(text)
 	return;
     }
 
-    // Also skip textareas we have already tagged
     var existing_id = text.getAttribute("edit_id");
-    if (existing_id)
+    if (!existing_id)
     {
-	return;
+	// tag it
+	var tat = new textAreaTracker(text);
+	pageTextAreas.push(tat);
     }
-
-    // Set attribute of text box so we can find it
-    var edit_id = "eta_"+page_edit_id;
-    text.setAttribute("edit_id", edit_id);
-    text.addEventListener('focus', setFocused);
-    text.addEventListener('dblclick', function(){sendTextArea(this);});
-
-    // Add a clickable edit img to trigger edit events
-    var image = document.createElement('img');
-    image.setAttribute("edit_id", edit_id);
-    image.src = editImgURL;
-    text.parentNode.insertBefore(image, text.nextSibling);
-    image.addEventListener('click', editTextArea, false);
-    image.addEventListener('mouseover', function(){this.style.cursor='pointer';});
-
-    // Inc
-    page_edit_id = page_edit_id + 1;
+    else
+    {
+	// update it
+	for (var i=0; i<pageTextAreas.length; i++) {
+	    if (pageTextAreas[i].edit_id == existing_id) {
+		pageTextAreas[i].updateEvents();
+	    }
+	}
+    }
 }
   
 
