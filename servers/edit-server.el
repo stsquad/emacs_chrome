@@ -32,6 +32,12 @@
   :group 'edit-server
   :type 'integer)
 
+(defcustom edit-server-host nil
+  "If not nil, accept connections from HOST address rather than just
+localhost. This may present a security issue."
+  :group 'edit-server
+  :type 'boolean)
+
 (defcustom edit-server-new-frame t
   "If not nil, edit each buffer in a new frame (and raise it)."
   :group 'edit-server
@@ -149,7 +155,9 @@ When called interactivity, a prefix argument will cause it to be verbose.
      :name "edit-server"
      :buffer edit-server-process-buffer-name
      :family 'ipv4
-     :host 'local ; only listen to local connections
+     :host (if edit-server-host
+	       edit-server-host
+	     'local)
      :service edit-server-port
      :log 'edit-server-accept
      :server 't)
