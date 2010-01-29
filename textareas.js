@@ -112,6 +112,11 @@ function tagTextArea(text)
 	return;
     }
 
+    // If spellcheck is turned off, usually it's just for quick editing, e.g. To: fields in gmail
+    var spellcheck = text.getAttribute("spellcheck");
+    if (spellcheck && spellcheck == "false")
+	return;
+
     var existing_id = text.getAttribute("edit_id");
     if (!existing_id)
     {
