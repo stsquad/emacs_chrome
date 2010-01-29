@@ -95,13 +95,35 @@ function tagTextArea(text)
 	// tag it
 	var tat = new textAreaTracker(text);
 	pageTextAreas.push(tat);
-    }
-    else
-    {
-	// update it
+    } else {
+	// Even though this text has an edit_id it might not actually be the
+	// text we think it is. If the textAreaTracker.text doesn't match then
+	// we should tag this with something different
 	for (var i=0; i<pageTextAreas.length; i++) {
-	    if (pageTextAreas[i].edit_id == existing_id) {
-		pageTextAreas[i].updateEvents();
+	    var existing_area = pageTextAreas[i];
+	    if ( (existing_area.edit_id == existing_id) &&
+		 (existing_area.text != text ) )
+	    {
+		console.log("found a duplicate id!");
+		// OK, first things first, find any images that think
+		// they are associated with a text area and remove them
+		siblings = text.parentElement.childNodes;
+		console.log("has "+siblings.length+ " siblings");
+
+		for (var j=0; j<siblings.length; j++) {
+		    if (! (siblings[j].getAttribute == undefined) ) {
+			console.log("B doing sibling: "+siblings[j].toString());
+		
+			    if ( (siblings[j].getAttribute("edit_id") == existing_area.edit_id) &&
+				 (siblings[j].toString() == "[object HTMLImageElement]") ) {
+				console.log("yoink");
+				siblings[j].parentElement.removeChild(siblings[j]);
+			    }
+			}
+		}
+		
+		// And create a new tracked text area
+		new textAreaTracker(text);
 	    }
 	}
     }
