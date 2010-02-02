@@ -16,6 +16,12 @@ var page_edit_id = 0;
 var pageTextAreas = [];
 var findingTextAreas = false;
 
+/*
+TODO: Do we still need this?
+
+The Google Groups bug wasn't events getting deleted but areas being cloned and
+loosing their events that way.
+*/
 function updateEvent(thing, event, listener)
 {
     // First remove the event so we don't stack up multiple ones
@@ -71,7 +77,24 @@ function textAreaTracker(text)
     }
 }
 
- 
+/*
+  getTextAreaTracker
+
+  Fetch the appropriate textAreaTracker for the given ID. As it tracks each element we
+  care about it's probably worth going through this short array rather than iterating
+  the entire DOM every time
+*/
+  
+function getTextAreaTracker(search_id)
+{
+    for (var i=0; i<pageTextAreas.length; i++) {
+	if (pageTextAreas[i].edit_id == search_id)
+	    return pageTextAreas[i];
+    }
+
+    return null;
+}
+    
 /*
   tagTextArea
 
@@ -93,38 +116,32 @@ function tagTextArea(text)
     if (!existing_id)
     {
 	// tag it
-	var tat = new textAreaTracker(text);
-	pageTextAreas.push(tat);
+	pageTextAreas.push(new textAreaTracker(text));
     } else {
 	// Even though this text has an edit_id it might not actually be the
 	// text we think it is. If the textAreaTracker.text doesn't match then
 	// we should tag this with something different
-	for (var i=0; i<pageTextAreas.length; i++) {
-	    var existing_area = pageTextAreas[i];
-	    if ( (existing_area.edit_id == existing_id) &&
-		 (existing_area.text != text ) )
-	    {
-		console.log("found a duplicate id!");
-		// OK, first things first, find any images that think
-		// they are associated with a text area and remove them
-		siblings = text.parentElement.childNodes;
-		console.log("has "+siblings.length+ " siblings");
 
-		for (var j=0; j<siblings.length; j++) {
-		    if (! (siblings[j].getAttribute == undefined) ) {
-			console.log("B doing sibling: "+siblings[j].toString());
-		
-			    if ( (siblings[j].getAttribute("edit_id") == existing_area.edit_id) &&
-				 (siblings[j].toString() == "[object HTMLImageElement]") ) {
-				console.log("yoink");
-				siblings[j].parentElement.removeChild(siblings[j]);
-			    }
-			}
+	var existing_area = getTextAreaTracker(existing_id);
+	if ( existing_area &&
+	     (existing_area.text != text ) )
+	{
+	    console.log("tagTextArea: Working around a duplicate id!");
+	    // OK, first things first, find any images that think
+	    // they are associated with a text area and remove them
+	    siblings = text.parentElement.childNodes;
+
+	    for (var j=0; j<siblings.length; j++) {
+		if (! (siblings[j].getAttribute == undefined) ) {
+		    if ( (siblings[j].getAttribute("edit_id") == existing_area.edit_id) &&
+			 (siblings[j].toString() == "[object HTMLImageElement]") ) {
+			siblings[j].parentElement.removeChild(siblings[j]);
+		    }
 		}
-		
-		// And create a new tracked text area
-		new textAreaTracker(text);
 	    }
+		
+	    // And create a new tracked text area
+	    pageTextAreas.push(new textAreaTracker(text));
 	}
     }
 }
@@ -136,16 +153,9 @@ function tagTextArea(text)
  Called when we want to update the text area with our updated text
 */
 function updateTextArea(id, content) {
-    var texts = document.getElementsByTagName('textarea');
-    for (var i=0; i<texts.length; i++) {
-	var text = texts[i];
-
-	var text_edit_id = text.getAttribute("edit_id");
-
-	if (text_edit_id == id)
-	{
-	    text.value = content;
-	}
+    var tracker = getTextAreaTracker(id);
+    if (tracker) {
+	tracker.text.value = content;
     }
 }
 
@@ -219,16 +229,9 @@ function editTextArea(event) {
     var img = event.currentTarget;
     var edit_id = img.getAttribute("edit_id");
 
-    var texts = document.getElementsByTagName('textarea');
-
-    for (var i=0; i<texts.length; i++) {
-	var text = texts[i];
-	var text_edit_id = text.getAttribute("edit_id");
-
-	if (text_edit_id == edit_id)
-	{
-	    sendTextArea(text);
-	}
+    var tracker = getTextAreaTracker(edit_id);
+    if (tracker) {
+	sendTextArea(tracker.text);
     }
 }
 
