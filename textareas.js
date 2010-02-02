@@ -186,7 +186,9 @@ function sendTextArea(text) {
      findActiveTextArea = function() {
 	 if (focusedEdit) {
 	     sendTextArea(focusedEdit);
-	 } 
+	 } else {
+	     port.postMessage( {msg: "error", text: "No textarea in focus"} );
+	 }
      };
 
      setFocused = function(){

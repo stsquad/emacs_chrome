@@ -141,6 +141,8 @@ function localMessageHandler(port)
 	    handleContentMessages(msg, port);
 	} else if (msg.msg == "test") {
 	    handleTestMessages(msg, port);
+	} else if (msg.msg == "error") {
+	    updateUserFeedback(msg.text, true);
 	}
     });
 }
