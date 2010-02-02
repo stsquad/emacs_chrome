@@ -38,11 +38,6 @@ localhost. This may present a security issue."
   :group 'edit-server
   :type 'boolean)
 
-(defcustom edit-server-new-frame t
-  "If not nil, edit each buffer in a new frame (and raise it)."
-  :group 'edit-server
-  :type 'boolean)
-
 (defcustom edit-server-verbose nil
   "If not nil, log connections and progress also to the echo area."
   :group 'edit-server
@@ -54,20 +49,26 @@ Current buffer holds the text that is about to be sent back to the client."
   :group 'edit-server
   :type 'hook)
 
+; frame options
+(defcustom edit-server-new-frame t
+  "If not nil, edit each buffer in a new frame (and raise it)."
+  :group 'edit-server
+  :type 'boolean)
+
 (defcustom edit-server-new-frame-minibuffer t
   "Show the emacs frame's minibuffer if set to t; hide if nil."
   :group 'edit-server
   :type 'boolean)
 
-(defcustom edit-server-new-frame-menu-bar 0
-  "Show the emacs frame's menu-bar if set to 1; hide if 0."
+(defcustom edit-server-new-frame-menu-bar t
+  "Show the emacs frame's menu-bar if set to t; hide if nil."
   :group 'edit-server
-  :type 'integer)
+  :type 'boolean)
 
-(defcustom edit-server-new-frame-no-mode-line nil
-  "Hide the emacs frame's mode-line."
+(defcustom edit-server-new-frame-mode-line t
+  "Show the emacs frame's mode-line if set to t; hide if nil."
   :group 'edit-server
-  :type 'integer)
+  :type 'boolean)
 
 ;; Vars
 (defconst edit-server-process-buffer-name " *edit-server*"
@@ -291,7 +292,7 @@ If `edit-server-verbose' is non-nil, then STRING is also echoed to the message l
              nil))
       (if edit-server-new-frame
         (progn
-          (if edit-server-new-frame-no-mode-line
+          (if (not edit-server-new-frame-mode-line)
             (setq mode-line-format nil))
           (raise-frame edit-server-frame))
         (pop-to-buffer buffer)))))
