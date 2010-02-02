@@ -232,49 +232,57 @@ function editTextArea(event) {
     }
 }
 
-function findTextAreasInDocument(doc) {
-    var texts;
-    try {
-	texts = doc.getElementsByTagName('textarea');
-	for (var i=0; i<texts.length; i++) {
-	    tagTextArea(texts[i]);
-	}
-    } catch (err) {
-	// it seems some (I)FRAMES have undefined contentDocuments
-	console.log("findTextAreasInDocument: failed with "+err);
-    }
-}
+/*
+  This is the main find function for searching for TEXTAREAS. It protects itself via
+  a (page) global semaphore called findingTextAreas so it doesn't call itself after
+  tagTextArea() adds new nodes to the DOM tree.
+*/
+function findTextAreasIn(thing) {
 
-function findTextAreas() {
-
+    // Whatever thing is it need to have the getElementsByTagName method
+    // or there isn't a lot we can do about it.
+    if (!thing.getElementsByTagName)
+	return;
+    
     // Don't run through this if already finding stuff, lest we trigger events
     if (findingTextAreas)
 	return;
 
     findingTextAreas = true;
+    
+    try {
+	var texts = thing.getElementsByTagName('textarea');
+	for (var i=0; i<texts.length; i++) {
+	    tagTextArea(texts[i]);
+	}
+    } catch (err) {
+	// it seems some (I)FRAMES have undefined contentDocuments
+	console.log("findTextAreasIn: failed with "+err);
+    }
 
-    findTextAreasInDocument(document);
+    findingTextAreas = false;
+}
+
+/*
+  Exhaustively search the page for textareas.
+*/
+function findTextAreas() {
+
+    // The main document
+    findTextAreasIn(document);
 
     // IFRAMEs
     var iframes = document.getElementsByTagName('iframe');
     for (i = 0; i < iframes.length; i++) {
-	findTextAreasInDocument(iframes[i].contentDocument);
+	findTextAreasIn(iframes[i].contentDocument);
     }
 
     // FRAMEs
     var frames = document.getElementsByTagName('frame');
     for (i = 0; i < frames.length; i++) {
-	findTextAreasInDocument(frames[i].contentDocument);
+	findTextAreasIn(frames[i].contentDocument);
     }
 
-    /* This may not be needed
-    // And finally lets update any events and ensure they have event listeners
-    for (var i=0; i<pageTextAreas.length; i++) {
-	pageTextAreas[i].updateEvents();
-    }
-    */
-
-    findingTextAreas = false;
     return true;
 }
 
@@ -288,7 +296,7 @@ function findTextAreas() {
 findTextAreas();
 
 /* called upon further document mods */
-document.addEventListener("DOMNodeInserted", (function () {
-    findTextAreas();
+document.addEventListener("DOMNodeInserted", (function (ev) {
+    findTextAreasIn(ev.target);
     return true;
 }), false);
