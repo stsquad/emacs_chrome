@@ -1,7 +1,7 @@
 {
   "name": "Edit with Emacs",
   "version": "1.5",
-  "description": "Allow user to edit web-pages with Emacs (and other editors).",
+  "description": "Allow user to edit web-page textareas with Emacs (and other editors).",
   "browser_action": {
     "default_icon": "emacs23-16x16.png"
   },
