@@ -302,6 +302,15 @@ findTextAreas();
 
 /* called upon further document mods */
 document.addEventListener("DOMNodeInserted", (function (ev) {
-    findTextAreasIn(ev.target);
+    /*
+      It would be nice to parse a sub-section of the tree when
+      new elements are added. However this breaks GMail so we scan
+      the entire document every time instead.
+     
+      console.log("DOM Event:"+ev.toString());
+      console.log("DOM Added:"+ev.target.toString());
+      findTextAreasIn(ev.target);
+    */
+    findTextAreas();
     return true;
 }), false);
