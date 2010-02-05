@@ -322,7 +322,7 @@ and its buffer are killed with `edit-server-kill-client'."
   (if (processp proc)
       (let ((response-header (concat
                           "HTTP/1.0 200 OK\n"
-                          "Server: Emacs\n"
+                          (format "Server: Emacs/%s\n" emacs-version)
                           "Date: "
                           (format-time-string
                            "%a, %d %b %Y %H:%M:%S GMT\n"
