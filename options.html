@@ -12,7 +12,7 @@ Save the file to somewhere visible to your your Emacs <em>load-path</em> and add
     (require 'edit-server)
     (edit-server-start)
   </pre>
-If your already running an instance of Emacs in <em>--daemon</em> mode then you can wrap the code in something like:
+If you're already running an instance of Emacs in <em>--daemon</em> mode then you can wrap the code in something like:
 <pre>
  (if (and (daemonp) (locate-library "edit-server"))
      (progn
