@@ -19,6 +19,17 @@ If you're already running an instance of Emacs in <code>--daemon</code> mode the
        (require 'edit-server)
        (edit-server-start)))
 </pre>
+
+To open pages for editing in a new buffer instead of a new frame on
+your running Emacs instance do:
+<pre>
+(if (locate-library "edit-server")
+    (progn
+      (require 'edit-server)
+      (setq edit-server-new-frame nil)
+      (edit-server-start)))
+</pre>
+
 <p>
 If for some reason you don't want to use Emacs you have a couple of other options available.
 <ul>
