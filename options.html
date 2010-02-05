@@ -7,12 +7,12 @@ your local machine. This is because extensions in Chrome(ium) cannot
 directly start new programs. For Emacs users it is recommended you use the use supplied native
 <a href="servers/edit-server.el">edit-server.el</a>.
 <p>
-Save the file to somewhere visible to your your Emacs <em>load-path</em> and add the following to your <em>.emacs</em>:
+Save the file to somewhere visible to your your Emacs <code>load-path</code> and add the following to your <code>.emacs</code>:
   <pre>
     (require 'edit-server)
     (edit-server-start)
   </pre>
-If you're already running an instance of Emacs in <em>--daemon</em> mode then you can wrap the code in something like:
+If you're already running an instance of Emacs in <code>--daemon</code> mode then you can wrap the code in something like:
 <pre>
  (if (and (daemonp) (locate-library "edit-server"))
      (progn
@@ -32,7 +32,7 @@ Other edit servers may well exist, please let me know at the project web site.
 <p>
 <hr>
 Edit Server @ 127.0.0.1:
-<input id="port" type="text" name="port"><em>(default is 9292)</em><br>
+<input id="port" type="text" name="port"><em>default: <code>9292</code></em><br>
 <div id="status"></div>
 <button onclick="save_options()">Save</button>
 <hr>
