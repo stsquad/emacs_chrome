@@ -9,7 +9,19 @@
 ;; http://nullprogram.com/blog/2009/05/17/
 ;;
 ;; To use it ensure the file is in your load-path and add something
-;; like:
+;; like the following examples to your .emacs:
+;;
+;; To open pages for editing in new buffers in your existing Emacs
+;; instance:
+;;
+;; (if (locate-library "edit-server")
+;;    (progn
+;;      (require 'edit-server)
+;;      (setq edit-server-new-frame nil)
+;;      (edit-server-start)))
+;;
+;; To open pages for editing in new frames using a running emacs
+;; started in --daemon mode:
 ;;
 ;; (if (and (daemonp) (locate-library "edit-server"))
 ;;     (progn
