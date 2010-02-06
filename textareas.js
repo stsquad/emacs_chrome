@@ -54,9 +54,16 @@ function textAreaTracker(text)
     // The text areas event handlers we attach
     this.focusListener = setFocused;
     this.dblclickListener = function(){sendTextArea(this);};
+    this.keydownListener = function (e) {
+	// Alt-Enter
+	if (e.altKey && e.keyCode == 13)
+	    sendTextArea(this);
+    };
+    
     this.text.addEventListener('focus',  this.focusListener);
     this.text.addEventListener('dblclick', this.dblclickListener);
-    
+    this.text.addEventListener('keydown', this.keydownListener);
+
     // The img 
     this.image = document.createElement('img');
     this.image.style.cursor='pointer';

@@ -7,6 +7,7 @@ Extension
 * Handle textareas that have been "cloned" by Javascript - fixes Google Groups
 * Generate user feedback if "edit focused area" failed
 * Skip textareas with spell-checking disabled (usually email address boxes)
+* Make Alt-Enter in focused area generate an edit request (patches to make it configurable welcome!)
 * Updates to help text in Options
 
 edit-server.el
