@@ -1,3 +1,20 @@
+v1.5
+
+Extension
+
+* Clean-up and streamline the text tagging code
+* Process sub FRAMEs and IFRAMEs looking for text boxes
+* Handle textareas that have been "cloned" by Javascript - fixes Google Groups
+* Generate user feedback if "edit focused area" failed
+* Skip textareas with spell-checking disabled (usually email address boxes)
+* Updates to help text in Options
+
+edit-server.el
+
+* Allow more customisation of the pop-up frame
+* Allow optional binding to a non-local IP address
+* Updates to help text in server code.
+
 v1.4
 
 Extension
