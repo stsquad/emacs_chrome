@@ -344,7 +344,7 @@ and its buffer are killed with `edit-server-kill-client'."
   (let ((procbuf (process-buffer proc)))
     (delete-process proc)
     (kill-buffer procbuf)
-    (setq edit-server-clients (delq procbuf edit-server-clients))))
+    (setq edit-server-clients (delq proc edit-server-clients))))
 
 (defun edit-server-done (&optional abort nokill)
   "Finish editing: send HTTP response back, close client and editing buffers.
