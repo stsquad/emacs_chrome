@@ -357,33 +357,35 @@ buffer is not killed.
 
 When called interactively, use prefix arg to abort editing."
   (interactive "P")
-  (let ((buffer (current-buffer))
-        (proc edit-server-proc)
-        (procbuf (process-buffer edit-server-proc)))
-    ;; edit-server-* vars are buffer-local, so they must be used before issuing kill-buffer
-    (if abort
+  ;; Do nothing if the connection is closed by the browser (tab killed, etc.)
+  (unless (eq (process-status edit-server-proc) 'closed)
+    (let ((buffer (current-buffer))
+           (proc edit-server-proc)
+           (procbuf (process-buffer edit-server-proc)))
+      ;; edit-server-* vars are buffer-local, so they must be used before issuing kill-buffer
+      (if abort
         ;; send back original content
         (with-current-buffer procbuf
           (run-hooks 'edit-server-done-hook)
           (edit-server-send-response proc t))
-      ;; send back edited content
-      (save-restriction
-	(widen)
-	(buffer-disable-undo)
-	;; ensure any format encoding is done (like longlines)
-	(dolist (format buffer-file-format)
-	  (format-encode-region (point-min) (point-max) format))
-	;; send back
-	(run-hooks 'edit-server-done-hook)
-	(edit-server-send-response edit-server-proc t)
-	;; restore formats (only useful if we keep the buffer)
-	(dolist (format buffer-file-format)
-	  (format-decode-region (point-min) (point-max) format))
-	(buffer-enable-undo)))
-    (if edit-server-frame (delete-frame edit-server-frame))
-    ;; delete-frame may change the current buffer
-    (unless nokill (kill-buffer buffer))
-    (edit-server-kill-client proc)))
+        ;; send back edited content
+        (save-restriction
+          (widen)
+          (buffer-disable-undo)
+          ;; ensure any format encoding is done (like longlines)
+          (dolist (format buffer-file-format)
+            (format-encode-region (point-min) (point-max) format))
+          ;; send back
+          (run-hooks 'edit-server-done-hook)
+          (edit-server-send-response edit-server-proc t)
+          ;; restore formats (only useful if we keep the buffer)
+          (dolist (format buffer-file-format)
+            (format-decode-region (point-min) (point-max) format))
+          (buffer-enable-undo)))
+      (if edit-server-frame (delete-frame edit-server-frame))
+      ;; delete-frame may change the current buffer
+      (unless nokill (kill-buffer buffer))
+      (edit-server-kill-client proc))))
 
 (defun edit-server-abort ()
   "Discard editing and send the original text back to the browser."
