@@ -100,6 +100,7 @@ function handleContentMessages(msg, tab_port)
     updateUserFeedback("Edit request sent", false);
 
     xhr.setRequestHeader("Content-type", "text/plain");
+    xhr.setRequestHeader("x-url", tab_port.tab.url);
     xhr.send(text);
 }
 

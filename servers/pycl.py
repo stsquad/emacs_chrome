@@ -17,7 +17,7 @@
 import cgi, urlparse
 import subprocess
 import tempfile, time
-import os, sys
+import os, sys, re
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 temp_has_delete=True
@@ -50,11 +50,15 @@ class Handler(BaseHTTPRequestHandler):
             print l
 
             # write text into file
+            url = self.headers.getheader('x-url')
+            print "url:", url
+            prefix = "chrome_" + re.sub("[^.\w]", "_", re.sub("^.*?//","",url))
             if temp_has_delete==True:
-                f = tempfile.NamedTemporaryFile(delete=False, suffix='.txt')
+                f = tempfile.NamedTemporaryFile(
+                        delete=False, prefix=prefix, suffix='.txt')
                 fname = f.name
             else:
-                tf = tempfile.mkstemp(suffix='.txt')
+                tf = tempfile.mkstemp(prefix=prefix, suffix='.txt')
                 f = os.fdopen(tf[0],"w")
                 fname = tf[1]
 
