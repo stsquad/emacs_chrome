@@ -52,7 +52,10 @@ class Handler(BaseHTTPRequestHandler):
             # write text into file
             url = self.headers.getheader('x-url')
             print "url:", url
-            prefix = "chrome_" + re.sub("[^.\w]", "_", re.sub("^.*?//","",url))
+            prefix = "chrome_"
+            if url:
+                prefix += re.sub("[^.\w]", "_", re.sub("^.*?//","",url))
+            prefix += "_"
             if temp_has_delete==True:
                 f = tempfile.NamedTemporaryFile(
                         delete=False, prefix=prefix, suffix='.txt')
