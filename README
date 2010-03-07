@@ -1,7 +1,7 @@
 About
 =====
 
-Emacs Chrome is an extension for Google's Chrome(ium) browser family
+Edit with Emacs is an extension for Google's Chrome(ium) browser family
 that allows you to edit text areas on your browser in a more full
 featured editor. It does this in conjunction with an "Edit Server"
 which services requests by the browser. This is because extensions
@@ -34,4 +34,5 @@ Riccardo Murri
 Niels Giesen
 Wei Hu
 Ævar Arnfjörð Bjarmason
+Chris Houser
 
