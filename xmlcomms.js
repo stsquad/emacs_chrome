@@ -128,6 +128,25 @@ function handleTestMessages(msg, tab_port)
     xhr.send();
 }
 
+// Handle config request messages, the textarea.js content script being in it's own
+// isolated sandbox has to be fed all this via the IPC mechanisms
+
+function getBooleanConfig(config) {
+    return typeof localStorage[config] == "undefined" ? false : localStorage[config] == "true";
+}
+
+
+function handleConfigMessages(msg, tab_port)
+{
+    var config_msg = {
+	msg: "config",
+	enable_dblclick: getBooleanConfig("enable_dblclick"),
+	enable_keys: getBooleanConfig("enable_keys")
+    };
+    tab_port.postMessage(config_msg);
+}
+
+
 /*
   Handle all in-coming messages to the extension.
 
@@ -138,7 +157,9 @@ function handleTestMessages(msg, tab_port)
 function localMessageHandler(port)
 {
     port.onMessage.addListener(function(msg, port) {
-        if (msg.msg == "edit") {
+        if (msg.msg == "config") {
+	    handleConfigMessages(msg, port);
+	} else if (msg.msg == "edit") {
 	    handleContentMessages(msg, port);
 	} else if (msg.msg == "test") {
 	    handleTestMessages(msg, port);
