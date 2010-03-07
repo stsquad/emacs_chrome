@@ -12,24 +12,7 @@ Save the file to somewhere visible to your your Emacs <code>load-path</code> and
     (require 'edit-server)
     (edit-server-start)
   </pre>
-If you're already running an instance of Emacs in <code>--daemon</code> mode then you can wrap the code in something like:
-<pre>
- (if (and (daemonp) (locate-library "edit-server"))
-     (progn
-       (require 'edit-server)
-       (edit-server-start)))
-</pre>
-
-To open pages for editing in a new buffer instead of a new frame on
-your running Emacs instance do:
-<pre>
-(if (locate-library "edit-server")
-    (progn
-      (require 'edit-server)
-      (setq edit-server-new-frame nil)
-      (edit-server-start)))
-</pre>
-
+For details about how to customise and control the behavior of the edit server please see <a href="http://www.emacswiki.org/emacs/Edit_with_Emacs">page on the Emacs Wiki</a>.
 <p>
 If for some reason you don't want to use Emacs you have a couple of other options available.
 <ul>
