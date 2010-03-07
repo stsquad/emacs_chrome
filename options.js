@@ -7,11 +7,21 @@
  * and licensed under the GPLv3. See the COPYING file for details
  */
 
-// Saves options to localStorage.
+
+// Snarfed from AdThwart, not sure why checkboxes are so trixy
+function loadCheckbox(id, config) {
+    document.getElementById(id).checked = typeof localStorage[config] == "undefined" ? false : localStorage[config] == "true";
+}
+ 
+function saveCheckbox(id, config) {
+    localStorage[config] = document.getElementById(id).checked;
+}
+
+// Saves options to localStorage
 function save_options() {
-  var port_box = document.getElementById("port");
-  var port = port_box.value;
-  localStorage["edit_server_port"] = port;
+  localStorage["edit_server_port"] = document.getElementById("port").value;
+  saveCheckbox("dblclick", "enable_dblclick");
+  saveCheckbox("keyshort", "enable_keys");
 
   // Update status to let user know options were saved.
   var status = document.getElementById("status");
@@ -27,8 +37,9 @@ function restore_options() {
   if (!port) {
     port = 9292;
   }
-  var port_box = document.getElementById("port");
-  port_box.value = port;
+  document.getElementById("port").value = port;
+  loadCheckbox("dblclick", "enable_dblclick");
+  loadCheckbox("keyshort", "enable_keys");
 }
 
 /* Message handling multiplexer */
