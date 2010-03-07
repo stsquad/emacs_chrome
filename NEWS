@@ -1,3 +1,18 @@
+v1.6
+
+Extension
+
+* Send the page URL to the edit server via x-url header
+* Options page: direct people to Emacs Wiki page for gory extras
+* Make Double Click to Edit a selectable option
+* Make Keyboard Shortcut to Edit a selectable option
+
+edit-server.el
+
+* Fix edit-server-kill-client (passed process not buffer)
+* Fix unkillable zombie buffers created by a closed browser
+* Name buffer based on x-url if it exists
+
 v1.5
 
 Extension
