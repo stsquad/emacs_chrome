@@ -16,6 +16,10 @@ var page_edit_id = 0;
 var pageTextAreas = [];
 var findingTextAreas = false;
 
+// via options
+var enable_dblclick = false;
+var enable_keys = false;
+
 /*
 TODO: Do we still need this?
 
@@ -61,8 +65,11 @@ function textAreaTracker(text)
     };
     
     this.text.addEventListener('focus',  this.focusListener);
-    this.text.addEventListener('dblclick', this.dblclickListener);
-    this.text.addEventListener('keydown', this.keydownListener);
+
+    if (enable_dblclick)
+	this.text.addEventListener('dblclick', this.dblclickListener);
+    if (enable_keys)
+	this.text.addEventListener('keydown', this.keydownListener);
 
     // The img 
     this.image = document.createElement('img');
