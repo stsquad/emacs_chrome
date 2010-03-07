@@ -215,29 +215,6 @@ function sendTextArea(text) {
      };
  })();
 
-/* Message handling multiplexer */
-function localMessageHandler(msg, port) {
-    // What was the bidding?
-    var cmd = msg.msg;
-    if (cmd == "find_edit") {
-	findActiveTextArea();
-    } else if (cmd == "update") {
-	var id = msg.id;
-	var content = msg.text;
-	updateTextArea(id, content);
-    } else {
-	console.log("localMessageHandler: un-handled message:"+cmd);
-    }
-}
-
-// Hook up the incoming message handler for both return messages
-// as well as direct messages from main extension.
-
-port.onMessage.addListener(localMessageHandler);
-chrome.extension.onConnect.addListener(function(iport) {
-	iport.onMessage.addListener(localMessageHandler);
-    });
-
 /*
  editTextArea
 
@@ -310,26 +287,40 @@ function findTextAreas() {
     return true;
 }
 
+/* Message handling multiplexer */
+function localMessageHandler(msg, port) {
+    // What was the bidding?
+    var cmd = msg.msg;
+    if (cmd == "config") {
+	console.log("config response: "+msg);
+	enable_dblclick = msg.enable_dblclick;
+	enable_keys = msg.enable_keys;
+	findTextAreas();
+	document.addEventListener("DOMNodeInserted", (function (ev) {
+		    findTextAreas();
+		    return true;
+		}), false);
+    } else if (cmd == "find_edit") {
+	findActiveTextArea();
+    } else if (cmd == "update") {
+	var id = msg.id;
+	var content = msg.text;
+	updateTextArea(id, content);
+    } else {
+	console.log("localMessageHandler: un-handled message:"+cmd);
+    }
+}
+
+// Hook up the incoming message handler for both return messages
+// as well as direct messages from main extension.
+
+port.onMessage.addListener(localMessageHandler);
+chrome.extension.onConnect.addListener(function(iport) {
+	iport.onMessage.addListener(localMessageHandler);
+    });
+
 /*
- We want to search for text areas when the page is first loaded as well
- as after any additional XHR events made by the page which may load
- additional elements (such as Gmail).
+  To start the whole process off we first need to fetch our configuration
+  from the background process.
 */
-
-/* called when content script loaded */
-findTextAreas();
-
-/* called upon further document mods */
-document.addEventListener("DOMNodeInserted", (function (ev) {
-    /*
-      It would be nice to parse a sub-section of the tree when
-      new elements are added. However this breaks GMail so we scan
-      the entire document every time instead.
-     
-      console.log("DOM Event:"+ev.toString());
-      console.log("DOM Added:"+ev.target.toString());
-      findTextAreasIn(ev.target);
-    */
-    findTextAreas();
-    return true;
-}), false);
+port.postMessage({msg: "config"});
