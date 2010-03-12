@@ -65,7 +65,7 @@ function handleContentMessages(msg, tab_port)
     var text = msg.text;
 
     var xhr = new XMLHttpRequest();
-    var url = getEditUrl() + cmd + "/" + id;
+    var url = getEditUrl() + cmd;
 
     console.log(" page URL:"+tab_port.tab.url);
     console.log(" tab_port:"+tab_port.portId_);
@@ -101,6 +101,7 @@ function handleContentMessages(msg, tab_port)
 
     xhr.setRequestHeader("Content-type", "text/plain");
     xhr.setRequestHeader("x-url", tab_port.tab.url);
+    xhr.setRequestHeader("textid", id);
     xhr.send(text);
 }
 

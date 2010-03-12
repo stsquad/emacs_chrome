@@ -42,8 +42,6 @@ CMD is the command to the edit server, it may be one of the following:
 
 * edit
 
-Optional parameters: ?id=${ID}&url=${URL}
-
 The edit command is sent as an HTTP POST request. After the headers
 the data is the current contents of the text area.
 
@@ -51,8 +49,12 @@ Once the edit is complete the server sends an HTTP 200 (OK) response
 with the data containing the new text area text. Any other response
 will result in the text area not being updated.
 
-The optional URL allows the edit server to create more identifiable
-names for the buffers/temp files to help the user keep track.
+The extension also sets some headers which may be used by the edit
+servers to create more identifiable names for the buffers/temp files
+to help the user keep track.
+
+x-url: The URL of the source page
+textid: The unique (on the page) ID of the text area
 
 * status
 
