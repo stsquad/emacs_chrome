@@ -101,7 +101,7 @@ function handleContentMessages(msg, tab_port)
 
     xhr.setRequestHeader("Content-type", "text/plain");
     xhr.setRequestHeader("x-url", tab_port.tab.url);
-    xhr.setRequestHeader("textid", id);
+    xhr.setRequestHeader("x-id", id);
     xhr.send(text);
 }
 

@@ -54,7 +54,7 @@ servers to create more identifiable names for the buffers/temp files
 to help the user keep track.
 
 x-url: The URL of the source page
-textid: The unique (on the page) ID of the text area
+x-id: The unique (on the page) ID of the text area
 
 * status
 
