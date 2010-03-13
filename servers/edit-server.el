@@ -309,7 +309,8 @@ If `edit-server-verbose' is non-nil, then STRING is also echoed to the message l
             (setq mode-line-format nil))
 	(raise-frame new-frame)
 	new-frame)
-    (pop-to-buffer buffer)))
+    (pop-to-buffer buffer)
+    nil))
 
 (defun edit-server-create-edit-buffer(proc)
   "Create an edit buffer, place content in it and save the network
