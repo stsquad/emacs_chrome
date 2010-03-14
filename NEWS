@@ -6,12 +6,14 @@ Extension
 * Options page: direct people to Emacs Wiki page for gory extras
 * Make Double Click to Edit a selectable option
 * Make Keyboard Shortcut to Edit a selectable option
+* Don't pass edit ID in URL, but in header as x-id (like x-url)
 
 edit-server.el
 
 * Fix edit-server-kill-client (passed process not buffer)
 * Fix unkillable zombie buffers created by a closed browser
 * Name buffer based on x-url if it exists
+* Workaround make-frame-on-display bug on Aquamacs
 
 v1.5
 
