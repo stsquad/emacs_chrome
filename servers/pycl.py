@@ -26,7 +26,13 @@ class Handler(BaseHTTPRequestHandler):
     global temp_has_delete
 
     def do_GET(self):
-        self.send_error(404, "Not Found: %s" % self.path)
+	if self.path == '/status':
+		self.send_response(200)
+		self.send_header('Content-Type', 'text/plain; charset=utf-8')
+		self.end_headers()
+		self.wfile.write('edit-server is running.\n')
+		return
+        self.send_error(404, "GET Not Found: %s" % self.path)
 
     def do_POST(self):
         try:
@@ -72,16 +78,24 @@ class Handler(BaseHTTPRequestHandler):
             print "Spawning editor... ", fname
 
             p = subprocess.Popen(["/usr/bin/emacsclient", "-c", fname], close_fds=True)
+            #p = subprocess.Popen(["/usr/local/bin/mvim", "--remote-wait", fname], close_fds=True)
 
             # hold connection open until editor finishes
-            p.wait()
+            rc = p.wait()
 
-            self.send_response(200)
-            self.end_headers()
+            if not rc:
+                    self.send_response(200)
+                    self.end_headers()
 
-            f = file(fname, 'r')
-            s = f.read()
-            f.close()
+                    f = file(fname, 'r')
+                    s = f.read()
+                    f.close()
+            else:
+                    if rc > 0:
+                            msg = 'text editor returned %d' % rc
+                    elif rc < 0:
+                            msg = 'text editor died on signal %d' % -rc
+                    self.send_error(404, msg)
 
             try:
                 os.unlink(fname)
@@ -93,7 +107,7 @@ class Handler(BaseHTTPRequestHandler):
         except :
             print "Error: ", sys.exc_info()[0]
             self.send_error(404, "Not Found: %s" % self.path)
-    
+
 def main():
     global temp_has_delete
     import platform
