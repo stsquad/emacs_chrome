@@ -67,6 +67,12 @@ Current buffer holds the text that is about to be sent back to the client."
   :group 'edit-server
   :type 'boolean)
 
+(defcustom edit-server-create-customized-frame t
+  "If not nil, customize the new frame as specified by the parameters below.
+Otherwise, use the default frame parameters."
+  :group 'edit-server
+  :type 'boolean)
+
 (defcustom edit-server-new-frame-minibuffer t
   "Show the emacs frame's minibuffer if set to t; hide if nil."
   :group 'edit-server
@@ -304,7 +310,8 @@ If `edit-server-verbose' is non-nil, then STRING is also echoed to the message l
 	      (if (featurep 'aquamacs)
 		  (make-frame property-alist)
 		(make-frame-on-display (getenv "DISPLAY")
-				       property-alist))))
+				       (and edit-server-create-customized-frame
+					    property-alist)))))
 	(if (not edit-server-new-frame-mode-line)
             (setq mode-line-format nil))
 	(raise-frame new-frame)
