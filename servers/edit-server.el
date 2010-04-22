@@ -293,7 +293,11 @@ If `edit-server-verbose' is non-nil, then STRING is also echoed to the message l
 (defun edit-server-create-frame(buffer)
   "Create a frame for the edit server"
   (if edit-server-new-frame
-      (let ((new-frame (make-frame edit-server-new-frame-alist)))
+      (let ((new-frame
+	     (if (featurep 'aquamacs)
+                 (make-frame edit-server-new-frame-alist)
+               (make-frame-on-display (getenv "DISPLAY")
+                                      edit-server-new-frame-alist))))
 	(if (not edit-server-new-frame-mode-line)
             (setq mode-line-format nil))
 	(raise-frame new-frame)
