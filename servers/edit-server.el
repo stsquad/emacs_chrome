@@ -67,19 +67,22 @@ Current buffer holds the text that is about to be sent back to the client."
   :group 'edit-server
   :type 'boolean)
 
+(defcustom edit-server-new-frame-alist
+  '((name . "Emacs TEXTAREA")
+    (width . 80)
+    (height . 25)
+    (minibuffer . t)
+    (menu-bar-lines . t))
+  "Frame parameters for new frames.  See `default-frame-alist' for examples.
+If nil, the new frame will use the existing `default-frame-alist' values."
+  :group 'edit-server
+  :type '(repeat (cons :format "%v"
+		       (symbol :tag "Parameter")
+		       (sexp :tag "Value"))))
+
 (defcustom edit-server-create-customized-frame t
   "If not nil, customize the new frame as specified by the parameters below.
 Otherwise, use the default frame parameters."
-  :group 'edit-server
-  :type 'boolean)
-
-(defcustom edit-server-new-frame-minibuffer t
-  "Show the emacs frame's minibuffer if set to t; hide if nil."
-  :group 'edit-server
-  :type 'boolean)
-
-(defcustom edit-server-new-frame-menu-bar t
-  "Show the emacs frame's menu-bar if set to t; hide if nil."
   :group 'edit-server
   :type 'boolean)
 
@@ -97,15 +100,6 @@ Otherwise, use the default frame parameters."
 
 (defconst edit-server-edit-buffer-name "TEXTAREA"
   "Template name of the edit-server text editing buffers.")
-
-(defconst edit-server-new-frame-title "Emacs TEXTAREA"
-  "Template name of the emacs frame's title.")
-
-(defconst edit-server-new-frame-width 80
-  "The emacs frame's width.")
-
-(defconst edit-server-new-frame-height 25
-  "The emacs frame's height.")
 
 (defvar edit-server-proc 'nil
   "Network process associated with the current edit, made local when
@@ -299,19 +293,7 @@ If `edit-server-verbose' is non-nil, then STRING is also echoed to the message l
 (defun edit-server-create-frame(buffer)
   "Create a frame for the edit server"
   (if edit-server-new-frame
-      (let* ((property-alist
-	     `((name . ,edit-server-new-frame-title)
-	       (width . ,edit-server-new-frame-width)
-	       (height . ,edit-server-new-frame-height)
-	       (minibuffer . ,edit-server-new-frame-minibuffer)
-	       (menu-bar-lines . ,edit-server-new-frame-menu-bar)))
-	; Aquamacs gets confused by make-frame-on-display
-	     (new-frame
-	      (if (featurep 'aquamacs)
-		  (make-frame property-alist)
-		(make-frame-on-display (getenv "DISPLAY")
-				       (and edit-server-create-customized-frame
-					    property-alist)))))
+      (let ((new-frame (make-frame edit-server-new-frame-alist)))
 	(if (not edit-server-new-frame-mode-line)
             (setq mode-line-format nil))
 	(raise-frame new-frame)
