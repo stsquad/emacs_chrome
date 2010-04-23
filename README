@@ -28,8 +28,11 @@ Firefox.
 Authors
 =======
 
+Edit with Emacs is open source and is brought to you thanks to
+contributions from the following people:
+
 David Hilley
-Alex Bennee
+Alex Bennée
 Riccardo Murri
 Niels Giesen
 Wei Hu
@@ -37,4 +40,4 @@ Wei Hu
 Chris Houser
 Robert Goldman
 Phil Pennock
-
+Sudish Joseph
