@@ -1,3 +1,13 @@
+v1.7
+
+Extension
+
+* Nothing yet
+
+edit-server.el
+
+* Move all frame customisation into edit-server-new-frame-alist
+
 v1.6
 
 Extension
