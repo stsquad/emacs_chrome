@@ -80,12 +80,6 @@ If nil, the new frame will use the existing `default-frame-alist' values."
 		       (symbol :tag "Parameter")
 		       (sexp :tag "Value"))))
 
-(defcustom edit-server-create-customized-frame t
-  "If not nil, customize the new frame as specified by the parameters below.
-Otherwise, use the default frame parameters."
-  :group 'edit-server
-  :type 'boolean)
-
 (defcustom edit-server-new-frame-mode-line t
   "Show the emacs frame's mode-line if set to t; hide if nil."
   :group 'edit-server
