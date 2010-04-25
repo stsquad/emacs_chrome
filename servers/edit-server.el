@@ -169,7 +169,8 @@ When called interactivity, a prefix argument will cause it to be verbose.
 	     'local)
      :service edit-server-port
      :log 'edit-server-accept
-     :server 't)
+     :server t
+     :noquery t)
     (setq edit-server-clients '())
     (if verbose (get-buffer-create edit-server-log-buffer-name))
     (edit-server-log nil "Created a new edit-server process")))
