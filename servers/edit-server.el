@@ -298,6 +298,7 @@ If `edit-server-verbose' is non-nil, then STRING is also echoed to the message l
 	(if (not edit-server-new-frame-mode-line)
             (setq mode-line-format nil))
 	(raise-frame new-frame)
+        (set-window-buffer (frame-selected-window new-frame) buffer)
 	new-frame)
     (pop-to-buffer buffer)
     nil))
