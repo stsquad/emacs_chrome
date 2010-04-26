@@ -9,6 +9,7 @@ edit-server.el
 * Move all frame customisation into edit-server-new-frame-alist
 * Don't ask user before closing emacs and network process
 * Just skip creating new network process if it's already running
+* Make sure edit buffer is selected on new frames
 
 v1.6
 
