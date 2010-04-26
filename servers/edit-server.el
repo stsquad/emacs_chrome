@@ -158,19 +158,21 @@ If argument VERBOSE is non-nil, logs all server activity to buffer `*edit-server
 When called interactivity, a prefix argument will cause it to be verbose.
 "
   (interactive "P")
-  (if (process-status "edit-server")
+  (if (or (process-status "edit-server")
+          (null (condition-case err
+                    (make-network-process
+                     :name "edit-server"
+                     :buffer edit-server-process-buffer-name
+                     :family 'ipv4
+                     :host (if edit-server-host
+                               edit-server-host
+                             'local)
+                     :service edit-server-port
+                     :log 'edit-server-accept
+                     :server t
+                     :noquery t)
+                  (file-error nil))))
       (message "An edit-server process is already running")
-    (make-network-process
-     :name "edit-server"
-     :buffer edit-server-process-buffer-name
-     :family 'ipv4
-     :host (if edit-server-host
-	       edit-server-host
-	     'local)
-     :service edit-server-port
-     :log 'edit-server-accept
-     :server t
-     :noquery t)
     (setq edit-server-clients '())
     (if verbose (get-buffer-create edit-server-log-buffer-name))
     (edit-server-log nil "Created a new edit-server process")))
