@@ -10,6 +10,7 @@ edit-server.el
 * Don't ask user before closing emacs and network process
 * Just skip creating new network process if it's already running
 * Make sure edit buffer is selected on new frames
+* Prompt window manager to bring new frames to the top of the stack (X windows only)
 
 v1.6
 
