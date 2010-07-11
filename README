@@ -9,7 +9,9 @@ cannot spawn new processes as a security measure.
 
 Example edit servers can be found at the project homepage including a
 native elisp version that can be run inside Emacs itself. There is no
-reason why other server scripts could not spawn other editors.
+reason why other server scripts could not spawn other editors.  It has
+been known to work with GNU Emacs and Aquamacs (MacOS); it is presently
+not compatible with XEmacs. 
 
 This extension is licensed under the GPL v3 and development versions
 can be found at: http://github.com/stsquad/emacs_chrome

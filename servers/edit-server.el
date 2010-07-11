@@ -38,6 +38,9 @@
 ;(setq debug-on-error 't)
 ;(setq edebug-all-defs 't)
 
+(if (not (featurep 'make-network-process))
+    (error "Incompatible version of [X]Emacs - lacks make-network-process"))
+
 ;; Customization
 (defcustom edit-server-port 9292
   "Local port the edit server listens to."
