@@ -11,6 +11,8 @@ edit-server.el
 * Just skip creating new network process if it's already running
 * Make sure edit buffer is selected on new frames
 * Prompt window manager to bring new frames to the top of the stack (X windows only)
+* Enable multi-byte mode on edit buffers for better unicode handling
+* Explicitly fail on XEmacs if make-network-process isn't found (XEmacs patches welcome)
 
 v1.6
 
