@@ -24,11 +24,15 @@ function getEditUrl()
 /*
  * Give some feedback to the user via the icon/hover text.
  */
-function updateUserFeedback(string, redIcon)
+function updateUserFeedback(string, colour)
 {
     console.log("updateUserFeedback: "+string);
     chrome.browserAction.setTitle({title:string});
-    if (redIcon) {
+    if (colour == null) {
+    	chrome.browserAction.setIcon({path:"emacs23-16x16.png"});
+    } else if (colour == "green") {
+	chrome.browserAction.setIcon({path:"emacs23-16x16-green.png"});
+    } else if (colour == "red") {
 	chrome.browserAction.setIcon({path:"emacs23-16x16-red.png"});
     } else {
     	chrome.browserAction.setIcon({path:"emacs23-16x16.png"});
@@ -36,7 +40,7 @@ function updateUserFeedback(string, redIcon)
 }
     
 // Initial message
-updateUserFeedback("Awaiting edit request", false);
+updateUserFeedback("Awaiting edit request", "blue");
 
 // Called when the user clicks on the browser action.
 //    
@@ -51,7 +55,7 @@ chrome.browserAction.onClicked.addListener(function(tab) {
   var tab_port = chrome.tabs.connect(tab.id);
   
   tab_port.postMessage(find_msg);
-  updateUserFeedback("sent request to content script", false);
+  updateUserFeedback("sent request to content script", "green");
 });
 
 // Handle and edit request coming from the content page script
@@ -85,19 +89,19 @@ function handleContentMessages(msg, tab_port)
 		    id: id
 		};
 
-		updateUserFeedback("Last Edit request a success", false);
+		updateUserFeedback("Last Edit request a success");
 		tab_port.postMessage(update_msg);
 	    } else if (xhr.status == 0) {
 		// Is the edit server actually running?
-		updateUserFeedback("Error: is edit server running?", true);
+		updateUserFeedback("Error: is edit server running?", "red");
 	    } else {
-		updateUserFeedback("Un-handled response: "+xhr.status, true); 
+		updateUserFeedback("Un-handled response: "+xhr.status, "red"); 
 	    }
         }
     }
 
     // reset the display before sending request..
-    updateUserFeedback("Edit request sent", false);
+    updateUserFeedback("Edit request sent", "green");
 
     xhr.setRequestHeader("Content-type", "text/plain");
     xhr.setRequestHeader("x-url", tab_port.tab.url);
@@ -165,7 +169,7 @@ function localMessageHandler(port)
 	} else if (msg.msg == "test") {
 	    handleTestMessages(msg, port);
 	} else if (msg.msg == "error") {
-	    updateUserFeedback(msg.text, true);
+	    updateUserFeedback(msg.text, "red");
 	}
     });
 }
