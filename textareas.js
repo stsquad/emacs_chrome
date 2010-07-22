@@ -187,10 +187,12 @@ function updateTextArea(id, content) {
 
 function sendTextArea(text) {
     var text_edit_id = text.getAttribute("edit_id");
+    var title = document.getElementsByTagName('title').item().innerText;
     // And spawn the request
     var edit_msg = {
 	msg: "edit",
 	text: text.value,
+	title: title,
 	id: text_edit_id
     };
     port.postMessage(edit_msg);
@@ -206,7 +208,12 @@ function sendTextArea(text) {
 	 if (focusedEdit) {
 	     sendTextArea(focusedEdit);
 	 } else {
-	     port.postMessage( {msg: "error", text: "No textarea in focus"} );
+	     var title = document.getElementsByTagName('title').item().innerText;
+	     var msg_text = "No textarea in focus";
+	     if (title != null) {
+		 msg_text = msg_text + " in "+title;
+	     }
+	     port.postMessage( {msg: "error", text: msg_text} );
 	 }
      };
 

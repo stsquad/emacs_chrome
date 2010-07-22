@@ -89,7 +89,7 @@ function handleContentMessages(msg, tab_port)
 		    id: id
 		};
 
-		updateUserFeedback("Last Edit request a success");
+		updateUserFeedback("Successful edit of "+msg.title);
 		tab_port.postMessage(update_msg);
 	    } else if (xhr.status == 0) {
 		// Is the edit server actually running?
@@ -101,7 +101,7 @@ function handleContentMessages(msg, tab_port)
     }
 
     // reset the display before sending request..
-    updateUserFeedback("Edit request sent", "green");
+    updateUserFeedback("Edit request sent for "+msg.title, "green");
 
     xhr.setRequestHeader("Content-type", "text/plain");
     xhr.setRequestHeader("x-url", tab_port.tab.url);
