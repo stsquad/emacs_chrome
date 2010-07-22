@@ -2,7 +2,8 @@ v1.7
 
 Extension
 
-* Nothing yet
+* New icon state. Blue=Waiting, Green=In Progress, Red=Error
+* Improved mouse-over text for icon to give more useful feedback
 
 edit-server.el
 
