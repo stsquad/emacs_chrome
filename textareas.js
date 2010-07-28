@@ -40,7 +40,25 @@ function updateEvent(thing, event, listener)
 	thing.addEventListener(event, listener, false);
     }
 }
- 
+
+/*
+  getTitle
+
+  Get the title from the DOM, if that fails try to synthesise something sensible
+*/
+function getTitle()
+{
+    var title = document.title;
+    if (title == null || title.length==0) {
+	try {
+	    title = document.getElementsByTagName('title').item().innerText;
+	} catch (err) {
+	    console.log ("failed to extract title from HTML ("+err+")");
+	    title = document.documentURI;
+	}
+    }
+    return title;
+}
 /*
   textAreaTracker
 
@@ -187,12 +205,11 @@ function updateTextArea(id, content) {
 
 function sendTextArea(text) {
     var text_edit_id = text.getAttribute("edit_id");
-    var title = document.getElementsByTagName('title').item().innerText;
     // And spawn the request
     var edit_msg = {
 	msg: "edit",
 	text: text.value,
-	title: title,
+	title: getTitle(),
 	id: text_edit_id
     };
     port.postMessage(edit_msg);
@@ -208,11 +225,7 @@ function sendTextArea(text) {
 	 if (focusedEdit) {
 	     sendTextArea(focusedEdit);
 	 } else {
-	     var title = document.getElementsByTagName('title').item().innerText;
-	     var msg_text = "No textarea in focus";
-	     if (title != null) {
-		 msg_text = msg_text + " in "+title;
-	     }
+	     var msg_text = "No textarea in focus in: "+getTitle();
 	     port.postMessage( {msg: "error", text: msg_text} );
 	 }
      };
