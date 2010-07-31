@@ -9,8 +9,8 @@
 
 
 // Snarfed from AdThwart, not sure why checkboxes are so trixy
-function loadCheckbox(id, config) {
-    document.getElementById(id).checked = typeof localStorage[config] == "undefined" ? false : localStorage[config] == "true";
+function loadCheckbox(id, config, defaultval) {
+    document.getElementById(id).checked = typeof localStorage[config] == "undefined" ? defaultval : localStorage[config] == "true";
 }
  
 function saveCheckbox(id, config) {
@@ -20,6 +20,7 @@ function saveCheckbox(id, config) {
 // Saves options to localStorage
 function save_options() {
   localStorage["edit_server_port"] = document.getElementById("port").value;
+  saveCheckbox("editbutton", "enable_button");
   saveCheckbox("dblclick", "enable_dblclick");
   saveCheckbox("keyshort", "enable_keys");
 
@@ -38,8 +39,9 @@ function restore_options() {
     port = 9292;
   }
   document.getElementById("port").value = port;
-  loadCheckbox("dblclick", "enable_dblclick");
-  loadCheckbox("keyshort", "enable_keys");
+  loadCheckbox("editbutton", "enable_button", true);
+  loadCheckbox("dblclick", "enable_dblclick", false);
+  loadCheckbox("keyshort", "enable_keys", false);
 }
 
 /* Message handling multiplexer */

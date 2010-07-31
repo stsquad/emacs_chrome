@@ -17,6 +17,7 @@ var pageTextAreas = [];
 var findingTextAreas = false;
 
 // via options
+var enable_button = true;
 var enable_dblclick = false;
 var enable_keys = false;
 
@@ -90,22 +91,25 @@ function textAreaTracker(text)
 	this.text.addEventListener('keydown', this.keydownListener);
 
     // The img 
-    this.image = document.createElement('img');
-    this.image.style.cursor='pointer';
-    this.image.setAttribute("edit_id", this.edit_id);
-    this.image.src = editImgURL;
+    if (enable_button) {
+	this.image = document.createElement('img');
+	this.image.style.cursor='pointer';
+	this.image.setAttribute("edit_id", this.edit_id);
+	this.image.src = editImgURL;
 
-    this.clickListener = editTextArea;
-    this.image.addEventListener('click', this.clickListener, false);
+	this.clickListener = editTextArea;
+	this.image.addEventListener('click', this.clickListener, false);
 
-    this.text.parentNode.insertBefore(this.image, text.nextSibling);
+	this.text.parentNode.insertBefore(this.image, text.nextSibling);
+    }
 
     // The update function removes and re-adds events
     this.updateEvents = function()
     {
 	updateEvent(this.text, 'focus', this.focusListener);
 	updateEvent(this.text, 'dblclick', this.dblclickListener);
-	updateEvent(this.image, 'click', this.clickListener);
+	if (this.image)
+	    updateEvent(this.image, 'click', this.clickListener);
     }
 }
 
@@ -313,6 +317,7 @@ function localMessageHandler(msg, port) {
     var cmd = msg.msg;
     if (cmd == "config") {
 	console.log("config response: "+msg);
+	enable_button = msg.enable_button;
 	enable_dblclick = msg.enable_dblclick;
 	enable_keys = msg.enable_keys;
 	findTextAreas();
