@@ -26,6 +26,7 @@ var enable_keys = false;
 
   Get the title from the DOM, if that fails try to synthesise something sensible
 */
+
 function getTitle()
 {
     var title = document.title;
@@ -39,6 +40,7 @@ function getTitle()
     }
     return title;
 }
+
 /*
   textAreaTracker
 
@@ -168,6 +170,11 @@ function updateTextArea(id, content) {
     var tracker = getTextAreaTracker(id);
     if (tracker) {
 	tracker.text.value = content;
+	orig = $(tracker.text).css('background-color');
+	$(tracker.text).css({'background-color': 'yellow'});
+	setTimeout(function(){
+	 	$(tracker.text).animate({ 'background-color': orig }, 1000);
+	    }, 1000);
     }
 }
 

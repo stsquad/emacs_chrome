@@ -18,7 +18,7 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*", "file://*/*"],
-      "js": ["textareas.js"],
+      "js": ["textareas.js", "jquery-1.4.2.min.js"],
       "run_at": "document_idle",
       "all_frames": true
     }
