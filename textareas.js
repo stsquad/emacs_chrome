@@ -235,7 +235,16 @@ function sendTextArea(text) {
      };
 
      setFocused = function(){
-	 focusedEdit = this;		
+	 focusedEdit = this;
+	 // Update UI?
+	 var id = this.getAttribute("edit_id");
+	 if (id != undefined) {
+	     port.postMessage( {msg: "focus", id: id} );
+	     this.addEventListener('blur',  function() {
+		     port.postMessage( {msg: "focus", id: null} );
+		     this.removeEventListener('blur',arguments.callee,false);
+		 });
+	 }
      };
  })();
 

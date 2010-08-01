@@ -34,6 +34,8 @@ function updateUserFeedback(string, colour)
 	chrome.browserAction.setIcon({path:"emacs23-16x16-green.png"});
     } else if (colour == "red") {
 	chrome.browserAction.setIcon({path:"emacs23-16x16-red.png"});
+    } else if (colour == "darkblue") {
+	chrome.browserAction.setIcon({path:"emacs23-16x16-darker.png"});
     } else {
     	chrome.browserAction.setIcon({path:"emacs23-16x16.png"});
     }
@@ -171,6 +173,12 @@ function localMessageHandler(port)
 	    handleTestMessages(msg, port);
 	} else if (msg.msg == "error") {
 	    updateUserFeedback(msg.text, "red");
+	} else if (msg.msg == "focus") {
+	    if (msg.id === null) {
+		updateUserFeedback("Awaiting edit request: no focus", "darkblue");
+	    } else {
+		updateUserFeedback("Awaiting edit request: in focus");
+	    }
 	}
     });
 }
