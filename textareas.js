@@ -22,27 +22,6 @@ var enable_dblclick = false;
 var enable_keys = false;
 
 /*
-TODO: Do we still need this?
-
-The Google Groups bug wasn't events getting deleted but areas being cloned and
-loosing their events that way.
-*/
-function updateEvent(thing, event, listener)
-{
-    // First remove the event so we don't stack up multiple ones
-    try {
-	thing && thing.removeEventListener(event, listener);
-    } catch (err) {
-	console.log ("event listener not registered for "+thing + "/"+event);
-    }
-    
-    // And the update again
-    if (thing) {
-	thing.addEventListener(event, listener, false);
-    }
-}
-
-/*
   getTitle
 
   Get the title from the DOM, if that fails try to synthesise something sensible
@@ -103,14 +82,6 @@ function textAreaTracker(text)
 	this.text.parentNode.insertBefore(this.image, text.nextSibling);
     }
 
-    // The update function removes and re-adds events
-    this.updateEvents = function()
-    {
-	updateEvent(this.text, 'focus', this.focusListener);
-	updateEvent(this.text, 'dblclick', this.dblclickListener);
-	if (this.image)
-	    updateEvent(this.image, 'click', this.clickListener);
-    }
 }
 
 /*
