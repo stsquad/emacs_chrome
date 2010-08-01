@@ -2,6 +2,7 @@ v1.8
 
 * Added option to enable/disable visual edit boxes
 * Improved feedback as editable elements come in and out of focus
+* Updated text box will now fade from yellow after an update
 
 v1.7
 
