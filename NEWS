@@ -1,8 +1,14 @@
 v1.8
 
+Extension
+
 * Added option to enable/disable visual edit boxes
 * Improved feedback as editable elements come in and out of focus
 * Updated text box will now fade from yellow after an update
+
+edit-server.el
+
+* Added edit-server-start-hook for additional customisation when edit starts
 
 v1.7
 
