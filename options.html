@@ -25,13 +25,28 @@ If for some reason you don't want to use Emacs you have a couple of other option
 Other edit servers may well exist, please let me know at the project web site.  
 <p>
 <hr>
+
 Edit Server @ 127.0.0.1:
-<input id="port" type="text" name="port"><em>default: <code>9292</code></em><br>
-Show "edit" button next to textarea: <input id="editbutton" type="checkbox" name="editbutton"><br>
-Allow double click on textarea to invoke editor: <input id="dblclick" type="checkbox" name="dblclick"><br>
-Enable Alt-E Keyboard shortcut to invoke editor: <input id="keyshort" type="checkbox" name="keyshort"><br>
+<input id="port" type="text" name="port">
+<em>default: <code>9292</code></em>
+<br>
+
+Show "edit" button next to textarea:
+<input id="editbutton" type="checkbox" name="editbutton">
+<br>
+
+Allow double click on textarea to invoke editor:
+<input id="dblclick" type="checkbox" name="dblclick">
+<br>
+
+Enable keyboard shortcut to invoke editor:
+<input id="keyshort" type="checkbox" name="keyshort"/>
+<input id="keystroke" type="textbox"disabled="true" value="current keystroke"/>
+<br>
+
 <div id="status"></div>
 <button onclick="save_options()">Save</button>
+
 <hr>
 <button onclick="test_server()">Test Edit Server</button>
 <div id="server_status"></div>

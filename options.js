@@ -39,6 +39,14 @@ function restore_options() {
     port = 9292;
   }
   document.getElementById("port").value = port;
+  var keymod = localStorage["keymod"];
+  if (!keymod) {
+      keymod = 
+  }
+  var keystroke = localStorage["keystroke"];
+  if (!keystroke) {
+      
+  }
   loadCheckbox("editbutton", "enable_button", true);
   loadCheckbox("dblclick", "enable_dblclick", false);
   loadCheckbox("keyshort", "enable_keys", false);
