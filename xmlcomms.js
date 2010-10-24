@@ -69,6 +69,7 @@ function handleContentMessages(msg, tab_port)
     var cmd = msg.msg;
     var id = msg.id;
     var text = msg.text;
+    var file = msg.file;
 
     var xhr = new XMLHttpRequest();
     var url = getEditUrl() + cmd;
@@ -93,6 +94,12 @@ function handleContentMessages(msg, tab_port)
 
 		updateUserFeedback("Successful edit of "+msg.title);
 		tab_port.postMessage(update_msg);
+
+                msg.text = xhr.responseText;
+                msg.file = xhr.getResponseHeader("x-file");
+                if(xhr.getResponseHeader("x-open")) {
+                    handleContentMessages(msg, tab_port);
+                }
 	    } else if (xhr.status == 0) {
 		// Is the edit server actually running?
 		updateUserFeedback("Error: is edit server running?", "red");
@@ -108,6 +115,7 @@ function handleContentMessages(msg, tab_port)
     xhr.setRequestHeader("Content-type", "text/plain");
     xhr.setRequestHeader("x-url", tab_port.tab.url);
     xhr.setRequestHeader("x-id", id);
+    xhr.setRequestHeader("x-file", file);
     xhr.send(text);
 }
 

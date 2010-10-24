@@ -1,4 +1,7 @@
+#!/usr/bin/env python
+
 # Copyright (C) 2009  David Hilley <davidhi@cc.gatech.edu>
+# Copyright (C) 2010  Matt DeVuyst <mdevuyst@gmail.com>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,9 +21,11 @@ import cgi, urlparse
 import subprocess
 import tempfile, time
 import os, sys, re
+import stat
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 temp_has_delete=True
+processes = {}
 
 class Handler(BaseHTTPRequestHandler):
     global temp_has_delete
@@ -35,6 +40,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_error(404, "GET Not Found: %s" % self.path)
 
     def do_POST(self):
+        global processes
         try:
             (content, params) = cgi.parse_header(self.headers.
                                                  getheader('content-type'))
@@ -55,37 +61,60 @@ class Handler(BaseHTTPRequestHandler):
             l = [s for s in self.path.split('/') if s]
             print l
 
+            existing_file = self.headers.getheader('x-file')
+
             # write text into file
-            url = self.headers.getheader('x-url')
-            print "url:", url
-            prefix = "chrome_"
-            if url:
-                prefix += re.sub("[^.\w]", "_", re.sub("^.*?//","",url))
-            prefix += "_"
-            if temp_has_delete==True:
-                f = tempfile.NamedTemporaryFile(
-                        delete=False, prefix=prefix, suffix='.txt')
-                fname = f.name
+            if not existing_file or existing_file == "undefined":
+                existing = False
+                url = self.headers.getheader('x-url')
+                print "url:", url
+                prefix = "chrome_"
+                if url:
+                    prefix += re.sub("[^.\w]", "_", re.sub("^.*?//","",url))
+                prefix += "_"
+                if temp_has_delete==True:
+                    f = tempfile.NamedTemporaryFile(
+                            delete=False, prefix=prefix, suffix='.txt')
+                    fname = f.name
+                else:
+                    tf = tempfile.mkstemp(prefix=prefix, suffix='.txt')
+                    f = os.fdopen(tf[0],"w")
+                    fname = tf[1]
+                print "Opening new file ", fname
             else:
-                tf = tempfile.mkstemp(prefix=prefix, suffix='.txt')
-                f = os.fdopen(tf[0],"w")
-                fname = tf[1]
+                existing = True
+                p = processes[existing_file]
+                print "Opening existing file ", existing_file
+                f = open(existing_file, "w")
+                fname = existing_file
 
             f.write(body)
             f.close()
+            last_mod_time = os.stat(fname)[stat.ST_MTIME]
 
-            # spawn editor...
-            print "Spawning editor... ", fname
+            if not existing:
+                # spawn editor...
+                print "Spawning editor... ", fname
 
-            p = subprocess.Popen(["/usr/bin/emacsclient", "-c", fname], close_fds=True)
-            #p = subprocess.Popen(["/usr/local/bin/mvim", "--remote-wait", fname], close_fds=True)
+                p = subprocess.Popen(["/usr/bin/emacsclient", fname], close_fds=True)
+                #p = subprocess.Popen(["/usr/local/bin/mvim", "--remote-wait", fname], close_fds=True)
+                processes[fname] = p
 
-            # hold connection open until editor finishes
-            rc = p.wait()
+            saved = False
+            rc = None
+            while (True):
+                time.sleep(1)
+                rc = p.poll()
+                if rc != None: break
+                mod_time = os.stat(fname)[stat.ST_MTIME]
+                if mod_time != last_mod_time:
+                    print "new mod time:", mod_time, " last:", last_mod_time
+                    last_mod_time = mod_time
+                    saved = True
+                if saved: break
 
-            if not rc:
+            if saved or not rc:
                     self.send_response(200)
-                    self.end_headers()
 
                     f = file(fname, 'r')
                     s = f.read()
@@ -97,12 +126,17 @@ class Handler(BaseHTTPRequestHandler):
                             msg = 'text editor died on signal %d' % -rc
                     self.send_error(404, msg)
 
-            try:
-                os.unlink(fname)
-            except :
-                print "Unable to unlink:", fname
-                pass
+            if saved:
+                self.send_header('x-open', "true")
+            else:
+                try:
+                    os.unlink(fname)
+                except :
+                    print "Unable to unlink:", fname
+                    pass
 
+            self.send_header('x-file', fname)
+            self.end_headers()
             self.wfile.write(s)
         except :
             print "Error: ", sys.exc_info()[0]
