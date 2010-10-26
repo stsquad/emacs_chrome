@@ -22,7 +22,11 @@ import subprocess
 import tempfile, time
 import os, sys, re
 import stat
+import optparse
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+
+_default_port = 9292
+_default_editor = "emacsclient"
 
 temp_has_delete=True
 processes = {}
@@ -96,8 +100,9 @@ class Handler(BaseHTTPRequestHandler):
                 # spawn editor...
                 print "Spawning editor... ", fname
 
-                p = subprocess.Popen(["/usr/bin/emacsclient", fname], close_fds=True)
-                #p = subprocess.Popen(["/usr/local/bin/mvim", "--remote-wait", fname], close_fds=True)
+                cmd = self.editor.split(",")
+                cmd.append(fname)
+                p = subprocess.Popen(cmd, close_fds=True)
                 processes[fname] = p
 
             saved = False
@@ -142,6 +147,16 @@ class Handler(BaseHTTPRequestHandler):
             print "Error: ", sys.exc_info()[0]
             self.send_error(404, "Not Found: %s" % self.path)
 
+def parse_options():
+    parser = optparse.OptionParser()
+    parser.add_option(
+        "-p", "--port", type="int", dest="port", default=_default_port,
+        help="port number to listen on (default: " + str(_default_port) + ")")
+    parser.add_option(
+        "-e", "--editor", dest="editor", default=_default_editor,
+        help='text editor to spawn (default: "' + _default_editor + '")')
+    return parser.parse_args()[0]
+
 def main():
     global temp_has_delete
     import platform
@@ -149,8 +164,10 @@ def main():
     if int(t[0]) == 2 and int(t[1]) < 6:
         temp_has_delete = False;
         print "Handling lack of delete for NamedTemporaryFile:", temp_has_delete
+    options = parse_options()
+    Handler.editor = options.editor
     try:
-        httpserv = HTTPServer(('localhost', 9292), Handler)
+        httpserv = HTTPServer(('localhost', options.port), Handler)
         httpserv.table = {}
         httpserv.serve_forever()
     except KeyboardInterrupt:
