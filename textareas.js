@@ -336,3 +336,24 @@ chrome.extension.onConnect.addListener(function(iport) {
   from the background process.
 */
 port.postMessage({msg: "config"});
+
+
+// Inform the background process whenever the user opens
+// the context menu on an editable element.
+document.addEventListener("contextmenu", (function(event) {
+
+  var elem = event.srcElement;
+  if (elem && elem.getAttribute("edit_id")) {
+    var request = {
+      type: "menu_target",
+      edit_msg: {
+        msg: "edit",
+        text: elem.value,
+        title: getTitle(),
+        id: elem.getAttribute("edit_id")
+      }
+    };
+    chrome.extension.sendRequest(request);
+  }
+
+}));

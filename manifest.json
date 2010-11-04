@@ -8,6 +8,7 @@
   "background_page": "background.html",
   "permissions": [
     "tabs",
+    "contextMenus",
     "http://127.0.0.1/edit/*"
   ],
   "icons":
