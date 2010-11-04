@@ -21,8 +21,14 @@ function saveCheckbox(id, config) {
 function save_options() {
   localStorage["edit_server_port"] = document.getElementById("port").value;
   saveCheckbox("editbutton", "enable_button");
+  saveCheckbox("contextmenu", "enable_contextmenu");
   saveCheckbox("dblclick", "enable_dblclick");
   saveCheckbox("keyshort", "enable_keys");
+
+  chrome.extension.sendRequest({
+    type: "enable_contextmenu",
+    enabled: (localStorage.enable_contextmenu === "true")
+  });
 
   // Update status to let user know options were saved.
   var status = document.getElementById("status");
@@ -40,6 +46,7 @@ function restore_options() {
   }
   document.getElementById("port").value = port;
   loadCheckbox("editbutton", "enable_button", true);
+  loadCheckbox("contextmenu", "enable_contextmenu", true);
   loadCheckbox("dblclick", "enable_dblclick", false);
   loadCheckbox("keyshort", "enable_keys", false);
 }
