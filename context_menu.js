@@ -33,7 +33,9 @@
   }
 
   // Initialize the context menu based on stored options.
-  if (localStorage.enable_contextmenu === "true") {
+  // Also, default to enabled if the setting hasn't been saved before.
+  if (localStorage.enable_contextmenu === "true" ||
+      !localStorage.hasOwnProperty('enable_contextmenu')) {
     enableContextMenu();
   } else {
     disableContextMenu();
