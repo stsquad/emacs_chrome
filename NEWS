@@ -1,3 +1,10 @@
+v1.9
+
+Extension
+
+* Support for iterative editing (python server only currently)
+* Add context menu while in text area box
+
 v1.8
 
 Extension
