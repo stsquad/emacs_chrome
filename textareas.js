@@ -172,6 +172,11 @@ function updateTextArea(id, content) {
 	tracker.text.value = content;
 	orig = $(tracker.text).css('background-color');
 	$(tracker.text).css({'background-color': 'yellow'});
+	// mark node as changed
+	var event = document.createEvent("HTMLEvents");
+	event.initEvent('change', true, false);
+	tracker.text.dispatchEvent(event);
+
 	setTimeout(function(){
 	 	$(tracker.text).animate({ 'background-color': orig }, 1000);
 	    }, 1000);
