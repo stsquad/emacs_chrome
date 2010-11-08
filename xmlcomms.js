@@ -97,7 +97,7 @@ function handleContentMessages(msg, tab_port)
 
                 msg.text = xhr.responseText;
                 msg.file = xhr.getResponseHeader("x-file");
-                if(xhr.getResponseHeader("x-open")) {
+                if(xhr.getResponseHeader("x-open") == "true") {
                     handleContentMessages(msg, tab_port);
                 }
 	    } else if (xhr.status == 0) {
