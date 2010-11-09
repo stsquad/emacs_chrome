@@ -1,27 +1,28 @@
+// -*- tab-width:2; indent-tabs-mode:t -*- vim: set noet ts=2:
 {
-  "name": "Edit with Emacs",
-  "version": "1.9",
-  "description": "Allow user to edit web-page textareas with Emacs (and other editors).",
-  "browser_action": {
-    "default_icon": "emacs23-16x16.png"
-  },
-  "background_page": "background.html",
-  "permissions": [
-    "tabs",
-    "contextMenus",
-    "http://127.0.0.1/edit/*"
-  ],
-  "icons":
-  {
-    "128" : "emacs.png"
-  },
-  "options_page" : "options.html",
-  "content_scripts": [
-    {
-      "matches": ["http://*/*", "https://*/*", "file://*/*"],
-      "js": ["textareas.js", "jquery-1.4.2.min.js", "jquery.color.js"],
-      "run_at": "document_idle",
-      "all_frames": true
-    }
-  ]
+	"name": "Edit with Emacs",
+	"version": "1.9",
+	"description": "Allow user to edit web-page textareas with Emacs (and other editors).",
+	"browser_action": {
+		"default_icon": "emacs23-16x16.png"
+	},
+	"background_page": "background.html",
+	"permissions": [
+		"tabs",
+		"contextMenus",
+		"http://127.0.0.1/edit/*"
+	],
+	"icons":
+	{
+		"128" : "emacs.png"
+	},
+	"options_page" : "options.html",
+	"content_scripts": [
+		{
+			"matches": ["http://*/*", "https://*/*", "file://*/*"],
+			"js": ["textareas.js", "jquery-1.4.2.min.js", "jquery.color.js"],
+			"run_at": "document_idle",
+			"all_frames": true
+		}
+	]
 }

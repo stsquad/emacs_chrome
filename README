@@ -20,13 +20,22 @@ protocol.
 This extension is licensed under the GPL v3 and development versions
 can be found at: http://github.com/stsquad/emacs_chrome
 
+Hacking
+=======
+
+This modeline should be used in every source file to keep indentation
+consistent:
+// -*- tab-width:2; indent-tabs-mode:t -*- vim: set noet ts=2:
+This tells both emacs and vim to use actual tab characters, and to
+display tabs as 2 columns wide.
+
 History
 =======
 
 Dave Hilley [1] wrote the original proof of concept that showed it
 could be done. I [2] then hacked around with the Javascript to make
 the behaviour more like the classic It's All Text add-on available to
-Firefox. 
+Firefox.
 
 [1] http://www.thegibson.org/blog/archives/689
 [2] http://www.bennee.com/~alex
