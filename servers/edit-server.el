@@ -363,9 +363,11 @@ and its buffer are killed with `edit-server-kill-client'."
 				(process-send-string proc response-header)
 				(process-send-string proc "\n")
 				(cond
-				 ((stringp body) (process-send-string proc body))
+				 ((stringp body) (process-send-string proc (encode-coding-string body 'utf-8)))
 				 ((not body) nil)
-				 (t (process-send-region proc (point-min) (point-max))))
+				 (t (progn 
+							(encode-coding-region (point-min) (point-max) 'utf-8)
+							(process-send-region proc (point-min) (point-max)))))
 				(process-send-eof proc)
 				(if close 
 						(edit-server-kill-client proc))
