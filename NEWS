@@ -7,6 +7,10 @@ Extension
 * Fix reference to Alt-E, it's actually Alt-Enter
 * Trigger a DOM change() event when we update the text area
 
+edit-server.el
+
+* Actively encode responses as UTF-8
+
 v1.8
 
 Extension
