@@ -10,6 +10,7 @@ Extension
 edit-server.el
 
 * Actively encode responses as UTF-8
+* Make edit-server-edit-mode a minor mode instead of a derived mode
 
 v1.8
 
