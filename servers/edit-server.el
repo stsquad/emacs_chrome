@@ -29,6 +29,15 @@
 ;;			 (require 'edit-server)
 ;;			 (edit-server-start)))
 ;;
+;; Buffers are edited in `text-mode' by default;
+;; to use a different mode, set it in `edit-server-start-hook'.
+;; For example:
+;;
+;; (add-hook 'edit-server-start-hook
+;;           (lambda ()
+;;             (if (string-match "github.com" (buffer-name))
+;;                 (markdown-mode))))
+;;
 ;; (C) 2009 Alex Bennee (alex@bennee.com)
 ;; (C) 2010 Riccardo Murri (riccardo.murri@gmail.com)
 ;;
@@ -67,8 +76,8 @@ Current buffer holds the text that is about to be sent back to the client."
 
 (defcustom edit-server-start-hook nil
 	"Hook run when starting a editing buffer.  Current buffer is
-the fully prepared editing buffer.	Use this hook to enable your
-favorite minor modes or add key bindings."
+the fully prepared editing buffer.  Use this hook to enable 
+buffer-specific modes or add key bindings."
 	:group 'edit-server
 	:type 'hook)
 
@@ -141,22 +150,35 @@ Depending on the character encoding, may be different from the buffer length.")
 ; define a special (derived) mode for handling editing of text areas.
 ;
 
-(define-derived-mode edit-server-text-mode text-mode "Edit Server Text Mode"
-	"A derived version of text-mode with a few common Emacs keystrokes
-rebound to more functions that can deal with the response to the
-edit-server request.
+(defvar edit-server-edit-mode-map
+  (make-sparse-keymap)
+  "Keymap for minor mode `edit-server-edit-mode'.
+
+Redefine a few common Emacs keystrokes to functions that can
+deal with the response to the edit-server request.
 
 Any of the following keys will close the buffer and send the text
 to the HTTP client: C-x #, C-x C-s, C-c C-c.
 
 If any of the above isused with a prefix argument, the
 unmodified text is sent back instead.
+")
+(define-key edit-server-edit-mode-map (kbd "C-x #")   'edit-server-done)
+(define-key edit-server-edit-mode-map (kbd "C-x C-s") 'edit-server-done)
+(define-key edit-server-edit-mode-map (kbd "C-c C-c") 'edit-server-done)
+(define-key edit-server-edit-mode-map (kbd "C-x C-c") 'edit-server-abort)
+
+(define-minor-mode edit-server-edit-mode
+  "Minor mode enabled on buffers opened by `edit-server-accept'.
+
+Its sole purpose is currently to enable
+`edit-server-edit-mode-map', which overrides common keystrokes to
+send a response back to the client.
 "
-	:group 'edit-server)
-(define-key edit-server-text-mode-map (kbd "C-x #") 'edit-server-done)
-(define-key edit-server-text-mode-map (kbd "C-x C-s") 'edit-server-done)
-(define-key edit-server-text-mode-map (kbd "C-c C-c") 'edit-server-done)
-(define-key edit-server-text-mode-map (kbd "C-x C-c") 'edit-server-abort)
+  :group 'edit-server
+  :lighter " EditSrv"
+  :init-value nil
+  :keymap edit-server-edit-mode-map)
 
 
 ;; Edit Server socket code
@@ -326,7 +348,8 @@ If `edit-server-verbose' is non-nil, then STRING is also echoed to the message l
 (defun edit-server-create-edit-buffer(proc)
 	"Create an edit buffer, place content in it and save the network
 	process for the final call back"
-	(let ((buffer (generate-new-buffer (if edit-server-url
+  (let ((buffer (generate-new-buffer 
+                 (if edit-server-url
 					 edit-server-url
 							 edit-server-edit-buffer-name))))
 		(with-current-buffer buffer
@@ -334,14 +357,19 @@ If `edit-server-verbose' is non-nil, then STRING is also echoed to the message l
 					 (set-buffer-multibyte t))) ; djb
 		(copy-to-buffer buffer (point-min) (point-max))
 		(with-current-buffer buffer
+      ;; use `text-mode' by default, but allow
+      ;; `edit-server-start-hook' to override it however, (re)setting
+      ;; the minor mode seems to clear the buffer-local variables that
+      ;; we depend upon for the response, so call the hooks early on
+      (text-mode)
+      (run-hooks 'edit-server-start-hook)
 			(not-modified)
-			(edit-server-text-mode)
 			(add-hook 'kill-buffer-hook 'edit-server-abort* nil t)
 			(buffer-enable-undo)
 			(set (make-local-variable 'edit-server-proc) proc)
 			(set (make-local-variable 'edit-server-frame)
 		 (edit-server-create-frame buffer))
-			(run-hooks 'edit-server-start-hook))))
+      (edit-server-edit-mode))))
 
 (defun edit-server-send-response (proc &optional body close)
 	"Send an HTTP 200 OK response back to process PROC.
