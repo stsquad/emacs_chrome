@@ -29,9 +29,16 @@
 ;;			 (require 'edit-server)
 ;;			 (edit-server-start)))
 ;;
-;; Buffers are edited in `text-mode' by default;
-;; to use a different mode, set it in `edit-server-start-hook'.
-;; For example:
+;; Buffers are edited in `text-mode' by default; to use a different
+;; mode, change `edit-server-default-major-mode' or customize
+;; `edit-server-url-major-mode-alist' to specify major modes based on
+;; the remote URL:
+;;
+;; (setq edit-server-url-major-mode-alist
+;;   '(("github\\.com" . markdown-mode)))
+;;
+;; Alternatively, set the mode in `edit-server-start-hook'.  For
+;; example:
 ;;
 ;; (add-hook 'edit-server-start-hook
 ;;           (lambda ()
@@ -99,6 +106,24 @@ If nil, the new frame will use the existing `default-frame-alist' values."
 	:type '(repeat (cons :format "%v"
 					 (symbol :tag "Parameter")
 					 (sexp :tag "Value"))))
+
+(defcustom edit-server-default-major-mode
+	'text-mode
+	"The default major mode to use in editing buffers, if no other
+mode is selected by `edit-server-url-major-mode-alist'."
+	:group 'edit-server
+	:type 'function)
+
+(defcustom edit-server-url-major-mode-alist
+	nil
+	"A-list of patterns and corresponding functions; when the first
+pattern is encountered which matches `edit-server-url', the
+corresponding function will be called in order to set the desired
+major mode. If no pattern matches,
+`edit-server-default-major-mode' will be used."
+	:group 'edit-server
+	:type '(alist :key-type (string :tag "Regexp")
+								:value-type (function :tag "Major mode function")))
 
 (defcustom edit-server-new-frame-mode-line t
 	"Show the emacs frame's mode-line if set to t; hide if nil."
@@ -345,6 +370,20 @@ If `edit-server-verbose' is non-nil, then STRING is also echoed to the message l
 		(raise-frame)
 		nil))
 
+(defun edit-server-choose-major-mode ()
+	"Use `edit-server-url-major-mode-alist' to choose a major mode
+initialization function based on `edit-server-url', or fall back
+to `edit-server-default-major-mode'"
+	(let ((pairs edit-server-url-major-mode-alist)
+				(mode edit-server-default-major-mode))
+		(while pairs
+			(let ((entry (car pairs)))
+				(if (string-match (car entry) edit-server-url)
+						(setq mode (cdr entry)
+									pairs nil)
+					(setq pairs (cdr pairs)))))
+	  (funcall mode)))
+
 (defun edit-server-create-edit-buffer(proc)
 	"Create an edit buffer, place content in it and save the network
 	process for the final call back"
@@ -357,11 +396,11 @@ If `edit-server-verbose' is non-nil, then STRING is also echoed to the message l
 					 (set-buffer-multibyte t))) ; djb
 		(copy-to-buffer buffer (point-min) (point-max))
 		(with-current-buffer buffer
-      ;; use `text-mode' by default, but allow
-      ;; `edit-server-start-hook' to override it however, (re)setting
-      ;; the minor mode seems to clear the buffer-local variables that
-      ;; we depend upon for the response, so call the hooks early on
-      (text-mode)
+      (edit-server-choose-major-mode)
+      ;; Allow `edit-server-start-hook' to override the major mode.
+      ;; (re)setting the minor mode seems to clear the buffer-local
+      ;; variables that we depend upon for the response, so call the
+      ;; hooks early on
       (run-hooks 'edit-server-start-hook)
 			(not-modified)
 			(add-hook 'kill-buffer-hook 'edit-server-abort* nil t)
