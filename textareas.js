@@ -127,6 +127,10 @@ function tagTextArea(text)
 	if (spellcheck && spellcheck == "false")
 		return;
 
+	// No edit for read-only text
+	// This also removes annoying edit button that appears under the menu bar in Google Docs viewer.
+	if (text.readOnly) return;
+
 	var existing_id = text.getAttribute("edit_id");
 	if (!existing_id)
 	{
