@@ -2,22 +2,27 @@
 <TITLE>Text Area Test</TITLE>
 <SCRIPT language="JavaScript">
 function seeTextArea (form) {
-	alert (form.myarea.value);
-
+	alert (form.children[1].value);
 }
 </SCRIPT>
 <STYLE></STYLE></HEAD><BODY>
 <FORM name="myform">
-<INPUT type="button" name="button3" value="Test" onclick="seeTextArea(this.form)">
-<TEXTAREA name="body" cols="40" rows="5" id="foo">
+<INPUT type="button" name="ta1_test" value="Test" onclick="seeTextArea(this.form)">
+<TEXTAREA name="first_textarea" cols="40" rows="5" id="foo">
 </TEXTAREA>
 </FORM>
 
 <FORM name="myform2">
-<INPUT type="button" name="button4" value="Test" onclick="seeTextArea(this.form)">
-<TEXTAREA name="body" cols="40" rows="5" id="foo">
+<INPUT type="button" name="ta2_test" value="Test" onclick="seeTextArea(this.form)">
+<TEXTAREA name="second_textarea" cols="40" rows="5" id="bar">
 </TEXTAREA>
 </FORM>
 
+<FORM name="myroform">
+<INPUT type="button" name="ro_button" value="Test" onclick="seeTextArea(this.form)">
+<TEXTAREA name="read" cols="40" rows="5" id="baz" readonly="readonly">
+This is some read-only text
+</TEXTAREA>
+</FORM>
 
 </BODY></HTML>
