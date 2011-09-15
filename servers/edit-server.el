@@ -326,7 +326,8 @@ If `edit-server-verbose' is non-nil, then STRING is also echoed to the message l
 	"Create a frame for the edit server"
 	(if edit-server-new-frame
 			(let ((new-frame
-						 (if (featurep 'aquamacs)
+						 (if (memq window-system '(ns mac))
+								 ;; Aquamacs, Emacs NS, Emacs (experimental) Mac port
 								 (make-frame edit-server-new-frame-alist)
 							 (make-frame-on-display (getenv "DISPLAY")
 																			edit-server-new-frame-alist))))
