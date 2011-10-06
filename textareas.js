@@ -115,13 +115,13 @@ function getTextAreaTracker(search_id)
 */
 function tagTextArea(text)
 {
-	// We don't want to tag all text boxen, especially if they are hidden
-	var display = text.style.getPropertyCSSValue('display');
-	if (display && display.cssText=="none")
-	{
-		return;
-	}
+	// Don't bother with hidden fields.
+	if ($(text).is(":hidden")) return;
 
+	// Is it offscreen (like some github textareas)
+	if ($(text).position().left + $(text).width() < 0) return;
+	if ($(text).position().top + $(text).height() < 0) return;
+		
 	// If spellcheck is turned off, usually it's just for quick editing, e.g. To: fields in gmail
 	var spellcheck = text.getAttribute("spellcheck");
 	if (spellcheck && spellcheck == "false")
