@@ -259,13 +259,8 @@ function editTextArea(event) {
 	a (page) global semaphore called findingTextAreas so it doesn't call itself after
 	tagTextArea() adds new nodes to the DOM tree.
 */
-function findTextAreasIn(thing) {
 
-	// Whatever thing is it need to have the getElementsByTagName method
-	// or there isn't a lot we can do about it.
-	if (!thing.getElementsByTagName)
-		return;
-	
+function findTextAreas() {
 	// Don't run through this if already finding stuff, lest we trigger events
 	if (findingTextAreas)
 		return;
@@ -273,7 +268,7 @@ function findTextAreasIn(thing) {
 	findingTextAreas = true;
 	
 	try {
-		var texts = thing.getElementsByTagName('textarea');
+		var texts = $("textarea");
 		for (var i=0; i<texts.length; i++) {
 			tagTextArea(texts[i]);
 		}
@@ -283,27 +278,6 @@ function findTextAreasIn(thing) {
 	}
 
 	findingTextAreas = false;
-}
-
-/*
-	Exhaustively search the page for textareas.
-*/
-function findTextAreas() {
-
-	// The main document
-	findTextAreasIn(document);
-
-	// IFRAMEs
-	var iframes = document.getElementsByTagName('iframe');
-	for (i = 0; i < iframes.length; i++) {
-		findTextAreasIn(iframes[i].contentDocument);
-	}
-
-	// FRAMEs
-	var frames = document.getElementsByTagName('frame');
-	for (i = 0; i < frames.length; i++) {
-		findTextAreasIn(frames[i].contentDocument);
-	}
 
 	return true;
 }
