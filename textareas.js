@@ -75,7 +75,7 @@ function textAreaTracker(text)
 	// The img 
 	if (enable_button) {
 		this.image = document.createElement('img');
-		this.image.style.cursor='pointer';
+		this.image.setAttribute("id", "ewe_edit_button");
 		this.image.setAttribute("edit_id", this.edit_id);
 		this.image.src = editImgURL;
 

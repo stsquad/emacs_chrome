@@ -1,0 +1,9 @@
+/*
+  CSS Definitions for Edit with Emacs
+ */
+
+#ewe_edit_button {
+    width: 28px;
+    height: 14px;
+    cursor: pointer;
+}
