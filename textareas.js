@@ -274,8 +274,16 @@ function findTextAreas() {
 		}
 	} catch (err) {
 		// it seems some (I)FRAMES have undefined contentDocuments
-		console.log("findTextAreasIn: failed with "+err);
+		console.log("findTextAreas: failed with "+err);
 	}
+
+  // lets see if we can find any contenteditable stuff
+	var editable = $('*').find("div[contenteditable='true']");
+  for (var i=0; i<editable.length; i++) {
+			// we need to treat stuff differently
+			console.log("found contenteditable divs");
+//			tagTextArea(editable[i]);
+  }
 
 	findingTextAreas = false;
 
