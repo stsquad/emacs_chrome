@@ -1,4 +1,4 @@
-// -*- tab-width:2; indent-tabs-mode:t -*- vim: set noet ts=2:
+// -*- tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
 /*
  * options.js
  *
@@ -13,7 +13,7 @@
 function loadCheckbox(id, config, defaultval) {
 	document.getElementById(id).checked = typeof localStorage[config] == "undefined" ? defaultval : localStorage[config] == "true";
 }
- 
+
 function saveCheckbox(id, config) {
 	localStorage[config] = document.getElementById(id).checked;
 }
@@ -57,10 +57,10 @@ function localMessageHandler(msg, port) {
 	// What was the bidding?
 	var cmd = msg.msg;
 	if (cmd == "test_result") {
-	var status = document.getElementById("server_status");
-	status.innerHTML = msg.text;
+	    var status = document.getElementById("server_status");
+	    status.innerHTML = msg.text;
 	} else {
-	console.log("localMessageHandler: un-handled message:"+cmd);
+	    console.log("localMessageHandler: un-handled message:"+cmd);
 	}
 }
 
