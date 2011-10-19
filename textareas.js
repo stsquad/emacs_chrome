@@ -1,4 +1,4 @@
-// -*- tab-width:2; indent-tabs-mode:t -*- vim: set noet ts=2:
+// -*- tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
 /*
  * TextAreas.js
  *
@@ -10,11 +10,14 @@
  * This file is part of emacs_chrome (http://github.com/stsquad/emacs_chrome)
  * and licensed under the GPLv3. See the COPYING file for details
  */
- 
+
 var editImgURL = chrome.extension.getURL("gumdrop.png");
 var port = chrome.extension.connect();
+
+// For findTextAreas
 var page_edit_id = 0;
 var pageTextAreas = [];
+var findTextAreasTimeout;
 var findingTextAreas = false;
 
 // via options
@@ -23,9 +26,9 @@ var enable_dblclick = false;
 var enable_keys = false;
 
 /*
-	getTitle
+  getTitle
 
-	Get the title from the DOM, if that fails try to synthesise something sensible
+  Get the title from the DOM, if that fails try to synthesise something sensible
 */
 
 function getTitle()
@@ -43,10 +46,10 @@ function getTitle()
 }
 
 /*
-	textAreaTracker
+  textAreaTracker
 
-	This object wraps up all the information about a given text area on the page.
-	It allows us to update the listeners and query stuff from one central location.
+  This object wraps up all the information about a given text area on the page.
+  It allows us to update the listeners and query stuff from one central location.
 */
 
 function textAreaTracker(text)
@@ -58,17 +61,17 @@ function textAreaTracker(text)
 
 	// The text areas event handlers we attach
 	this.focusListener = setFocused;
-	this.dblclickListener = function(){sendTextArea(this);};
+	this.editEvent = editTextArea;
 	this.keydownListener = function (e) {
 		// Alt-Enter
 		if (e.altKey && e.keyCode == 13)
-			sendTextArea(this);
+			editTextArea(e);
 	};
 	
 	this.text.addEventListener('focus',  this.focusListener);
 
 	if (enable_dblclick)
-		this.text.addEventListener('dblclick', this.dblclickListener);
+		this.text.addEventListener('dblclick', this.editEvent);
 	if (enable_keys)
 		this.text.addEventListener('keydown', this.keydownListener);
 
@@ -78,23 +81,37 @@ function textAreaTracker(text)
 		this.image.setAttribute("id", "ewe_edit_button");
 		this.image.setAttribute("edit_id", this.edit_id);
 		this.image.src = editImgURL;
-
-		this.clickListener = editTextArea;
-		this.image.addEventListener('click', this.clickListener, false);
-
+		this.image.addEventListener('click', editTextArea);
 		this.text.parentNode.insertBefore(this.image, text.nextSibling);
 	}
 
+	// Some methods to get and set content
+	this.getContent = function () {
+		if (this.text.tagName == "DIV") {
+			return this.text.innerHTML;
+		} else {
+			return this.text.value;
+		}
+	};
+
+	this.setContent = function(new_text) {
+		if (this.text.tagName == "DIV") {
+			this.text.innerHTML = new_text;
+		} else {
+			this.text.value = new_text;
+		}
+	};
+	
 }
 
 /*
-	getTextAreaTracker
+  getTextAreaTracker
 
-	Fetch the appropriate textAreaTracker for the given ID. As it tracks each element we
-	care about it's probably worth going through this short array rather than iterating
-	the entire DOM every time
+  Fetch the appropriate textAreaTracker for the given ID. As it tracks each element we
+  care about it's probably worth going through this short array rather than iterating
+  the entire DOM every time
 */
-	
+
 function getTextAreaTracker(search_id)
 {
 	for (var i=0; i<pageTextAreas.length; i++) {
@@ -104,14 +121,14 @@ function getTextAreaTracker(search_id)
 
 	return null;
 }
-	
-/*
-	tagTextArea
 
-	Any textarea we edit needs to be tagged with a unique ID so
-	when the get the edit response we know what to fill in. This
-	gets called several times not least as some text boxes can
-	appear in the document after first load.
+/*
+  tagTextArea
+
+  Any textarea we edit needs to be tagged with a unique ID so
+  when the get the edit response we know what to fill in. This
+  gets called several times not least as some text boxes can
+  appear in the document after first load.
 */
 function tagTextArea(text)
 {
@@ -121,7 +138,7 @@ function tagTextArea(text)
 	// Is it offscreen (like some github textareas)
 	if ($(text).position().left + $(text).width() < 0) return;
 	if ($(text).position().top + $(text).height() < 0) return;
-		
+
 	// If spellcheck is turned off, usually it's just for quick editing, e.g. To: fields in gmail
 	var spellcheck = text.getAttribute("spellcheck");
 	if (spellcheck && spellcheck == "false")
@@ -158,23 +175,22 @@ function tagTextArea(text)
 					}
 				}
 			}
-				
+
 			// And create a new tracked text area
 			pageTextAreas.push(new textAreaTracker(text));
 		}
 	}
 }
-	
 
 /*
- updateTextArea
+  updateTextArea
 
- Called when we want to update the text area with our updated text
+  Called when we want to update the text area with our updated text
 */
 function updateTextArea(id, content) {
 	var tracker = getTextAreaTracker(id);
 	if (tracker) {
-		tracker.text.value = content;
+		tracker.setContent(content);
 		orig = $(tracker.text).css('background-color');
 		$(tracker.text).css({'background-color': 'yellow'});
 		// mark node as changed
@@ -183,111 +199,133 @@ function updateTextArea(id, content) {
 		tracker.text.dispatchEvent(event);
 
 		setTimeout(function(){
-				$(tracker.text).animate({ 'background-color': orig }, 1000);
-			}, 1000);
+			$(tracker.text).animate({ 'background-color': orig }, 1000);
+		}, 1000);
 	}
 }
 
 /*
-	sendTextArea
+  sendTextArea
 
-	Send the text area to the main part of the extension to be passed
-	on to the external editor. Eventually 
+  Send the text area to the main part of the extension to be passed
+  on to the external editor. Eventually 
 */
 
-function sendTextArea(text) {
-	var text_edit_id = text.getAttribute("edit_id");
+function sendTextArea(text_tracker) {
 	// And spawn the request
 	var edit_msg = {
 		msg: "edit",
-		text: text.value,
+		text: text_tracker.getContent(),
 		title: getTitle(),
-		id: text_edit_id
+		id: text_tracker.edit_id
 	};
 	port.postMessage(edit_msg);
 }
 
 /*
-	Handle focused text area
+  Handle focused text area
 */
 (function(){
-	 var focusedEdit = null;
+	var focusedEdit = null;
 
-	 findActiveTextArea = function() {
-		 if (focusedEdit) {
-			 sendTextArea(focusedEdit);
-		 } else {
-			 var msg_text = "No textarea in focus in: "+getTitle();
-			 port.postMessage( {msg: "error", text: msg_text} );
-		 }
-	 };
+	findActiveTextArea = function() {
+		if (focusedEdit) {
+			sendTextArea(focusedEdit);
+		} else {
+			var msg_text = "No textarea in focus in: "+getTitle();
+			port.postMessage( {msg: "error", text: msg_text} );
+		}
+	};
 
-	 setFocused = function(){
-		 focusedEdit = this;
-		 // Update UI?
-		 var id = this.getAttribute("edit_id");
-		 if (id != undefined) {
-			 port.postMessage( {msg: "focus", id: id} );
-			 this.addEventListener('blur',	function() {
-					 port.postMessage( {msg: "focus", id: null} );
-					 this.removeEventListener('blur',arguments.callee,false);
-				 });
-		 }
-	 };
- })();
+	setFocused = function(){
+		focusedEdit = this;
+		// Update UI?
+		var id = this.getAttribute("edit_id");
+		if (id != undefined) {
+			port.postMessage( {msg: "focus", id: id} );
+			this.addEventListener('blur',	function() {
+				port.postMessage( {msg: "focus", id: null} );
+				this.removeEventListener('blur',arguments.callee,false);
+			});
+		}
+	};
+})();
 
 /*
- editTextArea
+  editTextArea
 
- Called when the edit button on a page is clicked, once done
- it finds the appropriate text area, extracts it's text and
- fires a message to the main extension to trigger the editing
+  Called when various edit events are called (dblClick, key-stroke or img click)
+
+  It finds the edit id, finds the textTracker for the id and sends the
+  tracker off to the be sent to the edit system.
 */
- 
-function editTextArea(event) {
-	var img = event.currentTarget;
-	var edit_id = img.getAttribute("edit_id");
 
+function editTextArea(event) {
+	var element = event.currentTarget;
+	var edit_id = element.getAttribute("edit_id");
 	var tracker = getTextAreaTracker(edit_id);
 	if (tracker) {
-		sendTextArea(tracker.text);
+		sendTextArea(tracker);
 	}
 }
 
 /*
-	This is the main find function for searching for TEXTAREAS. It protects itself via
-	a (page) global semaphore called findingTextAreas so it doesn't call itself after
-	tagTextArea() adds new nodes to the DOM tree.
+  This is the main find function for searching for TEXTAREAS. It protects itself via
+  a (page) global semaphore called findingTextAreas so it doesn't call itself after
+  tagTextArea() adds new nodes to the DOM tree.
+
+  I'm not sure we need the semaphore protection anymore...
 */
 
 function findTextAreas() {
 	// Don't run through this if already finding stuff, lest we trigger events
-	if (findingTextAreas)
+	if (findingTextAreas) {
+		console.log("findTextAreas: already running, exiting");
 		return;
-
-	findingTextAreas = true;
-	
-	try {
+	} else {
+		console.log("findTextAreas: running...");
+		findingTextAreas = true;
+	    
+		// Process textareas
 		var texts = $("textarea");
 		for (var i=0; i<texts.length; i++) {
 			tagTextArea(texts[i]);
 		}
-	} catch (err) {
-		// it seems some (I)FRAMES have undefined contentDocuments
-		console.log("findTextAreas: failed with "+err);
-	}
 
-  // lets see if we can find any contenteditable stuff
-	var editable = $('*').find("div[contenteditable='true']");
-  for (var i=0; i<editable.length; i++) {
-			// we need to treat stuff differently
-			console.log("found contenteditable divs");
-//			tagTextArea(editable[i]);
-  }
+		// lets see if we can find any contenteditable stuff
+		var editable = $('*').find("div[contenteditable='true']");
+		for (var i=0; i<editable.length; i++) {
+			tagTextArea(editable[i]);
+		}
 
-	findingTextAreas = false;
+		// According to http://www.w3.org/TR/html5/editing.html#contenteditable
+		// we should only see true/false or inherit. However G+ seems to ignore
+		// that so lets look for those here.
+		var editable = $('*').find("div[contenteditable='plaintext-only']");
+		for (var i=0; i<editable.length; i++) {
+			tagTextArea(editable[i]);
+		}
+		
+		findingTextAreas = false;
+    }
 
 	return true;
+}
+
+/*
+  This triggers each time an element is added.
+
+  By deferring the call to findTextAreas() with a timeout we prevent overloading
+  the browser on heavy DOM manipulation setups. If the timeout hasn't yet fired
+  we don't attempt to re-scan.
+*/
+function handleInsertedElements() {
+	if (!findTextAreasTimeout) {
+		findTextAreasTimeout = setTimeout((function() {
+			findTextAreas();
+			findTextAreasTimeout = undefined;
+		}), 0);
+	}
 }
 
 /* Message handling multiplexer */
@@ -301,9 +339,9 @@ function localMessageHandler(msg, port) {
 		enable_keys = msg.enable_keys;
 		findTextAreas();
 		document.addEventListener("DOMNodeInserted", (function (ev) {
-					findTextAreas();
-					return true;
-				}), false);
+			handleInsertedElements();
+			return true;
+		}), false);
 	} else if (cmd == "find_edit") {
 		findActiveTextArea();
 	} else if (cmd == "update") {
@@ -320,12 +358,12 @@ function localMessageHandler(msg, port) {
 
 port.onMessage.addListener(localMessageHandler);
 chrome.extension.onConnect.addListener(function(iport) {
-		iport.onMessage.addListener(localMessageHandler);
-	});
+	iport.onMessage.addListener(localMessageHandler);
+});
 
 /*
-	To start the whole process off we first need to fetch our configuration
-	from the background process.
+  To start the whole process off we first need to fetch our configuration
+  from the background process.
 */
 port.postMessage({msg: "config"});
 
@@ -336,16 +374,16 @@ document.addEventListener("contextmenu", (function(event) {
 
 	var elem = event.srcElement;
 	if (elem && elem.getAttribute("edit_id")) {
-	var request = {
-		type: "menu_target",
-		edit_msg: {
-		msg: "edit",
-		text: elem.value,
-		title: getTitle(),
-		id: elem.getAttribute("edit_id")
-		}
-	};
-	chrome.extension.sendRequest(request);
+	    var request = {
+		    type: "menu_target",
+		    edit_msg: {
+		        msg: "edit",
+		        text: elem.value,
+		        title: getTitle(),
+		        id: elem.getAttribute("edit_id")
+		    }
+	    };
+	    chrome.extension.sendRequest(request);
 	}
 
 }));
