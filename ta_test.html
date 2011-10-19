@@ -1,28 +1,68 @@
-<HTML><HEAD><META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<TITLE>Text Area Test</TITLE>
-<SCRIPT language="JavaScript">
-function seeTextArea (form) {
-	alert (form.children[1].value);
-}
-</SCRIPT>
-<STYLE></STYLE></HEAD><BODY>
-<FORM name="myform">
-<INPUT type="button" name="ta1_test" value="Test" onclick="seeTextArea(this.form)">
-<TEXTAREA name="first_textarea" cols="40" rows="5" id="foo">
-</TEXTAREA>
-</FORM>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
 
-<FORM name="myform2">
-<INPUT type="button" name="ta2_test" value="Test" onclick="seeTextArea(this.form)">
-<TEXTAREA name="second_textarea" cols="40" rows="5" id="bar">
-</TEXTAREA>
-</FORM>
+    <style type="text/css">
+      div.editable {
+	  width: 339px;
+	  border-width: 1px;
+	  box-sizing: border-box;
+	  word-wrap: break-word;
+		   }
+    </style>
 
-<FORM name="myroform">
-<INPUT type="button" name="ro_button" value="Test" onclick="seeTextArea(this.form)">
-<TEXTAREA name="read" cols="40" rows="5" id="baz" readonly="readonly">
+    <title>Text Area Test</title>
+
+  </head>
+
+  <body>
+
+    <script language="JavaScript">
+      function seeTextArea (form) {
+      alert (form.children[1].value);
+      }
+    </script>
+
+
+    <form name="myform">
+      <input type="button" name="ta1_test" value="Test" onclick="seeTextArea(this.form)"/>
+      <textarea name="first_textarea" cols="40" rows="5" id="foo">
+Text Area 1
+      </textarea>
+    </form>
+
+    <form name="myform2">
+      <input type="button" name="ta2_test" value="Test" onclick="seeTextArea(this.form)"/>
+      <textarea name="second_textarea" cols="40" rows="5" id="bar">
+Text Area 2
+      </textarea>
+    </form>
+
+    <form name="myroform">
+      <input type="button" name="ro_button" value="Test" onclick="seeTextArea(this.form)"/>
+      <textarea name="read" cols="40" rows="5" id="baz" readonly="readonly">
 This is some read-only text
-</TEXTAREA>
-</FORM>
+      </textarea>
+    </form>
 
-</BODY></HTML>
+    <p>
+      <div>  
+	<input type="button" name="ro_button" value="Test" onclick="showDiv(#ce1)"/>
+	<div class="editable" id="ce1" contenteditable="true">
+This is an editable div....
+	</div>
+      </div>
+    </p>
+
+    <p>
+      <div>  
+	<input type="button" name="ro_button" value="Test" onclick="showDiv(#ce2)"/>
+	<div class="editable" id="ce2" contenteditable="plaintext-only">
+Some content is plain text only...
+	</div>
+      </div>
+    </p>
+
+  </body>
+</html>
+
