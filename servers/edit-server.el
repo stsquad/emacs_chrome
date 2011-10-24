@@ -72,13 +72,14 @@
 ;;; Code:
 
 ;; uncomment to debug
-;(setq debug-on-error 't)
-;(setq edebug-all-defs 't)
+;; (setq debug-on-error t)
+;; (setq edebug-all-defs t)
 
 (if (not (featurep 'make-network-process))
 		(error "Incompatible version of [X]Emacs - lacks make-network-process"))
 
-;; Customization
+;;; Customization
+
 (defcustom edit-server-port 9292
 	"Local port the edit server listens to."
 	:group 'edit-server
@@ -108,7 +109,8 @@ buffer-specific modes or add key bindings."
 	:group 'edit-server
 	:type 'hook)
 
-; frame options
+;; frame options
+
 (defcustom edit-server-new-frame t
 	"If not nil, edit each buffer in a new frame (and raise it)."
 	:group 'edit-server
@@ -150,7 +152,8 @@ major mode. If no pattern matches,
 	:group 'edit-server
 	:type 'boolean)
 
-;; Vars
+;;; Variables
+
 (defconst edit-server-process-buffer-name " *edit-server*"
 	"Template name of the edit-server process buffers.")
 
@@ -161,23 +164,23 @@ major mode. If no pattern matches,
 	"Template name of the edit-server text editing buffers.")
 
 ;; Buffer local variables
-;
-; These are all required to associate the edit buffer with the
-; correct connection to the client and allow for the buffer to be sent
-; back when ready. They are `permanent-local` to avoid being reset if
-; the buffer changes major modes.
+;;
+;; These are all required to associate the edit buffer with the
+;; correct connection to the client and allow for the buffer to be sent
+;; back when ready. They are `permanent-local` to avoid being reset if
+;; the buffer changes major modes.
 
 (defvar edit-server-proc 'nil
 	"Network process associated with the current edit, made local when
  the edit buffer is created")
 (put 'edit-server-proc 'permanent-local t)
 
-(defvar edit-server-frame 'nil
+(defvar edit-server-frame nil
 	"The frame created for a new edit-server process, made local when
  then edit buffer is created")
 (put 'edit-server-frame 'permanent-local t)
 
-(defvar edit-server-clients '() 
+(defvar edit-server-clients ()
 	"List of all client processes associated with the server process.")
 (put 'edit-server-clients 'permanent-local t)
 
@@ -202,13 +205,13 @@ Depending on the character encoding, may be different from the buffer length.")
 	"The value gotten from the HTTP `x-url' header.")
 (put 'edit-server-url 'permanent-local t)
 
-;; Mode magic
-;
-; We want to re-map some of the keys to trigger edit-server-done
-; instead of the usual emacs like behaviour. However using
-; local-set-key will affect all buffers of the same mode, hence we
-; define a special (derived) mode for handling editing of text areas.
-;
+;;; Mode magic
+;;
+;; We want to re-map some of the keys to trigger edit-server-done
+;; instead of the usual emacs like behaviour. However using
+;; local-set-key will affect all buffers of the same mode, hence we
+;; define a special (derived) mode for handling editing of text areas.
+
 
 (defvar edit-server-edit-mode-map
   (make-sparse-keymap)
@@ -235,8 +238,7 @@ unmodified text is sent back instead.
 
 Its sole purpose is currently to enable
 `edit-server-edit-mode-map', which overrides common keystrokes to
-send a response back to the client.
-"
+send a response back to the client."
   :group 'edit-server
   :lighter " EditSrv"
   :init-value nil
@@ -244,14 +246,12 @@ send a response back to the client.
 
 
 ;; Edit Server socket code
-;
 
 (defun edit-server-start (&optional verbose) 
 	"Start the edit server.
 
 If argument VERBOSE is non-nil, logs all server activity to buffer `*edit-server-log*'.
-When called interactivity, a prefix argument will cause it to be verbose.
-"
+When called interactivity, a prefix argument will cause it to be verbose."
 	(interactive "P")
 	(if (or (process-status "edit-server")
 					(null (condition-case err
