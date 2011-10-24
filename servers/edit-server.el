@@ -1,7 +1,30 @@
-;; -*- tab-width:2; indent-tabs-mode:t -*- vim: set noet ts=2:
-;;
-;; Emacs edit-server
-;;
+;;; edit-server.el --- server that responds to edit requests from Chrome -*- tab-width:2; indent-tabs-mode:t -*- vim: set noet ts=2:
+
+;; Copyright (C) 2009-2011  Alex Bennee
+;; Copyright (C) 2010-2011  Riccardo Murri
+
+;; Author: Alex Bennee <alex@bennee.com>
+;; Maintainer: Alex Bennee <alex@bennee.com>
+;; Version: 1.10
+;; Homepage: https://github.com/stsquad/emacs_chrome
+
+;; This file is not part of GNU Emacs.
+
+;; This file is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 3, or (at your option)
+;; any later version.
+
+;; This file is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
 ;; This provides an edit server to respond to requests from the Chrome
 ;; Emacs Chrome plugin. This is my first attempt at doing something
 ;; with sockets in Emacs. I based it on the following examples:
@@ -45,11 +68,8 @@
 ;;             (if (string-match "github.com" (buffer-name))
 ;;                 (markdown-mode))))
 ;;
-;; (C) 2009 Alex Bennee (alex@bennee.com)
-;; (C) 2010 Riccardo Murri (riccardo.murri@gmail.com)
-;;
-;; Licensed under GPLv3
-;;
+
+;;; Code:
 
 ;; uncomment to debug
 ;(setq debug-on-error 't)
