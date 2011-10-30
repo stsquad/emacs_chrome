@@ -1,3 +1,21 @@
+v1.10
+
+Extension
+
+* Ignore textareas marked as read only
+* Don't tag areas that are not visible
+* General clean-up to use jQuery to find elements
+* Explicit CSS for edit button to override page settings
+* Handle editable <div> blocks (e.g. Google+)
+* Optimise the finding of text areas for highly dynamic pages
+
+edit-server.el
+
+* Allow customisation of edit-server-default-major-mode
+* Allow edit mode to be set by matched URL
+* Tweak detection of MacOS X Emacsen
+* Change behaviour of C-x C-s to save to kill-ring
+
 v1.9
 
 Extension
