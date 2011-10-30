@@ -158,13 +158,15 @@ Redefine a few common Emacs keystrokes to functions that can
 deal with the response to the edit-server request.
 
 Any of the following keys will close the buffer and send the text
-to the HTTP client: C-x #, C-x C-s, C-c C-c.
+to the HTTP client: C-x #, C-c C-c.
+
+Pressing C-x C-s will save the current state to the kill-ring.
 
 If any of the above isused with a prefix argument, the
 unmodified text is sent back instead.
 ")
+(define-key edit-server-edit-mode-map (kbd "C-x C-s") 'edit-server-save)
 (define-key edit-server-edit-mode-map (kbd "C-x #")   'edit-server-done)
-(define-key edit-server-edit-mode-map (kbd "C-x C-s") 'edit-server-done)
 (define-key edit-server-edit-mode-map (kbd "C-c C-c") 'edit-server-done)
 (define-key edit-server-edit-mode-map (kbd "C-x C-c") 'edit-server-abort)
 
@@ -451,6 +453,30 @@ When called interactively, use prefix arg to abort editing."
 			;; delete-frame may change the current buffer
 			(unless nokill (kill-buffer buffer))
 			(edit-server-kill-client proc))))
+
+;;
+;; There are a couple of options for handling the save
+;; action. The intent is to preserve data but not finish
+;; editing. There are a couple of approaches that could
+;; be taken:
+;;  a) Use the iterative edit-server option (send a buffer
+;;     back to the client which then returns new request
+;;     to continue the session).
+;;  b) Back-up the edit session to a file
+;;  c) Save the current buffer to the kill-ring
+;;
+;; I've attempted to do a) a couple of times but I keep running
+;; into problems which I think are emacs bugs. So for now I'll
+;; just push the current buffer to the kill-ring.
+
+(defun edit-server-save ()
+	"Save the current state of the edit buffer."
+	(interactive)
+	(save-restriction
+		(widen)
+		(buffer-disable-undo)
+		(copy-region-as-kill (point-min) (point-max))
+		(buffer-enable-undo)))
 
 (defun edit-server-abort ()
 	"Discard editing and send the original text back to the browser."
