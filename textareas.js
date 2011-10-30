@@ -18,7 +18,8 @@ var port = chrome.extension.connect();
 var page_edit_id = 0;
 var pageTextAreas = [];
 var findTextAreasTimeout;
-var findingTextAreas = false;
+var findTextAreasTime = 0;
+var findTextAreasDefferedElements = [];
 
 // via options
 var enable_button = true;
@@ -273,43 +274,35 @@ function editTextArea(event) {
   This is the main find function for searching for TEXTAREAS. It protects itself via
   a (page) global semaphore called findingTextAreas so it doesn't call itself after
   tagTextArea() adds new nodes to the DOM tree.
-
-  I'm not sure we need the semaphore protection anymore...
 */
 
-function findTextAreas() {
-	// Don't run through this if already finding stuff, lest we trigger events
-	if (findingTextAreas) {
-		console.log("findTextAreas: already running, exiting");
-		return;
-	} else {
-		console.log("findTextAreas: running...");
-		findingTextAreas = true;
-	    
-		// Process textareas
-		var texts = $("textarea");
-		for (var i=0; i<texts.length; i++) {
-			tagTextArea(texts[i]);
-		}
+function findTextAreas(elements) {
+	console.log("findTextAreas: running over "+elements.length);
 
-		// lets see if we can find any contenteditable stuff
-		var editable = $('*').find("div[contenteditable='true']");
-		for (var i=0; i<editable.length; i++) {
-			tagTextArea(editable[i]);
-		}
+    for (var i=0; i<elements.length; i++) {
+        var x = $(elements[i]);
+	    // Process textareas
+	    var texts = x.find("textarea");
+	    for (var j=0; j<texts.length; j++) {
+		    tagTextArea(texts[j]);
+	    }
 
-		// According to http://www.w3.org/TR/html5/editing.html#contenteditable
-		// we should only see true/false or inherit. However G+ seems to ignore
-		// that so lets look for those here.
-		var editable = $('*').find("div[contenteditable='plaintext-only']");
-		for (var i=0; i<editable.length; i++) {
-			tagTextArea(editable[i]);
-		}
-		
-		findingTextAreas = false;
+	    // lets see if we can find any contenteditable stuff
+	    var editable = x.find("div[contenteditable='true']");
+	    for (var j=0; j<editable.length; j++) {
+		    tagTextArea(editable[j]);
+	    }
+
+	    // According to http://www.w3.org/TR/html5/editing.html#contenteditable
+	    // we should only see true/false or inherit. However G+ seems to ignore
+	    // that so lets look for those here.
+	    var editable = x.find("div[contenteditable='plaintext-only']");
+	    for (var j=0; j<editable.length; j++) {
+		    tagTextArea(editable[j]);
+	    }
     }
-
-	return true;
+	
+	
 }
 
 /*
@@ -319,13 +312,25 @@ function findTextAreas() {
   the browser on heavy DOM manipulation setups. If the timeout hasn't yet fired
   we don't attempt to re-scan.
 */
-function handleInsertedElements() {
+function handleInsertedElements(ev) {
 	if (!findTextAreasTimeout) {
+        var elements = findTextAreasDefferedElements;
+        elements.push(ev.target);
+        console.log("will scan text area in "+findTextAreasTime);
 		findTextAreasTimeout = setTimeout((function() {
-			findTextAreas();
+            console.log("findTextAreas timeout fired");
+			findTextAreas(elements);
 			findTextAreasTimeout = undefined;
-		}), 0);
-	}
+            findTextAreasTime = 0;
+		}), findTextAreasTime);
+        // clear the deffered array
+        findTextAreasDefferedElements = [];
+	} else {
+        findTextAreasTime += 500;
+        findTextAreasTime = Math.min(findTextAreasTime, 2000);
+        findTextAreasDefferedElements.push(ev.target);
+        console.log("defered "+findTextAreasDefferedElements.length+" updates, next fire in "+findTextAreasTime);
+    }
 }
 
 /* Message handling multiplexer */
@@ -337,9 +342,9 @@ function localMessageHandler(msg, port) {
 		enable_button = msg.enable_button;
 		enable_dblclick = msg.enable_dblclick;
 		enable_keys = msg.enable_keys;
-		findTextAreas();
+		findTextAreas([$('*')]);
 		document.addEventListener("DOMNodeInserted", (function (ev) {
-			handleInsertedElements();
+			handleInsertedElements(ev);
 			return true;
 		}), false);
 	} else if (cmd == "find_edit") {
