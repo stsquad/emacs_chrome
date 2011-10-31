@@ -140,32 +140,47 @@ major mode. If no pattern matches,
 (defconst edit-server-edit-buffer-name "TEXTAREA"
 	"Template name of the edit-server text editing buffers.")
 
+;; Buffer local variables
+;
+; These are all required to associate the edit buffer with the
+; correct connection to the client and allow for the buffer to be sent
+; back when ready. They are `permanent-local` to avoid being reset if
+; the buffer changes major modes.
+
 (defvar edit-server-proc 'nil
 	"Network process associated with the current edit, made local when
  the edit buffer is created")
+(put 'edit-server-proc 'permanent-local t)
 
 (defvar edit-server-frame 'nil
 	"The frame created for a new edit-server process, made local when
  then edit buffer is created")
+(put 'edit-server-frame 'permanent-local t)
 
 (defvar edit-server-clients '() 
 	"List of all client processes associated with the server process.")
+(put 'edit-server-clients 'permanent-local t)
 
 (defvar edit-server-phase nil 
 	"Symbol indicating the state of the HTTP request parsing.")
+(put 'edit-server-phase 'permanent-local t)
 
 (defvar edit-server-received nil 
 	"Number of bytes received so far in the client buffer. 
 Depending on the character encoding, may be different from the buffer length.")
+(put 'edit-server-received 'permanent-local t)
 
 (defvar edit-server-request nil 
 	"The HTTP request (GET, HEAD, POST) received.")
+(put 'edit-server-request 'permanent-local t)
 
 (defvar edit-server-content-length nil 
 	"The value gotten from the HTTP `Content-Length' header.")
+(put 'edit-server-content-length 'permanent-local t)
 
 (defvar edit-server-url nil 
 	"The value gotten from the HTTP `x-url' header.")
+(put 'edit-server-url 'permanent-local t)
 
 ;; Mode magic
 ;
