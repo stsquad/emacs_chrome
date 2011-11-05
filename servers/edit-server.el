@@ -210,7 +210,12 @@ Depending on the character encoding, may be different from the buffer length.")
 
 
 (defvar edit-server-edit-mode-map
-  (make-sparse-keymap)
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-x C-s") 'edit-server-save)
+    (define-key map (kbd "C-x #")   'edit-server-done)
+    (define-key map (kbd "C-c C-c") 'edit-server-done)
+    (define-key map (kbd "C-x C-c") 'edit-server-abort)
+    map)
   "Keymap for minor mode `edit-server-edit-mode'.
 
 Redefine a few common Emacs keystrokes to functions that can
@@ -223,10 +228,6 @@ Pressing C-x C-s will save the current state to the kill-ring.
 
 If any of the above isused with a prefix argument, the
 unmodified text is sent back instead.")
-(define-key edit-server-edit-mode-map (kbd "C-x C-s") 'edit-server-save)
-(define-key edit-server-edit-mode-map (kbd "C-x #")   'edit-server-done)
-(define-key edit-server-edit-mode-map (kbd "C-c C-c") 'edit-server-done)
-(define-key edit-server-edit-mode-map (kbd "C-x C-c") 'edit-server-abort)
 
 (define-minor-mode edit-server-edit-mode
   "Minor mode enabled on buffers opened by `edit-server-accept'.
