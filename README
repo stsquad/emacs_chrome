@@ -75,6 +75,12 @@ Jonas Bernoulli
 Other Code
 ==========
 
+This extensions takes advantage of the jQuery library
+to do a lot of the heavy lifting in searching the page
+for elements. You can find it at:
+
+http://jquery.com/
+
 The settings code uses Frank Kohlhepp's excellent
 fancy-settings library. This can be found at:
 
