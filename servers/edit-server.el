@@ -159,6 +159,9 @@ major mode. If no pattern matches,
 (defconst edit-server-edit-buffer-name "TEXTAREA"
   "Template name of the edit-server text editing buffers.")
 
+(defvar edit-server-clients ()
+  "List of all client processes associated with the server process.")
+
 ;; Buffer local variables
 ;;
 ;; These are all required to associate the edit buffer with the
@@ -166,39 +169,40 @@ major mode. If no pattern matches,
 ;; back when ready. They are `permanent-local` to avoid being reset if
 ;; the buffer changes major modes.
 
-(defvar edit-server-proc 'nil
-  "Network process associated with the current edit, made local when
- the edit buffer is created")
+(defvar edit-server-proc nil
+  "Network process associated with the current edit.")
+(make-variable-buffer-local 'edit-server-proc)
 (put 'edit-server-proc 'permanent-local t)
 
 (defvar edit-server-frame nil
-  "The frame created for a new edit-server process, made local when
- then edit buffer is created")
+  "The frame created for a new edit-server process.")
+(make-variable-buffer-local 'edit-server-frame)
 (put 'edit-server-frame 'permanent-local t)
-
-(defvar edit-server-clients ()
-  "List of all client processes associated with the server process.")
-(put 'edit-server-clients 'permanent-local t)
 
 (defvar edit-server-phase nil
   "Symbol indicating the state of the HTTP request parsing.")
+(make-variable-buffer-local 'edit-server-phase)
 (put 'edit-server-phase 'permanent-local t)
 
 (defvar edit-server-received nil
   "Number of bytes received so far in the client buffer.
 Depending on the character encoding, may be different from the buffer length.")
+(make-variable-buffer-local 'edit-server-received)
 (put 'edit-server-received 'permanent-local t)
 
 (defvar edit-server-request nil
   "The HTTP request (GET, HEAD, POST) received.")
+(make-variable-buffer-local 'edit-server-request)
 (put 'edit-server-request 'permanent-local t)
 
 (defvar edit-server-content-length nil
   "The value gotten from the HTTP `Content-Length' header.")
+(make-variable-buffer-local 'edit-server-content-length)
 (put 'edit-server-content-length 'permanent-local t)
 
 (defvar edit-server-url nil
   "The value gotten from the HTTP `x-url' header.")
+(make-variable-buffer-local 'edit-server-url)
 (put 'edit-server-url 'permanent-local t)
 
 ;;; Mode magic
@@ -312,11 +316,11 @@ non-nil, then STRING is also echoed to the message line."
     ;; kill-buffer kills the associated process
     (set-process-query-on-exit-flag client nil)
     (with-current-buffer buffer
-      (set (make-local-variable 'edit-server-phase) 'wait)
-      (set (make-local-variable 'edit-server-received) 0)
-      (set (make-local-variable 'edit-server-request) nil))
-    (set (make-local-variable 'edit-server-content-length) nil)
-    (set (make-local-variable 'edit-server-url) nil))
+      (setq edit-server-phase 'wait
+	    edit-server-received 0
+	    edit-server-request nil))
+    (setq edit-server-content-length nil
+	  edit-server-url nil))
   (add-to-list 'edit-server-clients client)
   (edit-server-log client msg))
 
@@ -445,9 +449,8 @@ to `edit-server-default-major-mode'"
       (not-modified)
       (add-hook 'kill-buffer-hook 'edit-server-abort* nil t)
       (buffer-enable-undo)
-      (set (make-local-variable 'edit-server-proc) proc)
-      (set (make-local-variable 'edit-server-frame)
-	   (edit-server-create-frame buffer))
+      (setq edit-server-proc proc
+	    edit-server-frame (edit-server-create-frame buffer))
       (edit-server-edit-mode))))
 
 (defun edit-server-send-response (proc &optional body close)
