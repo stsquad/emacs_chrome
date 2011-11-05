@@ -12,14 +12,18 @@
  * and licensed under the GPLv3. See the COPYING file for details
  */
 
+var settings = new Store("settings", {
+    "edit_server_port": 9292,
+    "enable_button": true,
+    "enable_dblclick": false,
+    "enable_keys": false
+});
+
+
 // Get the base URL from which we make all requests to the server..
 function getEditUrl()
 {
-	var port = localStorage["edit_server_port"];
-	if (!port) {
-	    port = 9292;
-	}
-	return "http://127.0.0.1:" +	port + "/";
+	return "http://127.0.0.1:" + settings.get("edit_server_port") + "/";
 }
 
 /*
@@ -147,18 +151,13 @@ function handleTestMessages(msg, tab_port)
 // Handle config request messages, the textarea.js content script being in it's own
 // isolated sandbox has to be fed all this via the IPC mechanisms
 
-function getBooleanConfig(config, defaultval) {
-	return typeof localStorage[config] == "undefined" ? defaultval : localStorage[config] == "true";
-}
-
-
 function handleConfigMessages(msg, tab_port)
 {
 	var config_msg = {
 	    msg: "config",
-	    enable_button: getBooleanConfig("enable_button", true),
-	    enable_dblclick: getBooleanConfig("enable_dblclick", false),
-	    enable_keys: getBooleanConfig("enable_keys", false)
+	    enable_button: settings.get("enable_button"),
+	    enable_dblclick: settings.get("enable_dblclick"),
+	    enable_keys: settings.get("enable_keys")
 	};
 	tab_port.postMessage(config_msg);
 }
