@@ -71,8 +71,8 @@
 ;; (setq debug-on-error t)
 ;; (setq edebug-all-defs t)
 
-(if (not (featurep 'make-network-process))
-    (error "Incompatible version of [X]Emacs - lacks make-network-process"))
+(unless (featurep 'make-network-process)
+  (error "Incompatible version of [X]Emacs - lacks make-network-process"))
 
 ;;; Customization
 
@@ -260,9 +260,7 @@ will cause it to be verbose."
 		     :name "edit-server"
 		     :buffer edit-server-process-buffer-name
 		     :family 'ipv4
-		     :host (if edit-server-host
-			       edit-server-host
-			     'local)
+		     :host (or edit-server-host 'local)
 		     :service edit-server-port
 		     :log 'edit-server-accept
 		     :server t
@@ -282,8 +280,8 @@ will cause it to be verbose."
   (if (process-status "edit-server")
       (delete-process "edit-server")
     (message "No edit server running"))
-  (if (get-buffer edit-server-process-buffer-name)
-      (kill-buffer edit-server-process-buffer-name)))
+  (when (get-buffer edit-server-process-buffer-name)
+    (kill-buffer edit-server-process-buffer-name)))
 
 (defun edit-server-log (proc fmt &rest args)
   "If a `*edit-server-log*' buffer exists, write STRING to it.
@@ -308,8 +306,8 @@ non-nil, then STRING is also echoed to the message line."
 (defun edit-server-accept (server client msg)
   "Accept a new client connection."
   (let ((buffer (generate-new-buffer edit-server-process-buffer-name)))
-    (and (fboundp 'set-buffer-multibyte)
-	 (set-buffer-multibyte t)) ; djb
+    (when (fboundp 'set-buffer-multibyte)
+      (set-buffer-multibyte t)) ; djb
     (buffer-disable-undo buffer)
     (set-process-buffer client buffer)
     (set-process-filter client 'edit-server-filter)
@@ -399,14 +397,14 @@ non-nil, then STRING is also echoed to the message line."
 		 (make-frame edit-server-new-frame-alist)
 	       (make-frame-on-display (getenv "DISPLAY")
 				      edit-server-new-frame-alist))))
-	(if (not edit-server-new-frame-mode-line)
-	    (setq mode-line-format nil))
+	(unless edit-server-new-frame-mode-line
+	  (setq mode-line-format nil))
 	(select-frame new-frame)
-	(if (and (eq window-system 'x)
-		 (fboundp 'x-send-client-message))
-	    (x-send-client-message nil 0 nil
-				   "_NET_ACTIVE_WINDOW" 32
-				   '(1 0 0)))
+	(when (and (eq window-system 'x)
+		   (fboundp 'x-send-client-message))
+	  (x-send-client-message nil 0 nil
+				 "_NET_ACTIVE_WINDOW" 32
+				 '(1 0 0)))
 	(raise-frame new-frame)
 	(set-window-buffer (frame-selected-window new-frame) buffer)
 	new-frame)
@@ -432,12 +430,11 @@ to `edit-server-default-major-mode'"
   "Create an edit buffer, place content in it and save the network
 	process for the final call back"
   (let ((buffer (generate-new-buffer
-		 (if edit-server-url
-		     edit-server-url
-		   edit-server-edit-buffer-name))))
+		 (or edit-server-url
+		     edit-server-edit-buffer-name))))
     (with-current-buffer buffer
-      (and (fboundp 'set-buffer-multibyte)
-	   (set-buffer-multibyte t))) ; djb
+      (when (fboundp 'set-buffer-multibyte)
+	(set-buffer-multibyte t))) ; djb
     (copy-to-buffer buffer (point-min) (point-max))
     (with-current-buffer buffer
       (edit-server-choose-major-mode)
@@ -481,8 +478,8 @@ and its buffer are killed with `edit-server-kill-client'."
 	  (encode-coding-region (point-min) (point-max) 'utf-8)
 	  (process-send-region proc (point-min) (point-max))))
 	(process-send-eof proc)
-	(if close
-	    (edit-server-kill-client proc))
+	(when close
+	  (edit-server-kill-client proc))
 	(edit-server-log proc "Editing done, sent HTTP OK response."))
     (message "edit-server-send-response: invalid proc (bug?)")))
 
@@ -530,9 +527,11 @@ When called interactively, use prefix arg to abort editing."
 	  (dolist (format buffer-file-format)
 	    (format-decode-region (point-min) (point-max) format))
 	  (buffer-enable-undo)))
-      (if edit-server-frame (delete-frame edit-server-frame))
+      (when edit-server-frame
+	(delete-frame edit-server-frame))
       ;; delete-frame may change the current buffer
-      (unless nokill (kill-buffer buffer))
+      (unless nokill
+	(kill-buffer buffer))
       (edit-server-kill-client proc))))
 
 ;;
