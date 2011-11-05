@@ -70,3 +70,12 @@ Ryszard Szopa
 Kazuya Sakakihara
 Steve Purcell
 Dale Sedivec
+Jonas Bernoulli
+
+Other Code
+==========
+
+The settings code uses Frank Kohlhepp's excellent
+fancy-settings library. This can be found at:
+
+https://github.com/frankkohlhepp/fancy-settings

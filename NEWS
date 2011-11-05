@@ -8,6 +8,7 @@ Extension
 * Explicit CSS for edit button to override page settings
 * Handle editable <div> blocks (e.g. Google+)
 * Optimise the finding of text areas for highly dynamic pages
+* Revamp the settings page with "Fancy Settings"
 
 edit-server.el
 
