@@ -20,7 +20,7 @@
 		{
 			"matches": ["http://*/*", "https://*/*", "file://*/*"],
 			"css": ["textareas.css"],
-			"js": ["textareas.js", "jquery-1.4.2.min.js", "jquery.color.js"],
+			"js": ["textareas.js", "jquery-1.7.min.js", "jquery.color.min.js"],
 			"run_at": "document_idle",
 			"all_frames": true
 		}

@@ -200,7 +200,7 @@ function updateTextArea(id, content) {
 		tracker.text.dispatchEvent(event);
 
 		setTimeout(function(){
-			$(tracker.text).animate({ 'background-color': orig }, 1000);
+			$(tracker.text).animate({ 'backgroundColor': orig }, 1000);
 		}, 1000);
 	}
 }

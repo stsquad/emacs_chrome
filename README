@@ -81,6 +81,12 @@ for elements. You can find it at:
 
 http://jquery.com/
 
+It uses John Resig's jQuery Colour Animation plug-in
+to do the colour fades of the elements. It can be found
+at:
+
+https://github.com/jquery/jquery-color
+
 The settings code uses Frank Kohlhepp's excellent
 fancy-settings library. This can be found at:
 
