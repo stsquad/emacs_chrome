@@ -16,6 +16,8 @@ edit-server.el
 * Allow edit mode to be set by matched URL
 * Tweak detection of MacOS X Emacsen
 * Change behaviour of C-x C-s to save to kill-ring
+* Persist the buffer-local variables beyond mode changes
+* Setup keymap within defvar
 * Clean-ups to code to be more idiomatic.
 
 v1.9
