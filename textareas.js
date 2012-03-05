@@ -34,16 +34,16 @@ var enable_keys = false;
 
 function getTitle()
 {
-	var title = document.title;
-	if (title == null || title.length==0) {
-		try {
-			title = document.getElementsByTagName('title').item().innerText;
-		} catch (err) {
-			console.log ("failed to extract title from HTML ("+err+")");
-			title = document.documentURI;
-		}
-	}
-	return title;
+    var title = document.title;
+    if (title == null || title.length==0) {
+        try {
+            title = document.getElementsByTagName('title').item().innerText;
+        } catch (err) {
+            console.log ("failed to extract title from HTML ("+err+")");
+            title = document.documentURI;
+        }
+    }
+    return title;
 }
 
 /*
@@ -55,54 +55,54 @@ function getTitle()
 
 function textAreaTracker(text)
 {
-	this.edit_id = "eta_"+page_edit_id;
-	page_edit_id = page_edit_id + 1;
-	this.text = text;
-	this.text.setAttribute("edit_id", this.edit_id);
+    this.edit_id = "eta_"+page_edit_id;
+    page_edit_id = page_edit_id + 1;
+    this.text = text;
+    this.text.setAttribute("edit_id", this.edit_id);
 
-	// The text areas event handlers we attach
-	this.focusListener = setFocused;
-	this.editEvent = editTextArea;
-	this.keydownListener = function (e) {
-		// Alt-Enter
-		if (e.altKey && e.keyCode == 13)
-			editTextArea(e);
-	};
-	
-	this.text.addEventListener('focus',  this.focusListener);
+    // The text areas event handlers we attach
+    this.focusListener = setFocused;
+    this.editEvent = editTextArea;
+    this.keydownListener = function (e) {
+        // Alt-Enter
+        if (e.altKey && e.keyCode == 13)
+            editTextArea(e);
+    };
+    
+    this.text.addEventListener('focus',  this.focusListener);
 
-	if (enable_dblclick)
-		this.text.addEventListener('dblclick', this.editEvent);
-	if (enable_keys)
-		this.text.addEventListener('keydown', this.keydownListener);
+    if (enable_dblclick)
+        this.text.addEventListener('dblclick', this.editEvent);
+    if (enable_keys)
+        this.text.addEventListener('keydown', this.keydownListener);
 
-	// The img 
-	if (enable_button) {
-		this.image = document.createElement('img');
-		this.image.setAttribute("id", "ewe_edit_button");
-		this.image.setAttribute("edit_id", this.edit_id);
-		this.image.src = editImgURL;
-		this.image.addEventListener('click', editTextArea);
-		this.text.parentNode.insertBefore(this.image, text.nextSibling);
-	}
+    // The img 
+    if (enable_button) {
+        this.image = document.createElement('img');
+        this.image.setAttribute("id", "ewe_edit_button");
+        this.image.setAttribute("edit_id", this.edit_id);
+        this.image.src = editImgURL;
+        this.image.addEventListener('click', editTextArea);
+        this.text.parentNode.insertBefore(this.image, text.nextSibling);
+    }
 
-	// Some methods to get and set content
-	this.getContent = function () {
-		if (this.text.tagName == "DIV") {
-			return this.text.innerHTML;
-		} else {
-			return this.text.value;
-		}
-	};
+    // Some methods to get and set content
+    this.getContent = function () {
+        if (this.text.tagName == "DIV") {
+            return this.text.innerHTML;
+        } else {
+            return this.text.value;
+        }
+    };
 
-	this.setContent = function(new_text) {
-		if (this.text.tagName == "DIV") {
-			this.text.innerHTML = new_text;
-		} else {
-			this.text.value = new_text;
-		}
-	};
-	
+    this.setContent = function(new_text) {
+        if (this.text.tagName == "DIV") {
+            this.text.innerHTML = new_text;
+        } else {
+            this.text.value = new_text;
+        }
+    };
+    
 }
 
 /*
@@ -115,12 +115,12 @@ function textAreaTracker(text)
 
 function getTextAreaTracker(search_id)
 {
-	for (var i=0; i<pageTextAreas.length; i++) {
-		if (pageTextAreas[i].edit_id == search_id)
-			return pageTextAreas[i];
-	}
+    for (var i=0; i<pageTextAreas.length; i++) {
+        if (pageTextAreas[i].edit_id == search_id)
+            return pageTextAreas[i];
+    }
 
-	return null;
+    return null;
 }
 
 /*
@@ -133,54 +133,54 @@ function getTextAreaTracker(search_id)
 */
 function tagTextArea(text)
 {
-	// Don't bother with hidden fields.
-	if ($(text).is(":hidden")) return;
+    // Don't bother with hidden fields.
+    if ($(text).is(":hidden")) return;
 
-	// Is it offscreen (like some github textareas)
-	if ($(text).position().left + $(text).width() < 0) return;
-	if ($(text).position().top + $(text).height() < 0) return;
+    // Is it offscreen (like some github textareas)
+    if ($(text).position().left + $(text).width() < 0) return;
+    if ($(text).position().top + $(text).height() < 0) return;
 
-	// If spellcheck is turned off, usually it's just for quick editing, e.g. To: fields in gmail
-	var spellcheck = text.getAttribute("spellcheck");
-	if (spellcheck && spellcheck == "false")
-		return;
+    // If spellcheck is turned off, usually it's just for quick editing, e.g. To: fields in gmail
+    var spellcheck = text.getAttribute("spellcheck");
+    if (spellcheck && spellcheck == "false")
+        return;
 
-	// No edit for read-only text
-	// This also removes annoying edit button that appears under the menu bar in Google Docs viewer.
-	if (text.readOnly) return;
+    // No edit for read-only text
+    // This also removes annoying edit button that appears under the menu bar in Google Docs viewer.
+    if (text.readOnly) return;
 
-	var existing_id = text.getAttribute("edit_id");
-	if (!existing_id)
-	{
-		// tag it
-		pageTextAreas.push(new textAreaTracker(text));
-	} else {
-		// Even though this text has an edit_id it might not actually be the
-		// text we think it is. If the textAreaTracker.text doesn't match then
-		// we should tag this with something different
+    var existing_id = text.getAttribute("edit_id");
+    if (!existing_id)
+    {
+        // tag it
+        pageTextAreas.push(new textAreaTracker(text));
+    } else {
+        // Even though this text has an edit_id it might not actually be the
+        // text we think it is. If the textAreaTracker.text doesn't match then
+        // we should tag this with something different
 
-		var existing_area = getTextAreaTracker(existing_id);
-		if ( existing_area &&
-			 (existing_area.text != text ) )
-		{
-			console.log("tagTextArea: Working around a duplicate id!");
-			// OK, first things first, find any images that think
-			// they are associated with a text area and remove them
-			siblings = text.parentElement.childNodes;
+        var existing_area = getTextAreaTracker(existing_id);
+        if ( existing_area &&
+             (existing_area.text != text ) )
+        {
+            console.log("tagTextArea: Working around a duplicate id!");
+            // OK, first things first, find any images that think
+            // they are associated with a text area and remove them
+            siblings = text.parentElement.childNodes;
 
-			for (var j=0; j<siblings.length; j++) {
-				if (! (siblings[j].getAttribute == undefined) ) {
-					if ( (siblings[j].getAttribute("edit_id") == existing_area.edit_id) &&
-						 (siblings[j].toString() == "[object HTMLImageElement]") ) {
-						siblings[j].parentElement.removeChild(siblings[j]);
-					}
-				}
-			}
+            for (var j=0; j<siblings.length; j++) {
+                if (! (siblings[j].getAttribute == undefined) ) {
+                    if ( (siblings[j].getAttribute("edit_id") == existing_area.edit_id) &&
+                         (siblings[j].toString() == "[object HTMLImageElement]") ) {
+                        siblings[j].parentElement.removeChild(siblings[j]);
+                    }
+                }
+            }
 
-			// And create a new tracked text area
-			pageTextAreas.push(new textAreaTracker(text));
-		}
-	}
+            // And create a new tracked text area
+            pageTextAreas.push(new textAreaTracker(text));
+        }
+    }
 }
 
 /*
@@ -189,20 +189,20 @@ function tagTextArea(text)
   Called when we want to update the text area with our updated text
 */
 function updateTextArea(id, content) {
-	var tracker = getTextAreaTracker(id);
-	if (tracker) {
-		tracker.setContent(content);
-		orig = $(tracker.text).css('background-color');
-		$(tracker.text).css({'background-color': 'yellow'});
-		// mark node as changed
-		var event = document.createEvent("HTMLEvents");
-		event.initEvent('change', true, false);
-		tracker.text.dispatchEvent(event);
+    var tracker = getTextAreaTracker(id);
+    if (tracker) {
+        tracker.setContent(content);
+        orig = $(tracker.text).css('background-color');
+        $(tracker.text).css({'background-color': 'yellow'});
+        // mark node as changed
+        var event = document.createEvent("HTMLEvents");
+        event.initEvent('change', true, false);
+        tracker.text.dispatchEvent(event);
 
-		setTimeout(function(){
-			$(tracker.text).animate({ 'backgroundColor': orig }, 1000);
-		}, 1000);
-	}
+        setTimeout(function(){
+            $(tracker.text).animate({ 'backgroundColor': orig }, 1000);
+        }, 1000);
+    }
 }
 
 /*
@@ -213,43 +213,43 @@ function updateTextArea(id, content) {
 */
 
 function sendTextArea(text_tracker) {
-	// And spawn the request
-	var edit_msg = {
-		msg: "edit",
-		text: text_tracker.getContent(),
-		title: getTitle(),
-		id: text_tracker.edit_id
-	};
-	port.postMessage(edit_msg);
+    // And spawn the request
+    var edit_msg = {
+        msg: "edit",
+        text: text_tracker.getContent(),
+        title: getTitle(),
+        id: text_tracker.edit_id
+    };
+    port.postMessage(edit_msg);
 }
 
 /*
   Handle focused text area
 */
 (function(){
-	var focusedEdit = null;
+    var focusedEdit = null;
 
-	findActiveTextArea = function() {
-		if (focusedEdit) {
-			sendTextArea(focusedEdit);
-		} else {
-			var msg_text = "No textarea in focus in: "+getTitle();
-			port.postMessage( {msg: "error", text: msg_text} );
-		}
-	};
+    findActiveTextArea = function() {
+        if (focusedEdit) {
+            sendTextArea(focusedEdit);
+        } else {
+            var msg_text = "No textarea in focus in: "+getTitle();
+            port.postMessage( {msg: "error", text: msg_text} );
+        }
+    };
 
-	setFocused = function(){
-		focusedEdit = this;
-		// Update UI?
-		var id = this.getAttribute("edit_id");
-		if (id != undefined) {
-			port.postMessage( {msg: "focus", id: id} );
-			this.addEventListener('blur',	function() {
-				port.postMessage( {msg: "focus", id: null} );
-				this.removeEventListener('blur',arguments.callee,false);
-			});
-		}
-	};
+    setFocused = function(){
+        focusedEdit = this;
+        // Update UI?
+        var id = this.getAttribute("edit_id");
+        if (id != undefined) {
+            port.postMessage( {msg: "focus", id: id} );
+            this.addEventListener('blur',   function() {
+                port.postMessage( {msg: "focus", id: null} );
+                this.removeEventListener('blur',arguments.callee,false);
+            });
+        }
+    };
 })();
 
 /*
@@ -262,12 +262,12 @@ function sendTextArea(text_tracker) {
 */
 
 function editTextArea(event) {
-	var element = event.currentTarget;
-	var edit_id = element.getAttribute("edit_id");
-	var tracker = getTextAreaTracker(edit_id);
-	if (tracker) {
-		sendTextArea(tracker);
-	}
+    var element = event.currentTarget;
+    var edit_id = element.getAttribute("edit_id");
+    var tracker = getTextAreaTracker(edit_id);
+    if (tracker) {
+        sendTextArea(tracker);
+    }
 }
 
 /*
@@ -277,32 +277,32 @@ function editTextArea(event) {
 */
 
 function findTextAreas(elements) {
-	console.log("findTextAreas: running over "+elements.length);
+    console.log("findTextAreas: running over "+elements.length);
 
     for (var i=0; i<elements.length; i++) {
         var x = $(elements[i]);
-	    // Process textareas
-	    var texts = x.find("textarea");
-	    for (var j=0; j<texts.length; j++) {
-		    tagTextArea(texts[j]);
-	    }
+        // Process textareas
+        var texts = x.find("textarea");
+        for (var j=0; j<texts.length; j++) {
+            tagTextArea(texts[j]);
+        }
 
-	    // lets see if we can find any contenteditable stuff
-	    var editable = x.find("div[contenteditable='true']");
-	    for (var j=0; j<editable.length; j++) {
-		    tagTextArea(editable[j]);
-	    }
+        // lets see if we can find any contenteditable stuff
+        var editable = x.find("div[contenteditable='true']");
+        for (var j=0; j<editable.length; j++) {
+            tagTextArea(editable[j]);
+        }
 
-	    // According to http://www.w3.org/TR/html5/editing.html#contenteditable
-	    // we should only see true/false or inherit. However G+ seems to ignore
-	    // that so lets look for those here.
-	    var editable = x.find("div[contenteditable='plaintext-only']");
-	    for (var j=0; j<editable.length; j++) {
-		    tagTextArea(editable[j]);
-	    }
+        // According to http://www.w3.org/TR/html5/editing.html#contenteditable
+        // we should only see true/false or inherit. However G+ seems to ignore
+        // that so lets look for those here.
+        var editable = x.find("div[contenteditable='plaintext-only']");
+        for (var j=0; j<editable.length; j++) {
+            tagTextArea(editable[j]);
+        }
     }
-	
-	
+    
+    
 }
 
 /*
@@ -313,19 +313,19 @@ function findTextAreas(elements) {
   we don't attempt to re-scan.
 */
 function handleInsertedElements(ev) {
-	if (!findTextAreasTimeout) {
+    if (!findTextAreasTimeout) {
         var elements = findTextAreasDefferedElements;
         elements.push(ev.target);
         console.log("will scan text area in "+findTextAreasTime);
-		findTextAreasTimeout = setTimeout((function() {
+        findTextAreasTimeout = setTimeout((function() {
             console.log("findTextAreas timeout fired");
-			findTextAreas(elements);
-			findTextAreasTimeout = undefined;
+            findTextAreas(elements);
+            findTextAreasTimeout = undefined;
             findTextAreasTime = 0;
-		}), findTextAreasTime);
+        }), findTextAreasTime);
         // clear the deffered array
         findTextAreasDefferedElements = [];
-	} else {
+    } else {
         findTextAreasTime += 500;
         findTextAreasTime = Math.min(findTextAreasTime, 2000);
         findTextAreasDefferedElements.push(ev.target);
@@ -335,27 +335,27 @@ function handleInsertedElements(ev) {
 
 /* Message handling multiplexer */
 function localMessageHandler(msg, port) {
-	// What was the bidding?
-	var cmd = msg.msg;
-	if (cmd == "config") {
-		console.log("config response: "+msg);
-		enable_button = msg.enable_button;
-		enable_dblclick = msg.enable_dblclick;
-		enable_keys = msg.enable_keys;
-		findTextAreas([$('*')]);
-		document.addEventListener("DOMNodeInserted", (function (ev) {
-			handleInsertedElements(ev);
-			return true;
-		}), false);
-	} else if (cmd == "find_edit") {
-		findActiveTextArea();
-	} else if (cmd == "update") {
-		var id = msg.id;
-		var content = msg.text;
-		updateTextArea(id, content);
-	} else {
-		console.log("localMessageHandler: un-handled message:"+cmd);
-	}
+    // What was the bidding?
+    var cmd = msg.msg;
+    if (cmd == "config") {
+        console.log("config response: "+msg);
+        enable_button = msg.enable_button;
+        enable_dblclick = msg.enable_dblclick;
+        enable_keys = msg.enable_keys;
+        findTextAreas([$('*')]);
+        document.addEventListener("DOMNodeInserted", (function (ev) {
+            handleInsertedElements(ev);
+            return true;
+        }), false);
+    } else if (cmd == "find_edit") {
+        findActiveTextArea();
+    } else if (cmd == "update") {
+        var id = msg.id;
+        var content = msg.text;
+        updateTextArea(id, content);
+    } else {
+        console.log("localMessageHandler: un-handled message:"+cmd);
+    }
 }
 
 // Hook up the incoming message handler for both return messages
@@ -363,7 +363,7 @@ function localMessageHandler(msg, port) {
 
 port.onMessage.addListener(localMessageHandler);
 chrome.extension.onConnect.addListener(function(iport) {
-	iport.onMessage.addListener(localMessageHandler);
+    iport.onMessage.addListener(localMessageHandler);
 });
 
 /*
@@ -377,18 +377,18 @@ port.postMessage({msg: "config"});
 // the context menu on an editable element.
 document.addEventListener("contextmenu", (function(event) {
 
-	var elem = event.srcElement;
-	if (elem && elem.getAttribute("edit_id")) {
-	    var request = {
-		    type: "menu_target",
-		    edit_msg: {
-		        msg: "edit",
-		        text: elem.value,
-		        title: getTitle(),
-		        id: elem.getAttribute("edit_id")
-		    }
-	    };
-	    chrome.extension.sendRequest(request);
-	}
+    var elem = event.srcElement;
+    if (elem && elem.getAttribute("edit_id")) {
+        var request = {
+            type: "menu_target",
+            edit_msg: {
+                msg: "edit",
+                text: elem.value,
+                title: getTitle(),
+                id: elem.getAttribute("edit_id")
+            }
+        };
+        chrome.extension.sendRequest(request);
+    }
 
 }));
