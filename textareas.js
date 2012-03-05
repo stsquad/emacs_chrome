@@ -53,12 +53,18 @@ function getTitle()
   It allows us to update the listeners and query stuff from one central location.
 */
 
-function textAreaTracker(text)
+function textAreaTracker(text, opener)
 {
     this.edit_id = "eta_"+page_edit_id;
+    if(opener) {
+        this.open_id = "arbitrary value";
+    }
     page_edit_id = page_edit_id + 1;
     this.text = text;
     this.text.setAttribute("edit_id", this.edit_id);
+    if(opener) {
+        this.text.setAttribute("open_id", this.open_id);
+    }
 
     // The text areas event handlers we attach
     this.focusListener = setFocused;
@@ -81,6 +87,9 @@ function textAreaTracker(text)
         this.image = document.createElement('img');
         this.image.setAttribute("id", "ewe_edit_button");
         this.image.setAttribute("edit_id", this.edit_id);
+        if(opener) {
+            this.image.setAttribute("open_id", this.open_id);
+        }
         this.image.src = editImgURL;
         this.image.addEventListener('click', editTextArea);
         this.text.parentNode.insertBefore(this.image, text.nextSibling);
@@ -131,7 +140,7 @@ function getTextAreaTracker(search_id)
   gets called several times not least as some text boxes can
   appear in the document after first load.
 */
-function tagTextArea(text)
+function tagTextArea(text, opener)
 {
     // Don't bother with hidden fields.
     if ($(text).is(":hidden")) return;
@@ -153,7 +162,7 @@ function tagTextArea(text)
     if (!existing_id)
     {
         // tag it
-        pageTextAreas.push(new textAreaTracker(text));
+        pageTextAreas.push(new textAreaTracker(text, opener));
     } else {
         // Even though this text has an edit_id it might not actually be the
         // text we think it is. If the textAreaTracker.text doesn't match then
@@ -178,9 +187,21 @@ function tagTextArea(text)
             }
 
             // And create a new tracked text area
-            pageTextAreas.push(new textAreaTracker(text));
+            pageTextAreas.push(new textAreaTracker(text, opener));
         }
     }
+}
+
+/*
+  tagFileLinkForOpen
+
+  Tag a link to a file to be opened locally. The textAreaTracker
+  machinery is not necessary for this case but is left in for now.
+*/
+
+function tagFileLinkForOpen(text)
+{
+    tagTextArea(text, true);
 }
 
 /*
@@ -221,6 +242,14 @@ function sendTextArea(text_tracker) {
         id: text_tracker.edit_id
     };
     port.postMessage(edit_msg);
+}
+
+function openFile(url) {
+    var open_msg = {
+        msg: "open",
+        file: url
+    };
+    port.postMessage(open_msg);
 }
 
 /*
@@ -264,6 +293,12 @@ function sendTextArea(text_tracker) {
 function editTextArea(event) {
     var element = event.currentTarget;
     var edit_id = element.getAttribute("edit_id");
+    var open_id = element.getAttribute("open_id");
+    if(open_id) {
+        file_url = $(element).parent().find('a').attr('href');
+        openFile(file_url);
+        return;
+    }
     var tracker = getTextAreaTracker(edit_id);
     if (tracker) {
         sendTextArea(tracker);
@@ -302,6 +337,10 @@ function findTextAreas(elements) {
         }
     }
     
+    var github_file_links = $('div.file ul.actions li a[href*="/raw/"], div.file ul.actions li a[href*="/blob/"]');
+    for (var j =0; j<github_file_links.length; j++) {
+        tagFileLinkForOpen(github_file_links[j]);
+    }
     
 }
 

@@ -29,6 +29,12 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 _default_port = 9292
 _default_editor = "emacsclient"
 
+# Configure your local repository locations here.
+# REPO_DIRS = {
+#   "my_repo": '/path/to/my_repo',
+# }
+REPO_DIRS = {}
+
 temp_has_delete=True
 processes = {}
 
@@ -65,6 +71,11 @@ class Handler(BaseHTTPRequestHandler):
 
       l = [s for s in self.path.split('/') if s]
       print l
+
+      if l == ['open']:
+          file_url = self.headers.getheader('x-file')
+          self.open_file_from_github_url(file_url)
+          return
 
       existing_file = self.headers.getheader('x-file')
 
@@ -147,6 +158,26 @@ class Handler(BaseHTTPRequestHandler):
     except :
       print "Error: ", sys.exc_info()[0]
       self.send_error(404, "Not Found: %s" % self.path)
+
+  def open_file_from_github_url(self, file_url):
+    regexp = (r"/"
+              "(?P<organization>[^/]+)/"
+              "(?P<repo>[^/]+)/"
+              "(blob|tree|raw)/"
+              "(?P<branch>[^/]+)/"
+              "(?P<path>.+)")
+    match = re.compile(regexp).match(file_url)
+    if not match:
+      print "Error: failed to parse file URL: %s" % file_url
+      return
+    match = match.groupdict()
+    repo_dir = REPO_DIRS.get(match['repo'])
+    if not repo_dir:
+      print "Error: No entry for repo: %s" % match['repo']
+      return
+    # TODO: Handle the branch appropriately; this blindly uses whatever
+    # branch is checked out.
+    subprocess.call([self.editor, os.path.join(repo_dir, match['path'])])
 
 def parse_options():
   parser = optparse.OptionParser()

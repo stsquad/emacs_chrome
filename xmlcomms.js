@@ -187,6 +187,8 @@ function localMessageHandler(port)
             } else {
                 updateUserFeedback("Awaiting edit request: in focus");
             }
+        } else if (msg.msg == "open") {
+            handleContentMessages(msg, port);
         }
     });
 }
