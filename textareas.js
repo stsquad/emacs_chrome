@@ -239,16 +239,18 @@ function sendTextArea(text_tracker) {
 	};
 
 	setFocused = function(){
-		focusedEdit = this;
 		// Update UI?
 		var id = this.getAttribute("edit_id");
-		if (id != undefined) {
+		focusedEdit = getTextAreaTracker(id);
+		if (focusedEdit != undefined) {
 			port.postMessage( {msg: "focus", id: id} );
 			this.addEventListener('blur',	function() {
 				port.postMessage( {msg: "focus", id: null} );
 				this.removeEventListener('blur',arguments.callee,false);
 			});
-		}
+		} else {
+			console.log ("setFocused: failed to find a tracker for "+id);
+        }
 	};
 })();
 
