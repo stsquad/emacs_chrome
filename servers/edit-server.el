@@ -60,9 +60,9 @@
 ;; example:
 ;;
 ;; (add-hook 'edit-server-start-hook
-;;           (lambda ()
-;;             (when (string-match "github.com" (buffer-name))
-;; 	      (markdown-mode))))
+;;          (lambda ()
+;;            (when (string-match "github.com" (buffer-name))
+;;              (markdown-mode))))
 
 
 ;;; Code:
@@ -437,6 +437,7 @@ to `edit-server-default-major-mode'"
 	(set-buffer-multibyte t))) ; djb
     (copy-to-buffer buffer (point-min) (point-max))
     (with-current-buffer buffer
+      (setq edit-server-url (with-current-buffer (process-buffer proc) edit-server-url))
       (edit-server-choose-major-mode)
       ;; Allow `edit-server-start-hook' to override the major mode.
       ;; (re)setting the minor mode seems to clear the buffer-local
@@ -487,7 +488,8 @@ and its buffer are killed with `edit-server-kill-client'."
   "Kill client process PROC and remove it from the list."
   (let ((procbuf (process-buffer proc)))
     (delete-process proc)
-    (kill-buffer procbuf)
+    (when (buffer-live-p procbuf)
+      (kill-buffer procbuf))
     (setq edit-server-clients (delq proc edit-server-clients))))
 
 (defun edit-server-done (&optional abort nokill)
