@@ -244,6 +244,15 @@ send a response back to the client."
   :init-value nil
   :keymap edit-server-edit-mode-map)
 
+(defun turn-on-edit-server-edit-mode-if-server ()
+  "Turn on `edit-server-edit-mode' if in an edit-server buffer."
+  (when edit-server-proc
+    (edit-server-edit-mode t)))
+
+(define-globalized-minor-mode global-edit-server-edit-mode
+  edit-server-edit-mode turn-on-edit-server-edit-mode-if-server)
+(global-edit-server-edit-mode t)
+
 
 ;; Edit Server socket code
 
