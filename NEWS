@@ -1,3 +1,14 @@
+v1.11
+
+Extension
+
+* Fixed some breakage to the "edit focused area" feature
+
+edit-server.el
+
+* A couple of fixes for Emacs 24 compatibility
+* Globalize the minor mode so it persists through major-mode changes
+
 v1.10
 
 Extension
