@@ -11,7 +11,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -29,151 +29,182 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 _default_port = 9292
 _default_editor = "emacsclient"
 
+# Configure your local repository locations here.
+# REPO_DIRS = {
+#   "my_repo": '/path/to/my_repo',
+# }
+REPO_DIRS = {}
+
 temp_has_delete=True
 processes = {}
 
 class Handler(BaseHTTPRequestHandler):
-	global temp_has_delete
+  global temp_has_delete
 
-	def do_GET(self):
-		if self.path == '/status':
-		  self.send_response(200)
-		  self.send_header('Content-Type', 'text/plain; charset=utf-8')
-		  self.end_headers()
-		  self.wfile.write('edit-server is running.\n')
-		  return
-	  self.send_error(404, "GET Not Found: %s" % self.path)
+  def do_GET(self):
+    if self.path == '/status':
+      self.send_response(200)
+      self.send_header('Content-Type', 'text/plain; charset=utf-8')
+      self.end_headers()
+      self.wfile.write('edit-server is running.\n')
+      return
+    self.send_error(404, "GET Not Found: %s" % self.path)
 
-	def do_POST(self):
-		global processes
-		try:
-			(content, params) = cgi.parse_header(self.headers.
-												 getheader('content-type'))
+  def do_POST(self):
+    global processes
+    try:
+      (content, params) = cgi.parse_header(self.headers.
+                         getheader('content-type'))
 
-			clength = 0
-			cl = self.headers.getheader('content-length')
+      clength = 0
+      cl = self.headers.getheader('content-length')
 
-			if cl != None:
-				clength = int(cl)
-			else:
-				self.send_response(411)
-				self.end_headers()
-				return
+      if cl != None:
+        clength = int(cl)
+      else:
+        self.send_response(411)
+        self.end_headers()
+        return
 
-			body = self.rfile.read(clength)
-			print body
+      body = self.rfile.read(clength)
+      print body
 
-			l = [s for s in self.path.split('/') if s]
-			print l
+      l = [s for s in self.path.split('/') if s]
+      print l
 
-			existing_file = self.headers.getheader('x-file')
+      if l == ['open']:
+          file_url = self.headers.getheader('x-file')
+          self.open_file_from_github_url(file_url)
+          return
 
-			# write text into file
-			if not existing_file or existing_file == "undefined":
-				existing = False
-				url = self.headers.getheader('x-url')
-				print "url:", url
-				prefix = "chrome_"
-				if url:
-					prefix += re.sub("[^.\w]", "_", re.sub("^.*?//","",url))
-				prefix += "_"
-				if temp_has_delete==True:
-					f = tempfile.NamedTemporaryFile(
-							delete=False, prefix=prefix, suffix='.txt')
-					fname = f.name
-				else:
-					tf = tempfile.mkstemp(prefix=prefix, suffix='.txt')
-					f = os.fdopen(tf[0],"w")
-					fname = tf[1]
-				print "Opening new file ", fname
-			else:
-				existing = True
-				p = processes[existing_file]
-				print "Opening existing file ", existing_file
-				f = open(existing_file, "w")
-				fname = existing_file
+      existing_file = self.headers.getheader('x-file')
 
-			f.write(body)
-			f.close()
-			last_mod_time = os.stat(fname)[stat.ST_MTIME]
+      # write text into file
+      if not existing_file or existing_file == "undefined":
+        existing = False
+        url = self.headers.getheader('x-url')
+        print "url:", url
+        prefix = "chrome_"
+        if url:
+          prefix += re.sub("[^.\w]", "_", re.sub("^.*?//","",url))
+        prefix += "_"
+        if temp_has_delete==True:
+          f = tempfile.NamedTemporaryFile(
+              delete=False, prefix=prefix, suffix='.txt')
+          fname = f.name
+        else:
+          tf = tempfile.mkstemp(prefix=prefix, suffix='.txt')
+          f = os.fdopen(tf[0],"w")
+          fname = tf[1]
+        print "Opening new file ", fname
+      else:
+        existing = True
+        p = processes[existing_file]
+        print "Opening existing file ", existing_file
+        f = open(existing_file, "w")
+        fname = existing_file
 
-			if not existing:
-				# spawn editor...
-				print "Spawning editor... ", fname
+      f.write(body)
+      f.close()
+      last_mod_time = os.stat(fname)[stat.ST_MTIME]
 
-				cmd = self.editor.split(",")
-				cmd.append(fname)
-				p = subprocess.Popen(cmd, close_fds=True)
-				processes[fname] = p
+      if not existing:
+        # spawn editor...
+        print "Spawning editor... ", fname
 
-			saved = False
-			rc = None
-			while (True):
-				time.sleep(1)
-				rc = p.poll()
-				if rc != None: break
-				mod_time = os.stat(fname)[stat.ST_MTIME]
-				if mod_time != last_mod_time:
-					print "new mod time:", mod_time, " last:", last_mod_time
-					last_mod_time = mod_time
-					saved = True
-				if saved: break
+        cmd = self.editor.split(",")
+        cmd.append(fname)
+        p = subprocess.Popen(cmd, close_fds=True)
+        processes[fname] = p
 
-			if saved or not rc:
-					self.send_response(200)
+      saved = False
+      rc = None
+      while (True):
+        time.sleep(1)
+        rc = p.poll()
+        if rc != None: break
+        mod_time = os.stat(fname)[stat.ST_MTIME]
+        if mod_time != last_mod_time:
+          print "new mod time:", mod_time, " last:", last_mod_time
+          last_mod_time = mod_time
+          saved = True
+        if saved: break
 
-					f = file(fname, 'r')
-					s = f.read()
-					f.close()
-			else:
-					if rc > 0:
-							msg = 'text editor returned %d' % rc
-					elif rc < 0:
-							msg = 'text editor died on signal %d' % -rc
-					self.send_error(404, msg)
+      if saved or not rc:
+          self.send_response(200)
 
-			if saved:
-				self.send_header('x-open', "true")
-			else:
-				try:
-					os.unlink(fname)
-				except :
-					print "Unable to unlink:", fname
-					pass
+          f = file(fname, 'r')
+          s = f.read()
+          f.close()
+      else:
+          if rc > 0:
+              msg = 'text editor returned %d' % rc
+          elif rc < 0:
+              msg = 'text editor died on signal %d' % -rc
+          self.send_error(404, msg)
 
-			self.send_header('x-file', fname)
-			self.end_headers()
-			self.wfile.write(s)
-		except :
-			print "Error: ", sys.exc_info()[0]
-			self.send_error(404, "Not Found: %s" % self.path)
+      if saved:
+        self.send_header('x-open', "true")
+      else:
+        try:
+          os.unlink(fname)
+        except :
+          print "Unable to unlink:", fname
+          pass
+
+      self.send_header('x-file', fname)
+      self.end_headers()
+      self.wfile.write(s)
+    except :
+      print "Error: ", sys.exc_info()[0]
+      self.send_error(404, "Not Found: %s" % self.path)
+
+  def open_file_from_github_url(self, file_url):
+    regexp = (r"/"
+              "(?P<organization>[^/]+)/"
+              "(?P<repo>[^/]+)/"
+              "(blob|tree|raw)/"
+              "(?P<branch>[^/]+)/"
+              "(?P<path>.+)")
+    match = re.compile(regexp).match(file_url)
+    if not match:
+      print "Error: failed to parse file URL: %s" % file_url
+      return
+    match = match.groupdict()
+    repo_dir = REPO_DIRS.get(match['repo'])
+    if not repo_dir:
+      print "Error: No entry for repo: %s" % match['repo']
+      return
+    # TODO: Handle the branch appropriately; this blindly uses whatever
+    # branch is checked out.
+    subprocess.call([self.editor, os.path.join(repo_dir, match['path'])])
 
 def parse_options():
-	parser = optparse.OptionParser()
-	parser.add_option(
-		"-p", "--port", type="int", dest="port", default=_default_port,
-		help="port number to listen on (default: " + str(_default_port) + ")")
-	parser.add_option(
-		"-e", "--editor", dest="editor", default=_default_editor,
-		help='text editor to spawn (default: "' + _default_editor + '")')
-	return parser.parse_args()[0]
+  parser = optparse.OptionParser()
+  parser.add_option(
+    "-p", "--port", type="int", dest="port", default=_default_port,
+    help="port number to listen on (default: " + str(_default_port) + ")")
+  parser.add_option(
+    "-e", "--editor", dest="editor", default=_default_editor,
+    help='text editor to spawn (default: "' + _default_editor + '")')
+  return parser.parse_args()[0]
 
 def main():
-	global temp_has_delete
-	import platform
-	t = platform.python_version_tuple()
-	if int(t[0]) == 2 and int(t[1]) < 6:
-		temp_has_delete = False;
-		print "Handling lack of delete for NamedTemporaryFile:", temp_has_delete
-	options = parse_options()
-	Handler.editor = options.editor
-	try:
-		httpserv = HTTPServer(('localhost', options.port), Handler)
-		httpserv.table = {}
-		httpserv.serve_forever()
-	except KeyboardInterrupt:
-		httpserv.socket.close()
+  global temp_has_delete
+  import platform
+  t = platform.python_version_tuple()
+  if int(t[0]) == 2 and int(t[1]) < 6:
+    temp_has_delete = False;
+    print "Handling lack of delete for NamedTemporaryFile:", temp_has_delete
+  options = parse_options()
+  Handler.editor = options.editor
+  try:
+    httpserv = HTTPServer(('localhost', options.port), Handler)
+    httpserv.table = {}
+    httpserv.serve_forever()
+  except KeyboardInterrupt:
+    httpserv.socket.close()
 
 if __name__ == '__main__':
-	main()
+  main()
 
