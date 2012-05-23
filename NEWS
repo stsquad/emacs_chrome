@@ -3,6 +3,7 @@ v1.11
 Extension
 
 * Fixed some breakage to the "edit focused area" feature
+* Fixed broken link to embedded edit-server
 
 edit-server.el
 
