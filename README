@@ -31,6 +31,19 @@ consistent:
 This tells both emacs use spaces instead of tabs and use a basic indentation
 of 4 spaces.
 
+Release Checklist
+=================
+
+* Update NEWS
+* Update manifest.json
+* git tag vx.y
+* git archive --format zip --output ../emacs_chrome.zip master
+* Upload to chrome store
+* Update changelog
+* Publish
+* git push origin vx.y
+* Announce
+
 History
 =======
 
