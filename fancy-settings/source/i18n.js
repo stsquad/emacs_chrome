@@ -43,7 +43,7 @@ this.i18n = {
         "en": "Edit with Emacs is an extension that allows you to edit textareas and other editable text elements\
         of a web-page with your favourite editor. For this to work you need to be running an \"edit server\"\
         on your local machine. This is because extensions in Chrome(ium) cannot directly start new programs. For Emacs users \
-        it is recommended you use the use supplied native <a href=\"servers/edit-server.el\">edit-server.el</a>.\
+        it is recommended you use the use supplied native <a href=\"/servers/edit-server.el\">edit-server.el</a>.\
         </p>\
 	<p>\
         Save the file to somewhere visible to your your Emacs <code>load-path</code> and add the following\
