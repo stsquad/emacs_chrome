@@ -52,6 +52,13 @@ this.manifest = {
             "type": "button",
             "label": i18n.get("Test Edit Server"),
 	    "text": i18n.get("Test")
+        },
+        {
+            "tab": "Test",
+            "group": "Test",
+            "name": "enable_debug",
+            "type": "checkbox",
+            "label": i18n.get("enable_debug")
         }
     ]
 };

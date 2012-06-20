@@ -72,5 +72,9 @@ this.i18n = {
     "disconnect": {
         "en": "Disconnect:",
         "de": "Trennen:"
+    },
+    "enable_debug": {
+        "en": "Enable debug (logs to the console)",
+        "de": "Debug (Protokolle an die Konsole)"
     }
 };

@@ -25,6 +25,16 @@ var findTextAreasDefferedElements = [];
 var enable_button = true;
 var enable_dblclick = false;
 var enable_keys = false;
+var enable_debug = false;
+
+// Decorate console.log so that it only logs
+// when the enable_debug setting is true
+var orig_console_log = console.log;
+console.log = function() {
+    if (enable_debug) {
+        orig_console_log.apply(console, Array.prototype.slice.call(arguments));
+    }
+};
 
 /*
   getTitle
@@ -344,6 +354,7 @@ function localMessageHandler(msg, port) {
 		enable_button = msg.enable_button;
 		enable_dblclick = msg.enable_dblclick;
 		enable_keys = msg.enable_keys;
+		enable_debug = msg.enable_debug;
 		findTextAreas([$('*')]);
 		document.addEventListener("DOMNodeInserted", (function (ev) {
 			handleInsertedElements(ev);
