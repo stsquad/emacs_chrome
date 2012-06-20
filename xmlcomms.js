@@ -16,7 +16,8 @@ var settings = new Store("settings", {
     "edit_server_port": 9292,
     "enable_button": true,
     "enable_dblclick": false,
-    "enable_keys": false
+    "enable_keys": false,
+    "enable_debug": false
 });
 
 
@@ -157,7 +158,8 @@ function handleConfigMessages(msg, tab_port)
 	    msg: "config",
 	    enable_button: settings.get("enable_button"),
 	    enable_dblclick: settings.get("enable_dblclick"),
-	    enable_keys: settings.get("enable_keys")
+	    enable_keys: settings.get("enable_keys"),
+	    enable_debug: settings.get("enable_debug")
 	};
 	tab_port.postMessage(config_msg);
 }
