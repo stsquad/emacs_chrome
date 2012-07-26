@@ -44,6 +44,8 @@ this.i18n = {
         of a web-page with your favourite editor. For this to work you need to be running an \"edit server\"\
         on your local machine. This is because extensions in Chrome(ium) cannot directly start new programs. For Emacs users \
         it is recommended you use the use supplied native <a href=\"/servers/edit-server.el\">edit-server.el</a>.\
+	Alternativley you can track the latest version through the <a href=\"http://melpa.milkbox.net/\">MELPA</a>\
+	package archive.\
         </p>\
 	<p>\
         Save the file to somewhere visible to your your Emacs <code>load-path</code> and add the following\
