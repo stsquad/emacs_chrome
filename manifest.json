@@ -1,11 +1,16 @@
 {
 	"name": "Edit with Emacs",
-	"version": "1.10",
+	"version": "1.12",
+        "manifest_version": 2,
 	"description": "Allow user to edit web-page textareas with Emacs (and other editors).",
 	"browser_action": {
 		"default_icon": "emacs23-16x16.png"
 	},
-	"background_page": "background.html",
+        "background": {
+	    "scripts": ["fancy-settings/source/lib/store.js",
+			"xmlcomms.js",
+			"context_menu.js"]
+	},
 	"permissions": [
 		"tabs",
 		"contextMenus",
