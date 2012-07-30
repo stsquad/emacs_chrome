@@ -265,15 +265,17 @@ will cause it to be verbose."
   (interactive "P")
   (if (or (process-status "edit-server")
 	  (null (condition-case err
-		    (make-network-process
-		     :name "edit-server"
-		     :buffer edit-server-process-buffer-name
-		     :family 'ipv4
-		     :host (or edit-server-host 'local)
-		     :service edit-server-port
-		     :log 'edit-server-accept
-		     :server t
-		     :noquery t)
+                    (let ((proc (make-network-process
+                                 :name "edit-server"
+                                 :buffer edit-server-process-buffer-name
+                                 :family 'ipv4
+                                 :host (or edit-server-host 'local)
+                                 :service edit-server-port
+                                 :log 'edit-server-accept
+                                 :server t
+                                 :noquery t)))
+                      (set-process-coding-system proc 'utf-8 'utf-8)
+                      proc)
 		  (file-error nil))))
       (message "An edit-server process is already running")
     (setq edit-server-clients '())
