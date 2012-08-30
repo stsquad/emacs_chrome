@@ -20,11 +20,19 @@ var settings = new Store("settings", {
     "enable_debug": false
 });
 
+// Decorate console.log so that it only logs
+// when the enable_debug setting is true
+var orig_console_log = console.log;
+console.log = function() {
+    if (settings.get("enable_debug")) {
+        orig_console_log.apply(console, Array.prototype.slice.call(arguments));
+    }
+};
 
 // Get the base URL from which we make all requests to the server..
 function getEditUrl()
 {
-	return "http://127.0.0.1:" + settings.get("edit_server_port") + "/";
+    return "http://127.0.0.1:" + settings.get("edit_server_port") + "/";
 }
 
 /*
@@ -71,58 +79,62 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 // Package up the text to be edited and send it to the edit server
 function handleContentMessages(msg, tab_port)
 {
-	console.log("handleContentMessages called:"+JSON.stringify(msg));
-	var cmd = msg.msg;
-	var id = msg.id;
-	var text = msg.text;
-	var file = msg.file;
+    console.log("handleContentMessages called:"+JSON.stringify(msg));
+    var cmd = msg.msg;
+    var id = msg.id;
+    var text = msg.text;
+    var file = msg.file;
 
-	var xhr = new XMLHttpRequest();
-	var url = getEditUrl() + cmd;
+    var page_url = tab_port.sender.tab.url;
+    var page_port = tab_port.portId_;
+    console.log(" from page:"+page_url+" and tab port:"+page_port);
 
-	console.log(" page URL:"+tab_port.tab.url);
-	console.log(" tab_port:"+tab_port.portId_);
-	console.log(" request URL:"+url);
-	
-	xhr.open("POST", url, true);
-	
-	xhr.onreadystatechange = function() {
-		console.log("State change:"+ xhr.readyState + " status:"+xhr.status);
+    var xhr = new XMLHttpRequest();
+    var url = getEditUrl() + cmd;
+
+    xhr.open("POST", url, true);
+    
+    xhr.onreadystatechange = function() {
+	    console.log("State change:"+ xhr.readyState + " status:"+xhr.status);
 	    // readyState 4=HTTP response complete
-		if(xhr.readyState == 4) {
-		    if (xhr.status == 200) {
+	    if(xhr.readyState == 4) {
+	        if (xhr.status == 200) {
 		        
+                xfile = xhr.getResponseHeader("x-file");
+                xopen = xhr.getResponseHeader("x-open");
+                console.log("x-file: "+xfile+" x-open: "+xopen);
+
 		        var update_msg = {
-			        msg: "update",
-			        text: xhr.responseText,
-			        id: id
+		            msg: "update",
+		            text: xhr.responseText,
+		            id: id
 		        };
 
 		        updateUserFeedback("Successful edit of "+msg.title);
 		        tab_port.postMessage(update_msg);
 
-				msg.text = xhr.responseText;
-				msg.file = xhr.getResponseHeader("x-file");
-				if(xhr.getResponseHeader("x-open") == "true") {
-					handleContentMessages(msg, tab_port);
-				}
-		    } else if (xhr.status == 0) {
+		        msg.text = xhr.responseText;
+		        msg.file = xfile;
+		        if(xopen == "true") {
+		            handleContentMessages(msg, tab_port);
+		        }
+	        } else if (xhr.status == 0) {
 		        // Is the edit server actually running?
 		        updateUserFeedback("Error: is edit server running?", "red");
-		    } else {
+	        } else {
 		        updateUserFeedback("Un-handled response: "+xhr.status, "red"); 
-		    }
-		}
-	}
+	        }
+	    }
+    };
 
-	// reset the display before sending request..
-	updateUserFeedback("Edit request sent for "+msg.title, "green");
+    // reset the display before sending request..
+    updateUserFeedback("Edit request sent for "+msg.title, "green");
 
-	xhr.setRequestHeader("Content-type", "text/plain");
-	xhr.setRequestHeader("x-url", tab_port.tab.url);
-	xhr.setRequestHeader("x-id", id);
-	xhr.setRequestHeader("x-file", file);
-	xhr.send(text);
+    xhr.setRequestHeader("Content-type", "text/plain");
+    xhr.setRequestHeader("x-url", page_url);
+    xhr.setRequestHeader("x-id", id);
+    xhr.setRequestHeader("x-file", file);
+    xhr.send(text);
 }
 
 // Handle and edit request coming from the content page script
@@ -145,7 +157,7 @@ function handleTestMessages(msg, tab_port)
 		        tab_port.postMessage({msg: "test_result", text: "Un-handled response: "+xhr.status}); 
 		    }
 	    }
-	}
+    };
 	xhr.send();
 }
 
