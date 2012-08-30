@@ -392,7 +392,8 @@ non-nil, then STRING is also echoed to the message line."
 	  (edit-server-create-edit-buffer proc))
 	 (t
 	  ;; send 200 OK response to any other request
-	  (edit-server-send-response proc "edit-server is running.\n" t)))
+	  (edit-server-send-response proc "edit-server is running.\n")
+	  (edit-server-kill-client)))
 	;; wait for another connection to arrive
 	(setq edit-server-received 0)
 	(setq edit-server-phase 'wait)))))
@@ -460,15 +461,15 @@ to `edit-server-default-major-mode'"
 	    edit-server-frame (edit-server-create-frame buffer))
       (edit-server-edit-mode))))
 
-(defun edit-server-send-response (proc &optional body close)
+(defun edit-server-send-response (proc &optional body progress)
   "Send an HTTP 200 OK response back to process PROC.
 Optional second argument BODY specifies the response content:
     - If nil, the HTTP response will have null content.
     - If a string, the string is sent as response content.
     - Any other value will cause the contents of the current
       buffer to be sent.
-If optional third argument CLOSE is non-nil, then process PROC
-and its buffer are killed with `edit-server-kill-client'."
+If optional third argument progress is non-nil, then the response
+will include x-file and x-open headers to allow continuation of editing."
   (interactive)
   (if (processp proc)
       (let ((response-header (concat
@@ -477,7 +478,9 @@ and its buffer are killed with `edit-server-kill-client'."
 			      "Date: "
 			      (format-time-string
 			       "%a, %d %b %Y %H:%M:%S GMT\n"
-			       (current-time)))))
+			       (current-time))
+			      (when progress
+				(format "x-file: %s\nx-open: true\n" (buffer-name))))))
 	(process-send-string proc response-header)
 	(process-send-string proc "\n")
 	(cond
@@ -488,8 +491,6 @@ and its buffer are killed with `edit-server-kill-client'."
 	  (encode-coding-region (point-min) (point-max) 'utf-8)
 	  (process-send-region proc (point-min) (point-max))))
 	(process-send-eof proc)
-	(when close
-	  (edit-server-kill-client proc))
 	(edit-server-log proc "Editing done, sent HTTP OK response."))
     (message "edit-server-send-response: invalid proc (bug?)")))
 
@@ -508,7 +509,7 @@ The current contents of the buffer are sent back to the HTTP
 client, unless argument ABORT is non-nil, in which case then the
 original text is sent back.
 If optional second argument NOKILL is non-nil, then the editing
-buffer is not killed.
+buffer is not killed and the buffer name is passed to calling process.
 
 When called interactively, use prefix arg to abort editing."
   (interactive "P")
@@ -533,7 +534,7 @@ When called interactively, use prefix arg to abort editing."
 	    (format-encode-region (point-min) (point-max) format))
 	  ;; send back
 	  (run-hooks 'edit-server-done-hook)
-	  (edit-server-send-response edit-server-proc t)
+	  (edit-server-send-response proc t nokill)
 	  ;; restore formats (only useful if we keep the buffer)
 	  (dolist (format buffer-file-format)
 	    (format-decode-region (point-min) (point-max) format))
@@ -563,11 +564,7 @@ When called interactively, use prefix arg to abort editing."
 (defun edit-server-save ()
   "Save the current state of the edit buffer."
   (interactive)
-  (save-restriction
-    (widen)
-    (buffer-disable-undo)
-    (copy-region-as-kill (point-min) (point-max))
-    (buffer-enable-undo)))
+  (edit-server-done nil t))
 
 (defun edit-server-abort ()
   "Discard editing and send the original text back to the browser."
