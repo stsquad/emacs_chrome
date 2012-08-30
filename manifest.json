@@ -21,6 +21,9 @@
 		"128" : "emacs.png"
 	},
 	"options_page": "fancy-settings/source/index.html",
+        "web_accessible_resources": [
+	    "gumdrop.png"
+	],
 	"content_scripts": [
 		{
 			"matches": ["http://*/*", "https://*/*", "file://*/*"],
