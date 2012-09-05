@@ -395,7 +395,7 @@ non-nil, then STRING is also echoed to the message line."
 	 (t
 	  ;; send 200 OK response to any other request
 	  (edit-server-send-response proc "edit-server is running.\n")
-	  (edit-server-kill-client)))
+	  (edit-server-kill-client proc)))
 	;; wait for another connection to arrive
 	(setq edit-server-received 0)
 	(setq edit-server-phase 'wait)))))
