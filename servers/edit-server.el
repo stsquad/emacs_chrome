@@ -457,7 +457,7 @@ to `edit-server-default-major-mode'"
       ;; hooks early on
       (run-hooks 'edit-server-start-hook)
       (not-modified)
-      (add-hook 'kill-buffer-hook 'edit-server-abort* nil t)
+      (add-hook 'kill-buffer-query-functions 'edit-server-kill-query nil t)
       (buffer-enable-undo)
       (setq edit-server-proc proc
 	    edit-server-frame (edit-server-create-frame buffer))
@@ -578,6 +578,28 @@ When called interactively, use prefix arg to abort editing."
 but don't kill the editing buffer."
   (interactive)
   (edit-server-done t t))
+
+(defvar edit-server-kill-query-string
+  (concat
+   ;; prevent using minibuffer-prompt face
+   (propertize "(" 'face 'default)
+   (propertize "s" 'face '(:foreground "ForestGreen"))
+   ")ubmit changes ("
+   (propertize "k" 'face '(:foreground "Firebrick"))
+   ")ill changes?"))
+
+(defun edit-server-kill-query ()
+  "Ask user what to do when killing edit buffer."
+  (if (buffer-modified-p (current-buffer))
+      (progn
+        (case (read-char-choice
+               edit-server-kill-query-string
+               (append "sSKk" nil))
+          ((?s ?S) (edit-server-save))
+          ((?k ?K) (edit-server-abort*)))
+        t)
+    (edit-server-abort*)
+    t))
 
 (provide 'edit-server)
 
