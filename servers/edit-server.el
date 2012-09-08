@@ -541,11 +541,11 @@ When called interactively, use prefix arg to abort editing."
 	  (dolist (format buffer-file-format)
 	    (format-decode-region (point-min) (point-max) format))
 	  (buffer-enable-undo)))
-      (when edit-server-frame
-	(delete-frame edit-server-frame))
       ;; delete-frame may change the current buffer
       (unless nokill
 	(kill-buffer buffer))
+      (when edit-server-frame
+        (delete-frame edit-server-frame))
       (edit-server-kill-client proc))))
 
 ;;
@@ -573,12 +573,6 @@ When called interactively, use prefix arg to abort editing."
   (interactive)
   (edit-server-done t))
 
-(defun edit-server-abort* ()
-  "Discard editing and send the original text back to the browser,
-but don't kill the editing buffer."
-  (interactive)
-  (edit-server-done t t))
-
 (defvar edit-server-kill-query-string
   (concat
    ;; prevent using minibuffer-prompt face
@@ -590,16 +584,13 @@ but don't kill the editing buffer."
 
 (defun edit-server-kill-query ()
   "Ask user what to do when killing edit buffer."
-  (if (buffer-modified-p (current-buffer))
-      (progn
-        (case (read-char-choice
-               edit-server-kill-query-string
-               (append "sSKk" nil))
-          ((?s ?S) (edit-server-save))
-          ((?k ?K) (edit-server-abort*)))
-        t)
-    (edit-server-abort*)
-    t))
+  (when (buffer-modified-p (current-buffer))
+    (case (read-char-choice
+           edit-server-kill-query-string
+           (append "sSKk" nil))
+      ((?s ?S) (edit-server-done))
+      ((?k ?K) (edit-server-done t t))))
+  t)
 
 (provide 'edit-server)
 
