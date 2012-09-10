@@ -400,8 +400,9 @@ non-nil, then STRING is also echoed to the message line."
 	(setq edit-server-received 0)
 	(setq edit-server-phase 'wait)))))
 
-(defun edit-server-create-frame(buffer)
-  "Create a frame for the edit server"
+(defun edit-server-show-edit-buffer (buffer)
+  "Show edit buffer by creating a frame or raising the selected
+frame."
   (if edit-server-new-frame
       (let ((new-frame
 	     (if (memq window-system '(ns mac))
@@ -420,6 +421,7 @@ non-nil, then STRING is also echoed to the message line."
 	(raise-frame new-frame)
 	(set-window-buffer (frame-selected-window new-frame) buffer)
 	new-frame)
+    (select-frame-set-input-focus (window-frame (selected-window)))
     (pop-to-buffer buffer)
     (raise-frame)
     nil))
@@ -460,7 +462,7 @@ to `edit-server-default-major-mode'"
       (add-hook 'kill-buffer-hook 'edit-server-abort* nil t)
       (buffer-enable-undo)
       (setq edit-server-proc proc
-	    edit-server-frame (edit-server-create-frame buffer))
+	    edit-server-frame (edit-server-show-edit-buffer buffer))
       (edit-server-edit-mode))))
 
 (defun edit-server-send-response (proc &optional body progress)
