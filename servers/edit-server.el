@@ -205,6 +205,11 @@ Depending on the character encoding, may be different from the buffer length.")
 (make-variable-buffer-local 'edit-server-url)
 (put 'edit-server-url 'permanent-local t)
 
+(defvar edit-server-file nil
+  "The value gotten from the HTTP `x-file' header.")
+(make-variable-buffer-local 'edit-server-file)
+(put 'edit-server-file 'permanent-local t)
+
 ;;; Mode magic
 ;;
 ;; We want to re-map some of the keys to trigger edit-server-done
@@ -329,7 +334,8 @@ non-nil, then STRING is also echoed to the message line."
 	    edit-server-received 0
 	    edit-server-request nil))
     (setq edit-server-content-length nil
-	  edit-server-url nil))
+	  edit-server-url nil
+	  edit-server-file nil))
   (add-to-list 'edit-server-clients client)
   (edit-server-log client msg))
 
@@ -369,6 +375,12 @@ non-nil, then STRING is also echoed to the message line."
 	(goto-char (point-min))
 	(when (re-search-forward "^x-url: .*//\\(.*\\)/" nil t)
 	  (setq edit-server-url (match-string 1))))
+      ;; look for "x-file" header
+      (save-excursion
+	(goto-char (point-min))
+	(when (re-search-forward "^x-file: \\(.*\\)" nil t)
+	  (edit-server-log proc "Found x-file: %s" (match-string 1))
+	  (setq edit-server-file (match-string 1))))
       ;; look for head/body separator
       (save-excursion
 	(goto-char (point-min))
@@ -379,6 +391,9 @@ non-nil, then STRING is also echoed to the message line."
 		(- edit-server-received (- (match-end 0) (point-min))))
 	  ;; discard headers - keep only HTTP content in buffer
 	  (delete-region (point-min) (match-end 0))
+	  (edit-server-log proc
+			   "Processed headers, length: %s, url: %s, file: %s"
+			   edit-server-content-length edit-server-url edit-server-file)
 	  (setq edit-server-phase 'body))))
 
     (when (eq edit-server-phase 'body)
@@ -391,7 +406,7 @@ non-nil, then STRING is also echoed to the message line."
 	(cond
 	 ((string= edit-server-request "POST")
 	  ;; create editing buffer, and move content to it
-	  (edit-server-create-edit-buffer proc))
+	  (edit-server-create-edit-buffer proc edit-server-file))
 	 (t
 	  ;; send 200 OK response to any other request
 	  (edit-server-send-response proc "edit-server is running.\n")
@@ -440,12 +455,14 @@ to `edit-server-default-major-mode'"
 	  (setq pairs (cdr pairs)))))
     (funcall mode)))
 
-(defun edit-server-create-edit-buffer(proc)
+(defun edit-server-create-edit-buffer(proc &optional existing)
   "Create an edit buffer, place content in it and save the network
 	process for the final call back"
-  (let ((buffer (generate-new-buffer
-		 (or edit-server-url
-		     edit-server-edit-buffer-name))))
+  (let ((buffer (or (and (stringp existing)
+			 (get-buffer existing))
+		    (generate-new-buffer
+		     (or edit-server-url
+			 edit-server-edit-buffer-name)))))
     (with-current-buffer buffer
       (when (fboundp 'set-buffer-multibyte)
 	(set-buffer-multibyte t))) ; djb
@@ -475,6 +492,7 @@ Optional second argument BODY specifies the response content:
 If optional third argument progress is non-nil, then the response
 will include x-file and x-open headers to allow continuation of editing."
   (interactive)
+  (edit-server-log proc "sending edit-server response")
   (if (processp proc)
       (let ((response-header (concat
 			      "HTTP/1.0 200 OK\n"
@@ -550,23 +568,14 @@ When called interactively, use prefix arg to abort editing."
 	(kill-buffer buffer))
       (edit-server-kill-client proc))))
 
+;; edit-server-save uses the iterative edit-server option (send a
+;; buffer back to the client which then returns new request to
+;; continue the session). The edit-server then switches back to the
+;; buffer referenced by the x-file header.
 ;;
-;; There are a couple of options for handling the save
-;; action. The intent is to preserve data but not finish
-;; editing. There are a couple of approaches that could
-;; be taken:
-;;  a) Use the iterative edit-server option (send a buffer
-;;     back to the client which then returns new request
-;;     to continue the session).
-;;  b) Back-up the edit session to a file
-;;  c) Save the current buffer to the kill-ring
-;;
-;; I've attempted to do a) a couple of times but I keep running
-;; into problems which I think are emacs bugs. So for now I'll
-;; just push the current buffer to the kill-ring.
 
 (defun edit-server-save ()
-  "Save the current state of the edit buffer."
+  "Save the current state of the edit buffer but don't close it."
   (interactive)
   (edit-server-done nil t))
 
