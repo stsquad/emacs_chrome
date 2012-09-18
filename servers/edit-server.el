@@ -476,7 +476,7 @@ and save the network process for the final call back"
       ;; hooks early on
       (run-hooks 'edit-server-start-hook)
       (not-modified)
-      (add-hook 'kill-buffer-hook 'edit-server-abort* nil t)
+      (add-hook 'kill-buffer-query-functions 'edit-server-kill-query nil t)
       (buffer-enable-undo)
       (setq edit-server-proc proc
 	    edit-server-frame (edit-server-show-edit-buffer buffer))
@@ -561,11 +561,11 @@ When called interactively, use prefix arg to abort editing."
 	  (dolist (format buffer-file-format)
 	    (format-decode-region (point-min) (point-max) format))
 	  (buffer-enable-undo)))
-      (when edit-server-frame
-	(delete-frame edit-server-frame))
       ;; delete-frame may change the current buffer
       (unless nokill
 	(kill-buffer buffer))
+      (when edit-server-frame
+        (delete-frame edit-server-frame))
       (edit-server-kill-client proc))))
 
 ;; edit-server-save uses the iterative edit-server option (send a
@@ -584,11 +584,24 @@ When called interactively, use prefix arg to abort editing."
   (interactive)
   (edit-server-done t))
 
-(defun edit-server-abort* ()
-  "Discard editing and send the original text back to the browser,
-but don't kill the editing buffer."
-  (interactive)
-  (edit-server-done t t))
+(defvar edit-server-kill-query-string
+  (concat
+   ;; prevent using minibuffer-prompt face
+   (propertize "(" 'face 'default)
+   (propertize "s" 'face '(:foreground "ForestGreen"))
+   ")ubmit changes ("
+   (propertize "k" 'face '(:foreground "Firebrick"))
+   ")ill changes?"))
+
+(defun edit-server-kill-query ()
+  "Ask user what to do when killing edit buffer."
+  (when (buffer-modified-p (current-buffer))
+    (case (read-char-choice
+           edit-server-kill-query-string
+           (append "sSKk" nil))
+      ((?s ?S) (edit-server-done))
+      ((?k ?K) (edit-server-done t t))))
+  t)
 
 (provide 'edit-server)
 
