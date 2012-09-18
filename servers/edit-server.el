@@ -373,12 +373,12 @@ non-nil, then STRING is also echoed to the message line."
       ;; look for "x-url" header
       (save-excursion
 	(goto-char (point-min))
-	(when (re-search-forward "^x-url: .*//\\(.*\\)/" nil t)
+	(when (re-search-forward "^x-url: .*/\\{2,3\\}\\(.*\\)" nil t)
 	  (setq edit-server-url (match-string 1))))
       ;; look for "x-file" header
       (save-excursion
 	(goto-char (point-min))
-	(when (re-search-forward "^x-file: \\(.*\\)" nil t)
+	(when (re-search-forward "^x-file: \\(.*\\)" nil t)
 	  (edit-server-log proc "Found x-file: %s" (match-string 1))
 	  (setq edit-server-file (match-string 1))))
       ;; look for head/body separator
@@ -406,7 +406,7 @@ non-nil, then STRING is also echoed to the message line."
 	(cond
 	 ((string= edit-server-request "POST")
 	  ;; create editing buffer, and move content to it
-	  (edit-server-create-edit-buffer proc edit-server-file))
+	  (edit-server-find-or-create-edit-buffer proc edit-server-file))
 	 (t
 	  ;; send 200 OK response to any other request
 	  (edit-server-send-response proc "edit-server is running.\n")
@@ -455,9 +455,9 @@ to `edit-server-default-major-mode'"
 	  (setq pairs (cdr pairs)))))
     (funcall mode)))
 
-(defun edit-server-create-edit-buffer(proc &optional existing)
-  "Create an edit buffer, place content in it and save the network
-	process for the final call back"
+(defun edit-server-find-or-create-edit-buffer(proc &optional existing)
+  "Find and existing or create an new edit buffer, place content in it
+and save the network process for the final call back"
   (let ((buffer (or (and (stringp existing)
 			 (get-buffer existing))
 		    (generate-new-buffer
