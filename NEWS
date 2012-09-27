@@ -8,6 +8,10 @@ Extension
 edit-server.el
 
 * Now available from the MELPA package archive!
+* Beta support for iterative C-x C-s saving (it works but is ugly)
+* Default to using UTF-8 coding for process communication
+* Raise existing frame consistently on Mac
+* Tweak the portion of the URL used to name buffers
 
 v1.11
 
