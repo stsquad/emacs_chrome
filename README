@@ -94,3 +94,8 @@ The settings code uses Frank Kohlhepp's excellent
 fancy-settings library. This can be found at:
 
 https://github.com/frankkohlhepp/fancy-settings
+
+The textarea code uses the rather nifty mutation summary
+library by Google. This can be found at:
+
+https://code.google.com/p/mutation-summary/
