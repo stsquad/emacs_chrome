@@ -89,7 +89,7 @@ function textAreaTracker(text)
 	// The img 
 	if (enable_button) {
 		this.image = document.createElement('img');
-		this.image.setAttribute("id", "ewe_edit_button");
+		this.image.setAttribute("class", "ewe_edit_button");
 		this.image.setAttribute("edit_id", this.edit_id);
 		this.image.src = editImgURL;
 		this.image.addEventListener('click', editTextArea);
@@ -283,9 +283,7 @@ function editTextArea(event) {
 }
 
 /*
-  This is the main find function for searching for TEXTAREAS. It protects itself via
-  a (page) global semaphore called findingTextAreas so it doesn't call itself after
-  tagTextArea() adds new nodes to the DOM tree.
+  This is the main find function for searching for TEXTAREAS and other related divs
 */
 
 function findTextAreas(elements) {
@@ -313,37 +311,22 @@ function findTextAreas(elements) {
 		    tagTextArea(editable[j]);
 	    }
     }
-	
-	
 }
 
 /*
-  This triggers each time an element is added.
-
-  By deferring the call to findTextAreas() with a timeout we prevent overloading
-  the browser on heavy DOM manipulation setups. If the timeout hasn't yet fired
-  we don't attempt to re-scan.
+  This triggers each time an element is changed.
 */
-function handleInsertedElements(ev) {
-	if (!findTextAreasTimeout) {
-        var elements = findTextAreasDefferedElements;
-        elements.push(ev.target);
-        console.log("will scan text area in "+findTextAreasTime);
-		findTextAreasTimeout = setTimeout((function() {
-            console.log("findTextAreas timeout fired");
-			findTextAreas(elements);
-			findTextAreasTimeout = undefined;
-            findTextAreasTime = 0;
-		}), findTextAreasTime);
-        // clear the deffered array
-        findTextAreasDefferedElements = [];
-	} else {
-        findTextAreasTime += 500;
-        findTextAreasTime = Math.min(findTextAreasTime, 2000);
-        findTextAreasDefferedElements.push(ev.target);
-        console.log("defered "+findTextAreasDefferedElements.length+" updates, next fire in "+findTextAreasTime);
-    }
+function handleUpdatedElements(summaries) {
+    var widgetSummary = summaries[0];
+    widgetSummary.added.forEach(function(e) { tagTextArea(e); });
+//    widgetSummary.removed.forEach(cleanupExistingWidget);
 }
+
+function handleDuplicatedTags(summaries) {
+    console.log("handleDuplicatedTags called");
+    // TODO
+}
+
 
 /* Message handling multiplexer */
 function localMessageHandler(msg, port) {
@@ -356,10 +339,39 @@ function localMessageHandler(msg, port) {
 		enable_keys = msg.enable_keys;
 		enable_debug = msg.enable_debug;
 		findTextAreas([$('*')]);
-		document.addEventListener("DOMNodeInserted", (function (ev) {
-			handleInsertedElements(ev);
-			return true;
-		}), false);
+
+        /* 
+         * The mutation summary is responsible for monitoring all
+         * changes to the page and triggering updates.
+         *
+         * imgtag_observer - for pages inadvertently duplicating our imgtags
+         * textarea_observer - for looking for new textareas
+         */
+        var imgtag_observer = new MutationSummary({
+            callback: handleDuplicatedTags,
+            queries: [
+                {
+                    element: "img[class='ewe_edit_button']"
+                }
+            ]
+        });
+
+        var textarea_observer = new MutationSummary({
+            callback: handleUpdatedElements,
+            queries: [
+                {
+                    element: "textarea"
+                },
+                {
+                    element: "div[contenteditable='true']"
+                },
+                {
+                    element: "div[contenteditable='plain-text-only']"
+                }
+            ]
+        });
+
+
 	} else if (cmd == "find_edit") {
 		findActiveTextArea();
 	} else if (cmd == "update") {
