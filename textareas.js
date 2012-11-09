@@ -317,14 +317,28 @@ function findTextAreas(elements) {
   This triggers each time an element is changed.
 */
 function handleUpdatedElements(summaries) {
-    var widgetSummary = summaries[0];
-    widgetSummary.added.forEach(function(e) { tagTextArea(e); });
-//    widgetSummary.removed.forEach(cleanupExistingWidget);
-}
+    for (var s=0; s<summaries.length; s++) {
+        var widgetSummary = summaries[s];
 
-function handleDuplicatedTags(summaries) {
-    console.log("handleDuplicatedTags called");
-    // TODO
+        widgetSummary.added.forEach(function(e) {
+            if (e.className == "ewe_edit_button") {
+                $(e).remove();
+            } else {
+                // If the area was duplicated we want to remote it's ID
+                if (e.getAttribute("edit_id")) {
+                    e.removeAttribute("edit_id");
+                }
+                tagTextArea(e);
+            }
+        });
+
+        widgetSummary.removed.forEach(function(e) {
+            if (e.getAttribute("edit_id")) {
+                // TODO: cleanly
+                console.log("tagged element removed, we should probably do something about that");
+            }
+        });
+    }
 }
 
 
@@ -344,21 +358,13 @@ function localMessageHandler(msg, port) {
          * The mutation summary is responsible for monitoring all
          * changes to the page and triggering updates.
          *
-         * imgtag_observer - for pages inadvertently duplicating our imgtags
-         * textarea_observer - for looking for new textareas
          */
-        var imgtag_observer = new MutationSummary({
-            callback: handleDuplicatedTags,
-            queries: [
-                {
-                    element: "img[class='ewe_edit_button']"
-                }
-            ]
-        });
-
         var textarea_observer = new MutationSummary({
             callback: handleUpdatedElements,
             queries: [
+                {   // we don't want the source page accidently duplicating our tags
+                    element: "img[class='ewe_edit_button']"
+                },
                 {
                     element: "textarea"
                 },
