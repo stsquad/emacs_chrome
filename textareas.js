@@ -372,7 +372,7 @@ function localMessageHandler(msg, port) {
                     element: "div[contenteditable='true']"
                 },
                 {
-                    element: "div[contenteditable='plain-text-only']"
+                    element: "div[contenteditable='plaintext-only']"
                 }
             ]
         });
