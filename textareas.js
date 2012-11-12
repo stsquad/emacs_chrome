@@ -17,9 +17,6 @@ var port = chrome.extension.connect();
 // For findTextAreas
 var page_edit_id = 0;
 var pageTextAreas = [];
-var findTextAreasTimeout;
-var findTextAreasTime = 0;
-var findTextAreasDefferedElements = [];
 
 // via options
 var enable_button = true;
@@ -120,7 +117,9 @@ function textAreaTracker(text)
 
   Fetch the appropriate textAreaTracker for the given ID. As it tracks each element we
   care about it's probably worth going through this short array rather than iterating
-  the entire DOM every time
+  the entire DOM every time.
+
+  Currently the array is not cleaned when elements are removed from the page.
 */
 
 function getTextAreaTracker(search_id)
