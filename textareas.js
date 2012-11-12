@@ -317,28 +317,35 @@ function findTextAreas(elements) {
   This triggers each time an element is changed.
 */
 function handleUpdatedElements(summaries) {
-    for (var s=0; s<summaries.length; s++) {
-        var widgetSummary = summaries[s];
+    // These are in order of the queries in MutationSummary call
+    var imgSummary = summaries[0];
+    var taSummary = summaries[1];
+    var div1Summary = summaries[2];
+    var div2Summary = summaries[3];
 
-        widgetSummary.added.forEach(function(e) {
-            if (e.className == "ewe_edit_button") {
-                $(e).remove();
-            } else {
-                // If the area was duplicated we want to remote it's ID
-                if (e.getAttribute("edit_id")) {
-                    e.removeAttribute("edit_id");
-                }
-                tagTextArea(e);
-            }
-        });
+    // Clean up duplicate img tags
+    imgSummary.added.forEach(function(e) {
+        $(e).remove();
+    });
 
-        widgetSummary.removed.forEach(function(e) {
-            if (e.getAttribute("edit_id")) {
-                // TODO: cleanly
-                console.log("tagged element removed, we should probably do something about that");
-            }
-        });
-    }
+    // Process all new textareas
+    var allAdded = taSummary.added.concat(div1Summary.added, div2Summary.added);
+    allAdded.forEach(function(e) {
+        // If the area was duplicated we want to remote it's ID
+        if (e.getAttribute("edit_id")) {
+            e.removeAttribute("edit_id");
+        }
+        tagTextArea(e);
+    });
+
+    // For now just log removed
+    // TODO: something cleaner...
+    var allRemoved = taSummary.removed.concat(div1Summary.removed, div2Summary.removed);
+    allRemoved.forEach(function(e) {
+        if (e.getAttribute("edit_id")) {
+            console.log("tagged element removed, we should probably do something about that");
+        }
+    });
 }
 
 
