@@ -20,6 +20,28 @@ protocol.
 This extension is licensed under the GPL v3 and development versions
 can be found at: http://github.com/stsquad/emacs_chrome
 
+Installing
+==========
+
+If you just want to install Edit with Emacs you can simply visit the
+Chrome Store at:
+
+https://chrome.google.com/webstore/detail/edit-with-emacs/ljobjlafonikaiipfkggjbhkghgicgoh
+
+You then have the option of installing the packaged edit-server from the
+options page or alternatively you can install the latest version from
+MELPA if you have it enabled in Emacs 24+.
+
+If you would like to help with the development of Edit with Emacs the
+easiest way is to fork the github repository (https://github.com/stsquad/emacs_chrome)
+and clone it to your development system. The in Chrome(ium) go to:
+
+Tools->Extensions
+Select "Developer Mode"
+Click "Load Unpacked Extension"
+
+and point it at the cloned repository.
+
 Hacking
 =======
 
