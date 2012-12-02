@@ -208,6 +208,13 @@ function updateTextArea(id, content) {
 		event.initEvent('change', true, false);
 		tracker.text.dispatchEvent(event);
 
+		// set selection to after end of the text
+		tracker.text.selectionStart = content.length;
+		// send a textInputEvent to append a newline
+		event = document.createEvent("TextEvent");
+		event.initTextEvent('textInput', true, true, null, '\n', 0);
+		tracker.text.dispatchEvent(event);
+
 		setTimeout(function(){
 			$(tracker.text).animate({ 'backgroundColor': orig }, 1000);
 		}, 1000);
