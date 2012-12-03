@@ -4,11 +4,14 @@ Extension
 
 * Upgraded manifest to version 2 for future releases of Chrome
 * Added an "Enable Debug" flag to control logging to console
+* Use Mutation Observers to better track changes in dynamic DOMs
+* Fake a keypress when updating the textarea
+* Bug fix for handling editable DIV elements
 
 edit-server.el
 
 * Now available from the MELPA package archive!
-* Beta support for iterative C-x C-s saving (it works but is ugly)
+* Beta support for iterative C-x C-s saving (it works but is ugly, see kill-ring)
 * Default to using UTF-8 coding for process communication
 * Raise existing frame consistently on Mac
 * Tweak the portion of the URL used to name buffers
