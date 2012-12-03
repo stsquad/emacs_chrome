@@ -458,15 +458,33 @@ to `edit-server-default-major-mode'"
 (defun edit-server-find-or-create-edit-buffer(proc &optional existing)
   "Find and existing or create an new edit buffer, place content in it
 and save the network process for the final call back"
-  (let ((buffer (or (and (stringp existing)
-			 (get-buffer existing))
-		    (generate-new-buffer
-		     (or edit-server-url
-			 edit-server-edit-buffer-name)))))
-    (with-current-buffer buffer
-      (when (fboundp 'set-buffer-multibyte)
-	(set-buffer-multibyte t))) ; djb
+  (let* ((existing-buffer (get-buffer (or (and (stringp existing) existing) "")))
+	 (buffer (or existing-buffer (generate-new-buffer
+				     (or edit-server-url
+					 edit-server-edit-buffer-name)))))
+
+    (edit-server-log proc (format
+			   "using buffer %s for edit (existing-buffer
+is %s)"
+			   buffer existing-buffer))
+
+    ;; set multi-byte for proper UTF-8 handling (djb)
+    (when (fboundp 'set-buffer-multibyte)
+      (with-current-buffer buffer
+	(set-buffer-multibyte t)))
+
+    ;; I seem to be working around a bug here :-/
+    ;;
+    ;; For some reason the copy-to-buffer doesn't blat the existing contents.
+    ;; This screws up formatting as the contents where decoded before being
+    ;; sent back to the browser. As a kludge I save the returned contents
+    ;; in the kill-ring.
+    (when existing-buffer
+      (kill-ring-save (point-min) (point-max)))
+
+    (edit-server-log proc "copying new data into buffer")
     (copy-to-buffer buffer (point-min) (point-max))
+    
     (with-current-buffer buffer
       (setq edit-server-url (with-current-buffer (process-buffer proc) edit-server-url))
       (edit-server-choose-major-mode)
@@ -475,7 +493,7 @@ and save the network process for the final call back"
       ;; variables that we depend upon for the response, so call the
       ;; hooks early on
       (run-hooks 'edit-server-start-hook)
-      (not-modified)
+      (set-buffer-modified-p 'nil)
       (add-hook 'kill-buffer-hook 'edit-server-abort* nil t)
       (buffer-enable-undo)
       (setq edit-server-proc proc
@@ -557,10 +575,7 @@ When called interactively, use prefix arg to abort editing."
 	  ;; send back
 	  (run-hooks 'edit-server-done-hook)
 	  (edit-server-send-response proc t nokill)
-	  ;; restore formats (only useful if we keep the buffer)
-	  (dolist (format buffer-file-format)
-	    (format-decode-region (point-min) (point-max) format))
-	  (buffer-enable-undo)))
+	  (edit-server-log proc "sent response to browser")))
       (when edit-server-frame
 	(delete-frame edit-server-frame))
       ;; delete-frame may change the current buffer
