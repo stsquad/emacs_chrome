@@ -142,54 +142,57 @@ function getTextAreaTracker(search_id)
 */
 function tagTextArea(text)
 {
-	// Don't bother with hidden fields.
-	if ($(text).is(":hidden")) return;
+    // Don't bother with hidden fields.
+    if ($(text).is(":hidden")) return;
 
-	// Is it offscreen (like some github textareas)
-	if ($(text).position().left + $(text).width() < 0) return;
-	if ($(text).position().top + $(text).height() < 0) return;
+    // Is it offscreen (like some github textareas)
+    if ($(text).position().left + $(text).width() < 0) return;
+    if ($(text).position().top + $(text).height() < 0) return;
 
-	// If spellcheck is turned off, usually it's just for quick editing, e.g. To: fields in gmail
-	var spellcheck = text.getAttribute("spellcheck");
-	if (spellcheck && spellcheck == "false")
-		return;
+    // If spellcheck is turned off, usually it's just for quick editing, e.g. To: fields in gmail
+    var spellcheck = text.getAttribute("spellcheck");
+    if (spellcheck && spellcheck == "false") return;
 
-	// No edit for read-only text
-	// This also removes annoying edit button that appears under the menu bar in Google Docs viewer.
-	if (text.readOnly) return;
+    // No edit for read-only text
+    // This also removes annoying edit button that appears under the menu bar in Google Docs viewer.
+    if (text.readOnly) return;
 
-	var existing_id = text.getAttribute("edit_id");
-	if (!existing_id)
+    var existing_id = text.getAttribute("edit_id");
+    if (!existing_id)
+    {
+	// tag it
+	pageTextAreas.push(new textAreaTracker(text));
+    } else {
+        /*
+         * TODO: remove?
+         * 
+         * This code is possibly redundant now page changes are tracked using mutation events
+         * and we take steps to remove duplicate tags at that point. However we might as well
+         * keep the code for now and see if anything triggers it in the field.
+         */
+        console.log("Found existing ID when tagging: "+existing_id);
+	var existing_area = getTextAreaTracker(existing_id);
+	if ( existing_area &&
+	     (existing_area.text != text ) )
 	{
-		// tag it
-		pageTextAreas.push(new textAreaTracker(text));
-	} else {
-		// Even though this text has an edit_id it might not actually be the
-		// text we think it is. If the textAreaTracker.text doesn't match then
-		// we should tag this with something different
+	    console.log("tagTextArea: Working around a duplicate id!");
+	    // OK, first things first, find any images that think
+	    // they are associated with a text area and remove them
+	    siblings = text.parentElement.childNodes;
 
-		var existing_area = getTextAreaTracker(existing_id);
-		if ( existing_area &&
-			 (existing_area.text != text ) )
-		{
-			console.log("tagTextArea: Working around a duplicate id!");
-			// OK, first things first, find any images that think
-			// they are associated with a text area and remove them
-			siblings = text.parentElement.childNodes;
-
-			for (var j=0; j<siblings.length; j++) {
-				if (! (siblings[j].getAttribute == undefined) ) {
-					if ( (siblings[j].getAttribute("edit_id") == existing_area.edit_id) &&
-						 (siblings[j].toString() == "[object HTMLImageElement]") ) {
-						siblings[j].parentElement.removeChild(siblings[j]);
-					}
-				}
-			}
-
-			// And create a new tracked text area
-			pageTextAreas.push(new textAreaTracker(text));
+	    for (var j=0; j<siblings.length; j++) {
+		if (! (siblings[j].getAttribute == undefined) ) {
+		    if ( (siblings[j].getAttribute("edit_id") == existing_area.edit_id) &&
+			 (siblings[j].toString() == "[object HTMLImageElement]") ) {
+			siblings[j].parentElement.removeChild(siblings[j]);
+		    }
 		}
+	    }
+
+	    // And create a new tracked text area
+	    pageTextAreas.push(new textAreaTracker(text));
 	}
+    }
 }
 
 /*
