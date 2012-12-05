@@ -261,6 +261,24 @@ send a response back to the client."
 
 ;; Edit Server socket code
 
+;; Avoid an unnecessary prompt about active processes when exiting
+;; emacs with no active edit-server clients
+;; https://github.com/stsquad/emacs_chrome/issues/67
+;;
+;; According to http://emacswiki.org/emacs/AdviceVsHooks advice is a
+;; sledgehammer which should be avoided if possible.  However, the
+;; only hooks run by save-buffers-kill-emacs are defined by
+;; kill-emacs-query-functions and run *after* the check for active
+;; processes which results in precisely the interactive prompt we want
+;; to avoid when edit-server has no active clients.  So it seems that
+;; advice is the only solution until save-buffers-kill-emacs offers an
+;; earlier hook.
+(defadvice save-buffers-kill-emacs
+      (before edit-server-stop-before-kill-emacs)
+      "Call `edit-server-stop' if there are no active clients, to
+avoid the user being prompted to kill the edit-server process."
+      (or edit-server-clients (edit-server-stop)))
+
 (defun edit-server-start (&optional verbose)
   "Start the edit server.
 
@@ -283,6 +301,7 @@ will cause it to be verbose."
                       proc)
 		  (file-error nil))))
       (message "An edit-server process is already running")
+    (ad-activate 'save-buffers-kill-emacs)
     (setq edit-server-clients '())
     (if verbose (get-buffer-create edit-server-log-buffer-name))
     (edit-server-log nil "Created a new edit-server process")))
@@ -297,7 +316,12 @@ will cause it to be verbose."
       (delete-process "edit-server")
     (message "No edit server running"))
   (when (get-buffer edit-server-process-buffer-name)
-    (kill-buffer edit-server-process-buffer-name)))
+    (kill-buffer edit-server-process-buffer-name))
+  (ad-disable-advice 'save-buffers-kill-emacs
+                     'before 'edit-server-stop-before-kill-emacs)
+  ;; Disabling advice doesn't take effect until you (re-)activate
+  ;; all advice for the function.
+  (ad-activate 'save-buffers-kill-emacs))
 
 (defun edit-server-log (proc fmt &rest args)
   "If a `*edit-server-log*' buffer exists, write STRING to it.
