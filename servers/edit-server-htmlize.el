@@ -85,9 +85,11 @@ but only turns <br> tags into line breaks."
   (interactive)
   (save-excursion
     (let ((case-fold-search t)
-          (buffer-read-only nil))
+          (buffer-read-only nil)
+	  (edit-server-remove-list (append (list "span") html2text-remove-tag-list)))
       (html2text-replace-string "<br>" "\n" (point-min) (point-max))
-      (html2text-remove-tags html2text-remove-tag-list)
+      (html2text-replace-string "</div>" "</div>\n" (point-min) (point-max))
+      (html2text-remove-tags edit-server-remove-list)
       (html2text-format-tags)
       (html2text-remove-tags html2text-remove-tag-list2)
       (edit-server-html2text-substitute)
