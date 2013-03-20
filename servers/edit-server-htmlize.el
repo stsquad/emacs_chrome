@@ -4,7 +4,7 @@
 
 ;; Author: Roland McGrath <roland@hack.frob.com>
 ;; Maintainer: Roland McGrath <roland@hack.frob.com>
-;; Version: 0.2
+;; Version: 0.3
 
 ;; This file is not part of GNU Emacs.
 
@@ -76,6 +76,24 @@ of the buffer."
     (goto-char (point-max))
     (insert "</pre>")))
 
+(defun edit-server-html2text-clean-div (p1 p2 p3 p4)
+  (html2text-delete-tags p1 p2 p3 p4)
+  (insert "\n"))
+
+(defconst edit-server-html2text-remove-tag-list
+  (nconc '("span")
+         (delq nil (mapcar (lambda (tag)
+                             (if (member tag '("div"))
+                                 nil
+                               tag))
+                           html2text-remove-tag-list)))
+  "See `html2text-remove-tag-list'.")
+
+(defconst edit-server-html2text-format-tag-list
+  `(("div" . edit-server-html2text-clean-div)
+    ,@html2text-format-tag-list)
+  "See `html2text-format-tag-list'.")
+
 ;; XXX Modified from 23.3.1's gnus/html2text.el html2text,
 ;; which wants to eat <br> and refill paragraphs.
 (defun edit-server-dehtmlize-buffer ()
@@ -87,8 +105,9 @@ but only turns <br> tags into line breaks."
     (let ((case-fold-search t)
           (buffer-read-only nil))
       (html2text-replace-string "<br>" "\n" (point-min) (point-max))
-      (html2text-remove-tags html2text-remove-tag-list)
-      (html2text-format-tags)
+      (html2text-remove-tags edit-server-html2text-remove-tag-list)
+      (let ((html2text-format-tag-list edit-server-html2text-format-tag-list))
+        (html2text-format-tags))
       (html2text-remove-tags html2text-remove-tag-list2)
       (edit-server-html2text-substitute)
       (html2text-format-single-elements))))
