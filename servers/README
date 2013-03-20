@@ -29,6 +29,19 @@ edit-server [RET]`. Or you can set the variables' values directly in
 your ~/.emacs.
 
 
+Hooks
+=====
+
+edit-server.el provides two hooks for customising behaviour when edit
+requests are being made. These are:
+
+* edit-server-start-hook - called when editing starts
+* edit-server-done-hook - called when just before the text returned
+
+We now include edit-server-htmlize.el which provides some example
+functions which can be added to these hooks to deal with a popular web
+based email client which sends HTML even in plain text mode.
+
 How it works
 ============
 

@@ -1,3 +1,10 @@
+v1.13
+
+edit-server.el
+
+* add advice to save-buffers-kill-emacs to avoid prompting on shutdown
+* *new* edit-server-htmlize.el with hooks for dealing with HTML elements in "plain text" gmail
+
 v1.12
 
 Extension
