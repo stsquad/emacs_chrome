@@ -14,6 +14,7 @@
 	"permissions": [
 		"tabs",
 		"contextMenus",
+	        "notifications",
 		"http://127.0.0.1/edit/*"
 	],
 	"icons":
@@ -23,6 +24,8 @@
 	"options_page": "fancy-settings/source/index.html",
         "web_accessible_resources": [
 	    "icons/gumdrop.png"
+	    "icons/gumdrop.png",
+	    "icons/emacs23-16x16-red.png"
 	],
 	"content_scripts": [
 		{

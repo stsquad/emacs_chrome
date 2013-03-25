@@ -122,6 +122,16 @@ function handleContentMessages(msg, tab_port)
 	        } else if (xhr.status == 0) {
 		        // Is the edit server actually running?
 		        updateUserFeedback("Error: is edit server running?", "red");
+
+                // Also do a notification to draw attention to the failure
+                var notification = webkitNotifications.createNotification(
+                    'icons/emacs23-16x16-red.png',
+                    'Edit Server Error',
+                    "Unable to contact an edit server, is it running?"+
+                        " I'll take you to the options page when you close this"
+                );
+                notification.onclose = function() { chrome.tabs.create({'url': chrome.extension.getURL('fancy-settings/source/index.html')}) }
+                notification.show();
 	        } else {
 		        updateUserFeedback("Un-handled response: "+xhr.status, "red"); 
 	        }
