@@ -13,6 +13,7 @@
  */
 
 var settings = new Store("settings", {
+    "edit_server_host": "127.0.0.1",
     "edit_server_port": 9292,
     "enable_button": true,
     "enable_dblclick": false,
@@ -43,15 +44,15 @@ function updateUserFeedback(string, colour)
 	console.log("updateUserFeedback: "+string);
 	chrome.browserAction.setTitle({title:string});
 	if (colour == null) {
-		chrome.browserAction.setIcon({path:"emacs23-16x16.png"});
+		chrome.browserAction.setIcon({path:"icons/emacs23-16x16.png"});
 	} else if (colour == "green") {
-	    chrome.browserAction.setIcon({path:"emacs23-16x16-green.png"});
+	    chrome.browserAction.setIcon({path:"icons/emacs23-16x16-green.png"});
 	} else if (colour == "red") {
-	    chrome.browserAction.setIcon({path:"emacs23-16x16-red.png"});
+	    chrome.browserAction.setIcon({path:"icons/emacs23-16x16-red.png"});
 	} else if (colour == "darkblue") {
-	    chrome.browserAction.setIcon({path:"emacs23-16x16-darker.png"});
+	    chrome.browserAction.setIcon({path:"icons/emacs23-16x16-darker.png"});
 	} else {
-		chrome.browserAction.setIcon({path:"emacs23-16x16.png"});
+		chrome.browserAction.setIcon({path:"icons/emacs23-16x16.png"});
 	}
 }
 

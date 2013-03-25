@@ -4,12 +4,12 @@
         "manifest_version": 2,
 	"description": "Allow user to edit web-page textareas with Emacs (and other editors).",
 	"browser_action": {
-		"default_icon": "emacs23-16x16.png"
+		"default_icon": "icons/emacs23-16x16.png",
 	},
         "background": {
 	    "scripts": ["fancy-settings/source/lib/store.js",
-			"xmlcomms.js",
-			"context_menu.js"]
+			"javascript/xmlcomms.js",
+			"javascript/context_menu.js"]
 	},
 	"permissions": [
 		"tabs",
@@ -18,17 +18,17 @@
 	],
 	"icons":
 	{
-		"128" : "emacs.png"
+		"128" : "icons/emacs.png"
 	},
 	"options_page": "fancy-settings/source/index.html",
         "web_accessible_resources": [
-	    "gumdrop.png"
+	    "icons/gumdrop.png"
 	],
 	"content_scripts": [
 		{
 			"matches": ["http://*/*", "https://*/*", "file://*/*"],
-			"css": ["textareas.css"],
-			"js": ["textareas.js", "jquery-1.7.min.js", "jquery.color.min.js", "mutation_summary.js"],
+			"css": ["css/textareas.css"],
+			"js": ["javascript/textareas.js", "lib/jquery-1.7.min.js", "lib/jquery.color.min.js", "lib/mutation_summary.js"],
 			"run_at": "document_idle",
 			"all_frames": true
 		}

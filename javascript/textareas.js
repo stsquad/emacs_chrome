@@ -11,7 +11,7 @@
  * and licensed under the GPLv3. See the COPYING file for details
  */
 
-var editImgURL = chrome.extension.getURL("gumdrop.png");
+var editImgURL = chrome.extension.getURL("icons/gumdrop.png");
 var port = chrome.extension.connect();
 
 // For findTextAreas

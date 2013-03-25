@@ -1,7 +1,7 @@
 // Edit with Emacs options
 this.manifest = {
     "name": "Edit with Emacs",
-    "icon": "../../emacs.png",
+    "icon": "../../icons/emacs.png",
     "settings": [
         {
             "tab": i18n.get("information"),
@@ -9,6 +9,13 @@ this.manifest = {
             "name": "Description",
             "type": "description",
             "text": i18n.get("description")
+        },
+        {
+            "tab": "Configuration",
+            "group": "Edit Server",
+            "name": "edit_server_host",
+            "type": "text",
+            "label": "Edit Server Host:",
         },
         {
             "tab": "Configuration",
