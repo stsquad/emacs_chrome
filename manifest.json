@@ -23,7 +23,6 @@
 	},
 	"options_page": "fancy-settings/source/index.html",
         "web_accessible_resources": [
-	    "icons/gumdrop.png"
 	    "icons/gumdrop.png",
 	    "icons/emacs23-16x16-red.png"
 	],
@@ -31,7 +30,12 @@
 		{
 			"matches": ["http://*/*", "https://*/*", "file://*/*"],
 			"css": ["css/textareas.css"],
-			"js": ["javascript/textareas.js", "lib/jquery-1.7.min.js", "lib/jquery.color.min.js", "lib/mutation_summary.js"],
+			"js": [
+			    "javascript/textareas.js",
+			    "lib/jquery-1.7.min.js",
+			    "lib/jquery.color.min.js",
+			    "lib/mutation_summary.js"
+			],
 			"run_at": "document_idle",
 			"all_frames": true
 		}
