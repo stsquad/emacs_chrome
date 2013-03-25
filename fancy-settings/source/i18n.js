@@ -48,12 +48,13 @@ this.i18n = {
 	package archive.\
         </p>\
 	<p>\
-        Save the file to somewhere visible to your your Emacs <code>load-path</code> and add the following\
+        Save the file to somewhere visible to your your Emacs <code>load-path</code> (~/.emacs.d is popular) and add the following\
         to your <code>.emacs</code>:\
         </p>\
 	<pre>\
-	  (require 'edit-server)<br>\
-	  (edit-server-start)\
+          (add-to-list 'load-path \"~/.emacs.d\")<br>\
+          (require 'edit-server)<br>\
+          (edit-server-start)\
 	</pre>\
         For details about how to customise and control the behaviour of the edit server please see the\
         <a href=\"http://www.emacswiki.org/emacs/Edit_with_Emacs\">page on the Emacs Wiki</a>.\
