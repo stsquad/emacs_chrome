@@ -38,9 +38,12 @@ requests are being made. These are:
 * edit-server-start-hook - called when editing starts
 * edit-server-done-hook - called when just before the text returned
 
-We now include edit-server-htmlize.el which provides some example
+For an example of what can be achieved please see Roland McGrath's
+excellent edit-server-htmlize.el [1] which provides some example
 functions which can be added to these hooks to deal with a popular web
 based email client which sends HTML even in plain text mode.
+
+[1] https://github.com/frobtech/edit-server-htmlize
 
 How it works
 ============
