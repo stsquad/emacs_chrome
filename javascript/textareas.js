@@ -142,12 +142,23 @@ function getTextAreaTracker(search_id)
 */
 function tagTextArea(text)
 {
-    // Don't bother with hidden fields.
-    if ($(text).is(":hidden")) return;
+    /*
+      Don't bother with hidden fields unless hidden
+      by the parent container. If they are tagging
+      with our gumdrop won't be an issue and when the block
+      is restored we'll be able to edit
+    */
+    var t = $(text);
+    if (t.is(":hidden")) {
+        if (!t.parent().is(":hidden")) {
+            console.log("tagTextArea: skipping :hidden textarea");
+            return;
+        }
+    }
 
     // Is it offscreen (like some github textareas)
-    if ($(text).position().left + $(text).width() < 0) return;
-    if ($(text).position().top + $(text).height() < 0) return;
+    if (t.position().left + t.width() < 0) return;
+    if (t.position().top + t.height() < 0) return;
 
     // If spellcheck is turned off, usually it's just for quick editing, e.g. To: fields in gmail
     var spellcheck = text.getAttribute("spellcheck");
