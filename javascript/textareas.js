@@ -169,40 +169,11 @@ function tagTextArea(text)
     if (text.readOnly) return;
 
     var existing_id = text.getAttribute("edit_id");
-    if (!existing_id)
-    {
-	// tag it
-	pageTextAreas.push(new textAreaTracker(text));
-    } else {
-        /*
-         * TODO: remove?
-         * 
-         * This code is possibly redundant now page changes are tracked using mutation events
-         * and we take steps to remove duplicate tags at that point. However we might as well
-         * keep the code for now and see if anything triggers it in the field.
-         */
-        console.log("Found existing ID when tagging: "+existing_id);
-	var existing_area = getTextAreaTracker(existing_id);
-	if ( existing_area &&
-	     (existing_area.text != text ) )
-	{
-	    console.log("tagTextArea: Working around a duplicate id!");
-	    // OK, first things first, find any images that think
-	    // they are associated with a text area and remove them
-	    siblings = text.parentElement.childNodes;
-
-	    for (var j=0; j<siblings.length; j++) {
-		if (! (siblings[j].getAttribute == undefined) ) {
-		    if ( (siblings[j].getAttribute("edit_id") == existing_area.edit_id) &&
-			 (siblings[j].toString() == "[object HTMLImageElement]") ) {
-			siblings[j].parentElement.removeChild(siblings[j]);
-		    }
-		}
-	    }
-
-	    // And create a new tracked text area
+    if (!existing_id) {
+	    // tag it
 	    pageTextAreas.push(new textAreaTracker(text));
-	}
+    } else {
+        console.log("Warning: found existing ID when tagging: "+existing_id);
     }
 }
 
