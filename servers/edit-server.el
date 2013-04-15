@@ -279,6 +279,7 @@ send a response back to the client."
 avoid the user being prompted to kill the edit-server process."
       (or edit-server-clients (edit-server-stop)))
 
+;;;###autoload
 (defun edit-server-start (&optional verbose)
   "Start the edit server.
 
