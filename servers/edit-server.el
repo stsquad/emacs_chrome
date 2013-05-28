@@ -487,10 +487,9 @@ and save the network process for the final call back"
 				     (or edit-server-url
 					 edit-server-edit-buffer-name)))))
 
-    (edit-server-log proc (format
-			   "using buffer %s for edit (existing-buffer
-is %s)"
-			   buffer existing-buffer))
+    (edit-server-log proc
+		     "using buffer %s for edit (existing-buffer is %s)"
+		     buffer existing-buffer)
 
     ;; set multi-byte for proper UTF-8 handling (djb)
     (when (fboundp 'set-buffer-multibyte)
