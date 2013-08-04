@@ -195,6 +195,11 @@ Depending on the character encoding, may be different from the buffer length.")
 (make-variable-buffer-local 'edit-server-request)
 (put 'edit-server-request 'permanent-local t)
 
+(defvar edit-server-request-url nil
+  "The HTTP request URL received.")
+(make-variable-buffer-local 'edit-server-request-url)
+(put 'edit-server-request-url 'permanent-local t)
+
 (defvar edit-server-content-length nil
   "The value gotten from the HTTP `Content-Length' header.")
 (make-variable-buffer-local 'edit-server-content-length)
@@ -357,7 +362,8 @@ non-nil, then STRING is also echoed to the message line."
     (with-current-buffer buffer
       (setq edit-server-phase 'wait
 	    edit-server-received 0
-	    edit-server-request nil))
+	    edit-server-request nil
+	    edit-server-request-url nil))
     (setq edit-server-content-length nil
 	  edit-server-url nil
 	  edit-server-file nil))
@@ -381,12 +387,13 @@ non-nil, then STRING is also echoed to the message line."
 	(when (re-search-forward
 	       "^\\([A-Z]+\\)\\s-+\\(\\S-+\\)\\s-+\\(HTTP/[0-9\.]+\\)\r?\n"
 	       nil t)
+	  (setq edit-server-request (match-string 1)
+		edit-server-request-url (match-string 2)
+		edit-server-content-length nil
+		edit-server-phase 'head)
 	  (edit-server-log
-	   proc "Got HTTP `%s' request, processing in buffer `%s'..."
-	   (match-string 1) (current-buffer))
-	  (setq edit-server-request (match-string 1))
-	  (setq edit-server-content-length nil)
-	  (setq edit-server-phase 'head))))
+	   proc "Got HTTP `%s' request of url `%s', processing in buffer `%s'..."
+	   edit-server-request edit-server-request-url (current-buffer)))))
 
     (when (eq edit-server-phase 'head)
       ;; look for "Content-length" header
@@ -432,6 +439,10 @@ non-nil, then STRING is also echoed to the message line."
 	 ((string= edit-server-request "POST")
 	  ;; create editing buffer, and move content to it
 	  (edit-server-find-or-create-edit-buffer proc edit-server-file))
+	 ((string-match "foreground" edit-server-request-url)
+	  (edit-server-foreground-request)
+	  (edit-server-send-response proc "edit-server received foreground request.\n")
+	  (edit-server-kill-client proc))
 	 (t
 	  ;; send 200 OK response to any other request
 	  (edit-server-send-response proc "edit-server is running.\n")
@@ -439,6 +450,12 @@ non-nil, then STRING is also echoed to the message line."
 	;; wait for another connection to arrive
 	(setq edit-server-received 0)
 	(setq edit-server-phase 'wait)))))
+
+(defun edit-server-foreground-request ()
+  "Bring Emacs into the foreground after a request from Chrome"
+  (when edit-server-new-frame
+    (make-frame-on-display (getenv "DISPLAY")
+			   edit-server-new-frame-alist)))
 
 (defun edit-server-show-edit-buffer (buffer)
   "Show edit buffer by creating a frame or raising the selected

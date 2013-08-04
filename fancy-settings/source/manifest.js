@@ -52,6 +52,13 @@ this.manifest = {
 	    "type": "checkbox",
 	    "label": "Enable Alt-Enter Keyboard shortcut to invoke editor"
 	},
+	{
+	    "tab": "Configuration",
+	    "group": "Interface",
+	    "name": "enable_foreground",
+	    "type": "checkbox",
+	    "label": "Allow clicking on Emacs icon to bring Emacs to foreground when no text area in focus"
+	},
         {
             "tab": "Test",
             "group": "Test",

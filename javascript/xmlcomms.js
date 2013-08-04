@@ -18,7 +18,8 @@ var settings = new Store("settings", {
     "enable_button": true,
     "enable_dblclick": false,
     "enable_keys": false,
-    "enable_debug": false
+    "enable_debug": false,
+    "enable_foreground": false
 });
 
 // Decorate console.log so that it only logs
@@ -69,10 +70,18 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 	var find_msg = {
 		msg: "find_edit"
 	};
-	var tab_port = chrome.tabs.connect(tab.id);
-	
-	tab_port.postMessage(find_msg);
-	updateUserFeedback("sent request to content script", "green");
+    try {
+        // sometimes there is no tab to talk to
+	    var tab_port = chrome.tabs.connect(tab.id);
+	    tab_port.postMessage(find_msg);
+	    updateUserFeedback("sent request to content script", "green");
+    } catch (err) {
+        if (settings.get("enable_foreground")) {
+            handleForegroundMessage(msg);
+        } else {
+            updateUserFeedback("no text area listener on this page", "red");
+        }
+    }
 });
 
 // Handle and edit request coming from the content page script
@@ -148,9 +157,11 @@ function handleContentMessages(msg, tab_port)
     xhr.send(text);
 }
 
-// Handle and edit request coming from the content page script
-//
-// Package up the text to be edited and send it to the edit server
+/*
+ * Handle and edit request coming from the content page script
+ *
+ * Package up the text to be edited and send it to the edit server
+ */
 function handleTestMessages(msg, tab_port)
 {
 	var url = getEditUrl() + "status";
@@ -171,6 +182,25 @@ function handleTestMessages(msg, tab_port)
     };
 	xhr.send();
 }
+
+/*
+ * Handle foreground focus message
+ *
+ * This isn't really an edit request but will allow the edit-server running in emacs
+ * to respond. My main use case for this is quickly spinning up a window on my Chromebook
+ * because I can't focus emacs directly due to the rather minimal WM
+ */
+function handleForegroundMessage(msg)
+{
+	var url = getEditUrl() + "foreground";
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", url, true);
+	xhr.onreadystatechange = function() {
+	    console.log("handleForegroundMessage state change:"+ xhr.readyState + " status:"+xhr.status);
+    };
+    xhr.send();
+ }
+
 
 // Handle config request messages, the textarea.js content script being in it's own
 // isolated sandbox has to be fed all this via the IPC mechanisms
@@ -205,7 +235,11 @@ function localMessageHandler(port)
 	    } else if (msg.msg == "test") {
 		    handleTestMessages(msg, port);
 	    } else if (msg.msg == "error") {
-		    updateUserFeedback(msg.text, "red");
+            if (settings.get("enable_foreground") && msg.orig_cmd == "find_edit") {
+                handleForegroundMessage(msg);
+            } else {
+		        updateUserFeedback(msg.text, "red");
+            }
 	    } else if (msg.msg == "focus") {
 		    if (msg.id === null) {
 			    updateUserFeedback("Awaiting edit request: no focus", "darkblue");

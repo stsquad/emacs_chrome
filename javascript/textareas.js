@@ -237,7 +237,7 @@ function sendTextArea(text_tracker) {
 			sendTextArea(focusedEdit);
 		} else {
 			var msg_text = "No textarea in focus in: "+getTitle();
-			port.postMessage( {msg: "error", text: msg_text} );
+			port.postMessage( {msg: "error", orig_cmd: "find_edit", text: msg_text} );
 		}
 	};
 
