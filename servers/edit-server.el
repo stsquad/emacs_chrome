@@ -1,10 +1,10 @@
 ;;; edit-server.el --- server that responds to edit requests from Chrome
 
-;; Copyright (C) 2009-2011  Alex Bennee
+;; Copyright (C) 2009-2013  Alex Bennée
 ;; Copyright (C) 2010-2011  Riccardo Murri
 
-;; Author: Alex Bennee <alex@bennee.com>
-;; Maintainer: Alex Bennee <alex@bennee.com>
+;; Author: Alex Bennée <alex@bennee.com>
+;; Maintainer: Alex Bennée <alex@bennee.com>
 ;; Version: 1.10
 ;; Homepage: https://github.com/stsquad/emacs_chrome
 
