@@ -66,22 +66,19 @@ updateUserFeedback("Awaiting edit request", "blue");
 // content script. It will then use heuristics to decide which text
 // area to spawn an edit request for.
 chrome.browserAction.onClicked.addListener(function(tab) {
-	
-	var find_msg = {
-		msg: "find_edit"
-	};
-    try {
-        // sometimes there is no tab to talk to
-	    var tab_port = chrome.tabs.connect(tab.id);
-	    tab_port.postMessage(find_msg);
-	    updateUserFeedback("sent request to content script", "green");
-    } catch (err) {
-        if (settings.get("enable_foreground")) {
-            handleForegroundMessage(msg);
+    var find_msg = {
+        msg: "find_edit"
+    };
+    // sometimes there is no content script to talk to which we need to detect
+    console.log("sending find_edit message");
+    chrome.tabs.sendMessage(tab.id, find_msg, function(response) {
+        console.log("sendMessage: "+response);
+        if (chrome.runtime.lastError && settings.get("enable_foreground")) {
+            handleForegroundMessage();
         } else {
-            updateUserFeedback("no text area listener on this page", "red");
+            updateUserFeedback("sent request to content script", "green");
         }
-    }
+    });
 });
 
 // Handle and edit request coming from the content page script
@@ -190,13 +187,19 @@ function handleTestMessages(msg, tab_port)
  * to respond. My main use case for this is quickly spinning up a window on my Chromebook
  * because I can't focus emacs directly due to the rather minimal WM
  */
-function handleForegroundMessage(msg)
+function handleForegroundMessage()
 {
-	var url = getEditUrl() + "foreground";
-	var xhr = new XMLHttpRequest();
-	xhr.open("GET", url, true);
-	xhr.onreadystatechange = function() {
-	    console.log("handleForegroundMessage state change:"+ xhr.readyState + " status:"+xhr.status);
+    var url = getEditUrl() + "foreground";
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.onreadystatechange = function() {
+        console.log("handleForegroundMessage state change:"+ xhr.readyState + " status:"+xhr.status);
+        // readyState 4=HTTP response complete
+        if(xhr.readyState == 4) {
+            if (xhr.status == 200) {
+                updateUserFeedback(xhr.responseText);
+            }
+        }
     };
     xhr.send();
  }
@@ -227,27 +230,27 @@ function handleConfigMessages(msg, tab_port)
 
 function localMessageHandler(port)
 {
-	port.onMessage.addListener(function(msg, port) {
-		if (msg.msg == "config") {
-		    handleConfigMessages(msg, port);
-	    } else if (msg.msg == "edit") {
-		    handleContentMessages(msg, port);
-	    } else if (msg.msg == "test") {
-		    handleTestMessages(msg, port);
-	    } else if (msg.msg == "error") {
+    port.onMessage.addListener(function(msg, port) {
+        if (msg.msg == "config") {
+            handleConfigMessages(msg, port);
+        } else if (msg.msg == "edit") {
+            handleContentMessages(msg, port);
+        } else if (msg.msg == "test") {
+            handleTestMessages(msg, port);
+        } else if (msg.msg == "error") {
             if (settings.get("enable_foreground") && msg.orig_cmd == "find_edit") {
-                handleForegroundMessage(msg);
+                handleForegroundMessage();
             } else {
-		        updateUserFeedback(msg.text, "red");
+                updateUserFeedback(msg.text, "red");
             }
-	    } else if (msg.msg == "focus") {
-		    if (msg.id === null) {
-			    updateUserFeedback("Awaiting edit request: no focus", "darkblue");
-		    } else {
-			    updateUserFeedback("Awaiting edit request: in focus");
-		    }
-	    }
-	});
+        } else if (msg.msg == "focus") {
+            if (msg.id === null) {
+                updateUserFeedback("Awaiting edit request: no focus", "darkblue");
+            } else {
+                updateUserFeedback("Awaiting edit request: in focus");
+            }
+        }
+    });
 }
 
 // Hook up whenever someone connects to the extension comms port
