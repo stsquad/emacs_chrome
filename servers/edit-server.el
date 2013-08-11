@@ -452,10 +452,15 @@ non-nil, then STRING is also echoed to the message line."
 	(setq edit-server-phase 'wait)))))
 
 (defun edit-server-foreground-request ()
-  "Bring Emacs into the foreground after a request from Chrome"
+  "Bring Emacs into the foreground after a request from Chrome.
+
+The new frame will have a specific frame parameter of
+  `edit-server-forground-frame' set to 't"
   (when edit-server-new-frame
-    (make-frame-on-display (getenv "DISPLAY")
-			   edit-server-new-frame-alist)))
+    (set-frame-parameter
+     (make-frame-on-display (getenv "DISPLAY")
+                            edit-server-new-frame-alist)
+     'edit-server-forground-frame 't)))
 
 (defun edit-server-show-edit-buffer (buffer)
   "Show edit buffer by creating a frame or raising the selected
