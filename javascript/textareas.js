@@ -62,54 +62,57 @@ function getTitle()
 
 function textAreaTracker(text)
 {
-	this.edit_id = "eta_"+page_edit_id;
-	page_edit_id = page_edit_id + 1;
-	this.text = text;
-	this.text.setAttribute("edit_id", this.edit_id);
+    this.edit_id = "eta_"+page_edit_id;
+    page_edit_id = page_edit_id + 1;
+    this.text = text;
+    this.text.setAttribute("edit_id", this.edit_id);
 
-	// The text areas event handlers we attach
-	this.focusListener = setFocused;
-	this.editEvent = editTextArea;
-	this.keydownListener = function (e) {
-		// Alt-Enter
-		if (e.altKey && e.keyCode == 13)
-			editTextArea(e);
-	};
-	
-	this.text.addEventListener('focus',  this.focusListener);
+    // The text areas event handlers we attach
+    this.focusListener = setFocused;
+    this.editEvent = editTextArea;
+    this.keydownListener = function (e) {
+        // Alt-Enter
+        if (e.altKey && e.keyCode == 13)
+            editTextArea(e);
+    };
 
-	if (enable_dblclick)
-		this.text.addEventListener('dblclick', this.editEvent);
-	if (enable_keys)
-		this.text.addEventListener('keydown', this.keydownListener);
+    this.text.addEventListener('focus',  this.focusListener);
 
-	// The img 
-	if (enable_button) {
-		this.image = document.createElement('img');
-		this.image.setAttribute("class", "ewe_edit_button");
-		this.image.setAttribute("edit_id", this.edit_id);
-		this.image.src = editImgURL;
-		this.image.addEventListener('click', editTextArea);
-		this.text.parentNode.insertBefore(this.image, text.nextSibling);
-	}
+    if (enable_dblclick)
+        this.text.addEventListener('dblclick', this.editEvent);
+    if (enable_keys)
+        this.text.addEventListener('keydown', this.keydownListener);
 
-	// Some methods to get and set content
-	this.getContent = function () {
-		if (this.text.tagName == "DIV") {
-			return this.text.innerHTML;
-		} else {
-			return this.text.value;
-		}
-	};
+    // The img 
+    if (enable_button) {
+        this.image = document.createElement('img');
+        if (this.text.tagName == "DIV") {
+            this.image.setAttribute("class", "ewe_div_edit_button");
+        } else {
+            this.image.setAttribute("class", "ewe_ta_edit_button");
+        }
+        this.image.setAttribute("edit_id", this.edit_id);
+        this.image.src = editImgURL;
+        this.image.addEventListener('click', editTextArea);
+        this.text.parentNode.insertBefore(this.image, text.nextSibling);
+    }
 
-	this.setContent = function(new_text) {
-		if (this.text.tagName == "DIV") {
-			this.text.innerHTML = new_text;
-		} else {
-			this.text.value = new_text;
-		}
-	};
-	
+    // Some methods to get and set content
+    this.getContent = function () {
+        if (this.text.tagName == "DIV") {
+            return this.text.innerHTML;
+        } else {
+            return this.text.value;
+        }
+    };
+
+    this.setContent = function(new_text) {
+        if (this.text.tagName == "DIV") {
+            this.text.innerHTML = new_text;
+        } else {
+            this.text.value = new_text;
+        }
+    };
 }
 
 /*
