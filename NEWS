@@ -1,8 +1,16 @@
 v1.13
 
+Extension
+
+* Change the handling of hidden elements (fix bug #78)
+* Add option to send foreground requests (for Chromebooks with Crouton)
+
 edit-server.el
 
 * add advice to save-buffers-kill-emacs to avoid prompting on shutdown
+* add autoload cookies
+* fix bug with format chars in url (#80)
+* support the "foreground" request
 
 v1.12
 
