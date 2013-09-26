@@ -71,7 +71,7 @@ chrome.browserAction.onClicked.addListener(function(tab) {
     // sometimes there is no content script to talk to which we need to detect
     console.log("sending find_edit message");
     chrome.tabs.sendMessage(tab.id, find_msg, function(response) {
-        console.log("sendMessage: "+response);
+        console.log("sendMessage: "+response+" and lastError:"+chrome.runtime.lastError);
         if (chrome.runtime.lastError && settings.get("enable_foreground")) {
             handleForegroundMessage();
         } else {
