@@ -1,5 +1,4 @@
-// -*- tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
-/*
+/* -*- tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  * xmlcomms.js
  *
  * This handles making XMLHttp calls to the "Edit Server"
