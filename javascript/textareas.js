@@ -265,12 +265,14 @@ function sendTextArea(text_tracker) {
 */
 
 function editTextArea(event) {
-	var element = event.currentTarget;
-	var edit_id = element.getAttribute("edit_id");
-	var tracker = getTextAreaTracker(edit_id);
-	if (tracker) {
-		sendTextArea(tracker);
-	}
+    var element = event.currentTarget;
+    var edit_id = element.getAttribute("edit_id");
+    var tracker = getTextAreaTracker(edit_id);
+    if (tracker) {
+        sendTextArea(tracker);
+    } else {
+        console.log("No text area found");
+    }
 }
 
 /*
