@@ -214,7 +214,8 @@ function handleConfigMessages(msg, tab_port)
 	    enable_button: settings.get("enable_button"),
 	    enable_dblclick: settings.get("enable_dblclick"),
 	    enable_keys: settings.get("enable_keys"),
-	    enable_debug: settings.get("enable_debug")
+	    enable_debug: settings.get("enable_debug"),
+	    enable_foreground: settings.get("enable_foreground")
 	};
 	tab_port.postMessage(config_msg);
 }
@@ -236,6 +237,8 @@ function localMessageHandler(port)
             handleContentMessages(msg, port);
         } else if (msg.msg == "test") {
             handleTestMessages(msg, port);
+        } else if (settings.get("enable_foreground") && msg.msg == "foreground") {
+            handleForegroundMessage();
         } else if (msg.msg == "error") {
             if (settings.get("enable_foreground") && msg.orig_cmd == "find_edit") {
                 handleForegroundMessage();

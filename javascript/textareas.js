@@ -344,15 +344,27 @@ function handleUpdatedElements(summaries) {
 
 /* Message handling multiplexer */
 function localMessageHandler(msg, port) {
-	// What was the bidding?
-	var cmd = msg.msg;
-	if (cmd == "config") {
-		console.log("config response: "+msg);
-		enable_button = msg.enable_button;
-		enable_dblclick = msg.enable_dblclick;
-		enable_keys = msg.enable_keys;
-		enable_debug = msg.enable_debug;
-		findTextAreas([$('*')]);
+    // What was the bidding?
+    var cmd = msg.msg;
+    if (cmd == "config") {
+        console.log("config response: "+msg);
+        enable_button = msg.enable_button;
+        enable_dblclick = msg.enable_dblclick;
+        enable_keys = msg.enable_keys;
+        enable_debug = msg.enable_debug;
+        findTextAreas([$('*')]);
+
+        if (msg.enable_foreground) {
+            window.onkeydown = function (e) {
+                // Alt-Enter
+                if (e.altKey && e.keyCode == 13) {
+                    var foregound_msg = {
+                        msg: "foreground"
+                    };
+                    port.postMessage(foregound_msg);
+                }
+            };
+        }
 
         /* 
          * The mutation summary is responsible for monitoring all
@@ -377,16 +389,15 @@ function localMessageHandler(msg, port) {
             ]
         });
 
-
-	} else if (cmd == "find_edit") {
-		findActiveTextArea();
-	} else if (cmd == "update") {
-		var id = msg.id;
-		var content = msg.text;
-		updateTextArea(id, content);
-	} else {
-		console.log("localMessageHandler: un-handled message:"+cmd);
-	}
+    } else if (cmd == "find_edit") {
+        findActiveTextArea();
+    } else if (cmd == "update") {
+        var id = msg.id;
+        var content = msg.text;
+        updateTextArea(id, content);
+    } else {
+        console.log("localMessageHandler: un-handled message:"+cmd);
+    }
 }
 
 // Hook up the incoming message handler for both return messages
