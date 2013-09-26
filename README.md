@@ -48,10 +48,17 @@ Hacking
 This modeline should be used in every source file to keep indentation
 consistent:
 
-// -*- tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
+    // -*- tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
 
 This tells both emacs use spaces instead of tabs and use a basic indentation
 of 4 spaces.
+
+There is currently a minimal Travis-CI control file which
+essentially ensures the edit-server.el still compiles. Additions to
+the test coverage are always welcome ;-)
+
+[![Build Status](https://travis-ci.org/stsquad/emacs_chrome.png?branch=master)](https://travis-ci.org/stsquad/emacs_chrome)
+
 
 History
 =======
