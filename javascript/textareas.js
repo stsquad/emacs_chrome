@@ -1,6 +1,4 @@
-// -*- tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
-/*
- * TextAreas.js
+/* -*- tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
  *
  * This "content" script finds TextArea's in the DOM and tags them
  * with a unique ID and edit button. When the button is
