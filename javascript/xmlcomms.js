@@ -59,25 +59,28 @@ function updateUserFeedback(string, colour)
 // Initial message
 updateUserFeedback("Awaiting edit request", "blue");
 
-// Called when the user clicks on the browser action.
+// Called when the user clicks on the browser action
+// (or the activate extension key-stroke)
 //
 // When clicked we send a message to the current active tab's
-// content script. It will then use heuristics to decide which text
-// area to spawn an edit request for.
+// content script. If it fails we will never see an answer.
 chrome.browserAction.onClicked.addListener(function(tab) {
     var find_msg = {
         msg: "find_edit"
     };
-    // sometimes there is no content script to talk to which we need to detect
-    console.log("sending find_edit message");
-    chrome.tabs.sendMessage(tab.id, find_msg, function(response) {
-        console.log("sendMessage: "+response+" and lastError:"+chrome.runtime.lastError);
-        if (chrome.runtime.lastError && settings.get("enable_foreground")) {
-            handleForegroundMessage();
-        } else {
-            updateUserFeedback("sent request to content script", "green");
-        }
-    });
+    var tab_port = chrome.tabs.connect(tab.id);
+ 
+    tab_port.postMessage(find_msg);
+    updateUserFeedback("sent request to content script", "green");
+});
+
+// Called when the browser passes another configured command action
+// as defined in manifest.json (or configured in exttensions tab)
+chrome.commands.onCommand.addListener(function(command) {
+    console.log('onCommand listener:', command);
+    if (command == "activate-emacs" && settings.get("enable_foreground")) {
+        handleForegroundMessage();
+    }
 });
 
 // Handle and edit request coming from the content page script
@@ -214,8 +217,7 @@ function handleConfigMessages(msg, tab_port)
 	    enable_button: settings.get("enable_button"),
 	    enable_dblclick: settings.get("enable_dblclick"),
 	    enable_keys: settings.get("enable_keys"),
-	    enable_debug: settings.get("enable_debug"),
-	    enable_foreground: settings.get("enable_foreground")
+	    enable_debug: settings.get("enable_debug")
 	};
 	tab_port.postMessage(config_msg);
 }
@@ -237,14 +239,8 @@ function localMessageHandler(port)
             handleContentMessages(msg, port);
         } else if (msg.msg == "test") {
             handleTestMessages(msg, port);
-        } else if (settings.get("enable_foreground") && msg.msg == "foreground") {
-            handleForegroundMessage();
         } else if (msg.msg == "error") {
-            if (settings.get("enable_foreground") && msg.orig_cmd == "find_edit") {
-                handleForegroundMessage();
-            } else {
-                updateUserFeedback(msg.text, "red");
-            }
+            updateUserFeedback(msg.text, "red");
         } else if (msg.msg == "focus") {
             if (msg.id === null) {
                 updateUserFeedback("Awaiting edit request: no focus", "darkblue");

@@ -357,18 +357,6 @@ function localMessageHandler(msg, port) {
         enable_debug = msg.enable_debug;
         findTextAreas([$('*')]);
 
-        if (msg.enable_foreground) {
-            window.onkeydown = function (e) {
-                // Alt-Enter
-                if (e.altKey && e.keyCode == 13) {
-                    var foregound_msg = {
-                        msg: "foreground"
-                    };
-                    port.postMessage(foregound_msg);
-                }
-            };
-        }
-
         /* 
          * The mutation summary is responsible for monitoring all
          * changes to the page and triggering updates.

@@ -39,5 +39,15 @@
 			"run_at": "document_idle",
 			"all_frames": true
 		}
-	]
+	],
+        "commands": {
+	        "activate-emacs": {
+		    "suggested_key": {
+			"default": "Ctrl+Shift+E",
+			"linux": "Ctrl+Shift+E",
+			"mac": "Command+E"
+		    },
+		    "description": "Activate Emacs with contents of clipboard"
+		}
+	}
 }
