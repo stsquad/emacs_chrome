@@ -11,6 +11,13 @@ this.manifest = {
             "text": i18n.get("description")
         },
         {
+            "tab": i18n.get("information"),
+            "group": i18n.get("Focusing Emacs"),
+            "name": "Description",
+            "type": "description",
+            "text": i18n.get("focus")
+        },
+        {
             "tab": "Configuration",
             "group": "Edit Server",
             "name": "edit_server_host",
@@ -51,13 +58,6 @@ this.manifest = {
 	    "name": "enable_keys",
 	    "type": "checkbox",
 	    "label": "Enable Alt-Enter Keyboard shortcut to invoke editor"
-	},
-	{
-	    "tab": "Configuration",
-	    "group": "Interface",
-	    "name": "enable_foreground",
-	    "type": "checkbox",
-	    "label": "Allow clicking on Emacs icon to bring Emacs to foreground when no text area in focus"
 	},
         {
             "tab": "Test",

@@ -113,7 +113,7 @@ buffer-specific modes or add key bindings."
   :type 'boolean)
 
 (defcustom edit-server-new-frame-alist
-  '((name . "Emacs TEXTAREA")
+  '((name . "Edit with Emacs FRAME")
     (width . 80)
     (height . 25)
     (minibuffer . t)
@@ -436,13 +436,13 @@ non-nil, then STRING is also echoed to the message line."
 			   edit-server-received edit-server-content-length)
 	;; all content transferred - process request now
 	(cond
+	 ((string-match "foreground" edit-server-request-url)
+	  (edit-server-foreground-request (current-buffer))
+	  (edit-server-send-response proc "edit-server received foreground request.\n")
+	  (edit-server-kill-client proc))
 	 ((string= edit-server-request "POST")
 	  ;; create editing buffer, and move content to it
 	  (edit-server-find-or-create-edit-buffer proc edit-server-file))
-	 ((string-match "foreground" edit-server-request-url)
-	  (edit-server-foreground-request)
-	  (edit-server-send-response proc "edit-server received foreground request.\n")
-	  (edit-server-kill-client proc))
 	 (t
 	  ;; send 200 OK response to any other request
 	  (edit-server-send-response proc "edit-server is running.\n")
@@ -451,11 +451,17 @@ non-nil, then STRING is also echoed to the message line."
 	(setq edit-server-received 0)
 	(setq edit-server-phase 'wait)))))
 
-(defun edit-server-foreground-request ()
+(defun edit-server-foreground-request (buffer)
   "Bring Emacs into the foreground after a request from Chrome.
+`buffer' is the process buffer which contains any potential contents
+to be passed into the kill ring.
 
 The new frame will have a specific frame parameter of
   `edit-server-forground-frame' set to 't"
+  (when (bufferp buffer)
+    (with-current-buffer buffer
+      (kill-ring-save (point-min) (point-max))))
+  
   (when edit-server-new-frame
     (set-frame-parameter
      (make-frame-on-display (getenv "DISPLAY")

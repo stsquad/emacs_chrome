@@ -3,14 +3,15 @@ v1.13
 Extension
 
 * Change the handling of hidden elements (fix bug #78)
-* Add option to send foreground requests (for Chromebooks with Crouton)
+* Add keyboard shortcut to bring Emacs to foreground
+* Pass clipboard contents to foreground request
 
 edit-server.el
 
 * add advice to save-buffers-kill-emacs to avoid prompting on shutdown
 * add autoload cookies
 * fix bug with format chars in url (#80)
-* support the "foreground" request
+* support the "foreground" request with optional clipboard contents
 
 v1.12
 

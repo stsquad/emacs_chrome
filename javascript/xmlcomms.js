@@ -17,8 +17,7 @@ var settings = new Store("settings", {
     "enable_button": true,
     "enable_dblclick": false,
     "enable_keys": false,
-    "enable_debug": false,
-    "enable_foreground": false
+    "enable_debug": false
 });
 
 // Decorate console.log so that it only logs
@@ -44,15 +43,15 @@ function updateUserFeedback(string, colour)
 	console.log("updateUserFeedback: "+string);
 	chrome.browserAction.setTitle({title:string});
 	if (colour == null) {
-		chrome.browserAction.setIcon({path:"icons/emacs23-16x16.png"});
+		chrome.browserAction.setIcon({path:"../icons/emacs23-16x16.png"});
 	} else if (colour == "green") {
-	    chrome.browserAction.setIcon({path:"icons/emacs23-16x16-green.png"});
+	    chrome.browserAction.setIcon({path:"../icons/emacs23-16x16-green.png"});
 	} else if (colour == "red") {
-	    chrome.browserAction.setIcon({path:"icons/emacs23-16x16-red.png"});
+	    chrome.browserAction.setIcon({path:"../icons/emacs23-16x16-red.png"});
 	} else if (colour == "darkblue") {
-	    chrome.browserAction.setIcon({path:"icons/emacs23-16x16-darker.png"});
+	    chrome.browserAction.setIcon({path:"../icons/emacs23-16x16-darker.png"});
 	} else {
-		chrome.browserAction.setIcon({path:"icons/emacs23-16x16.png"});
+		chrome.browserAction.setIcon({path:"../icons/emacs23-16x16.png"});
 	}
 }
 
@@ -78,7 +77,7 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 // as defined in manifest.json (or configured in exttensions tab)
 chrome.commands.onCommand.addListener(function(command) {
     console.log('onCommand listener:', command);
-    if (command == "activate-emacs" && settings.get("enable_foreground")) {
+    if (command == "activate-emacs") {
         handleForegroundMessage();
     }
 });
@@ -193,7 +192,7 @@ function handleForegroundMessage()
 {
     var url = getEditUrl() + "foreground";
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
+    xhr.open("POST", url, true);
     xhr.onreadystatechange = function() {
         console.log("handleForegroundMessage state change:"+ xhr.readyState + " status:"+xhr.status);
         // readyState 4=HTTP response complete
@@ -203,7 +202,13 @@ function handleForegroundMessage()
             }
         }
     };
-    xhr.send();
+    xhr.setRequestHeader("Content-type", "text/plain");
+    // get the contents of the clipboard
+    var clipboard = document.getElementById("clipboardholder");
+    clipboard.value = "";
+    clipboard.select();
+    document.execCommand("Paste");
+    xhr.send(clipboard.value);
  }
 
 

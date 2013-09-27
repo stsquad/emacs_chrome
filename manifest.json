@@ -7,15 +7,14 @@
 		"default_icon": "icons/emacs23-16x16.png"
 	},
         "background": {
-	    "scripts": ["fancy-settings/source/lib/store.js",
-			"javascript/xmlcomms.js",
-			"javascript/context_menu.js"]
+	    "page": "html/background.html"
 	},
 	"permissions": [
 		"tabs",
 		"contextMenus",
 	        "notifications",
-		"http://127.0.0.1/edit/*"
+		"http://127.0.0.1/edit/*",
+		"clipboardRead"
 	],
 	"icons":
 	{
