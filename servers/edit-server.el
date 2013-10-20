@@ -632,6 +632,8 @@ When called interactively, use prefix arg to abort editing."
 	(delete-frame edit-server-frame))
       ;; delete-frame may change the current buffer
       (unless nokill
+        ; don't run abort twice in a row.
+        (remove-hook 'kill-buffer-hook 'edit-server-abort*)
 	(kill-buffer buffer))
       (edit-server-kill-client proc))))
 
