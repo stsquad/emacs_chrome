@@ -158,8 +158,13 @@ function tagTextArea(text)
     }
 
     // Is it offscreen (like some github textareas)
-    if (t.position().left + t.width() < 0) return;
-    if (t.position().top + t.height() < 0) return;
+    if ( (t.position().left + t.width() < 0) ||
+         (t.position().top + t.height() < 0) ) {
+        console.log("tagTextArea: skipping offscreen text area %s (%d/%d x %d/%d)",
+                    t.attr("id"),
+                    t.position().left, t.width(), t.position().top, t.height());
+        return;
+    }
 
     // If spellcheck is turned off, usually it's just for quick editing, e.g. To: fields in gmail
     var spellcheck = text.getAttribute("spellcheck");
