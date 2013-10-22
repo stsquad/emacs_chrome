@@ -32,12 +32,13 @@ your ~/.emacs.
 Hooks
 =====
 
-edit-server.el provides three hooks for customising behaviour when edit
+edit-server.el provides four hooks for customising behaviour when edit
 requests are being made. These are:
 
 * edit-server-start-hook - called when the editing buffer is created
 * edit-server-started-hook - called after editing window is created
-* edit-server-done-hook - called when just before the text returned
+* edit-server-done-hook - called just before the text is returned
+* edit-server-buffer-closed-hook - called after editing buffer is closed
 
 The edit-server-start-hook should be used for setting any major/minor
 modes. The edit-server-started-hook can be used for manipulating the

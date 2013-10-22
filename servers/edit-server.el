@@ -98,6 +98,12 @@ Current buffer holds the text that is about to be sent back to the client."
   :group 'edit-server
   :type 'hook)
 
+(defcustom edit-server-buffer-closed-hook nil
+  "Hook run after text is sent back to the client and the editing buffer
+has been closed."
+  :group 'edit-server
+  :type 'hook)
+
 (defcustom edit-server-start-hook nil
   "Hook run when starting a editing buffer.  Current buffer is
 the fully prepared editing buffer.  Use this hook to enable
@@ -642,7 +648,8 @@ When called interactively, use prefix arg to abort editing."
       (unless nokill
         ; don't run abort twice in a row.
         (remove-hook 'kill-buffer-hook 'edit-server-abort*)
-	(kill-buffer buffer))
+	(kill-buffer buffer)
+	(run-hooks 'edit-server-buffer-closed-hook))
       (edit-server-kill-client proc))))
 
 ;; edit-server-save uses the iterative edit-server option (send a
