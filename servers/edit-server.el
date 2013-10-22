@@ -105,6 +105,13 @@ buffer-specific modes or add key bindings."
   :group 'edit-server
   :type 'hook)
 
+(defcustom edit-server-started-hook nil
+  "Hook run after starting an editing buffer.  Current buffer is
+the fully prepared editing buffer. Use this hook for anything that
+requires that the editing frame/window exist."
+  :group 'edit-server
+  :type 'hook)
+
 ;; frame options
 
 (defcustom edit-server-new-frame t
@@ -550,6 +557,7 @@ and save the network process for the final call back"
       (buffer-enable-undo)
       (setq edit-server-proc proc
 	    edit-server-frame (edit-server-show-edit-buffer buffer))
+      (run-hooks 'edit-server-started-hook)
       (edit-server-edit-mode))))
 
 (defun edit-server-send-response (proc &optional body progress)
