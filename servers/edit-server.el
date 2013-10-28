@@ -352,8 +352,6 @@ non-nil, then STRING is also echoed to the message line."
 (defun edit-server-accept (server client msg)
   "Accept a new client connection."
   (let ((buffer (generate-new-buffer edit-server-process-buffer-name)))
-    (when (fboundp 'set-buffer-multibyte)
-      (set-buffer-multibyte t)) ; djb
     (buffer-disable-undo buffer)
     (set-process-buffer client buffer)
     (set-process-filter client 'edit-server-filter)
