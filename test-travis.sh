@@ -6,6 +6,4 @@ set -ex
 
 # About the simplest test we can do, ensure the file loads without error
 ${EMACS} --version
-${EMACS} -q --batch -l servers/edit-server.el
-
-
+${EMACS} -q --batch -l ert -l servers/edit-server.el -l servers/edit-server-ert.el -f ert-run-tests-batch-and-exit
