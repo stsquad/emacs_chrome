@@ -40,19 +40,19 @@ function getEditUrl()
  */
 function updateUserFeedback(string, colour)
 {
-	console.log("updateUserFeedback: "+string);
-	chrome.browserAction.setTitle({title:string});
-	if (colour == null) {
-		chrome.browserAction.setIcon({path:"../icons/emacs23-16x16.png"});
-	} else if (colour == "green") {
-	    chrome.browserAction.setIcon({path:"../icons/emacs23-16x16-green.png"});
-	} else if (colour == "red") {
-	    chrome.browserAction.setIcon({path:"../icons/emacs23-16x16-red.png"});
-	} else if (colour == "darkblue") {
-	    chrome.browserAction.setIcon({path:"../icons/emacs23-16x16-darker.png"});
-	} else {
-		chrome.browserAction.setIcon({path:"../icons/emacs23-16x16.png"});
-	}
+    console.log("updateUserFeedback: "+string);
+    chrome.browserAction.setTitle({title:string});
+    if (colour === null) {
+        chrome.browserAction.setIcon({path:"../icons/emacs23-16x16.png"});
+    } else if (colour == "green") {
+        chrome.browserAction.setIcon({path:"../icons/emacs23-16x16-green.png"});
+    } else if (colour == "red") {
+        chrome.browserAction.setIcon({path:"../icons/emacs23-16x16-red.png"});
+    } else if (colour == "darkblue") {
+        chrome.browserAction.setIcon({path:"../icons/emacs23-16x16-darker.png"});
+    } else {
+        chrome.browserAction.setIcon({path:"../icons/emacs23-16x16.png"});
+    }
 }
 
 // Initial message
@@ -101,34 +101,33 @@ function handleContentMessages(msg, tab_port)
     var url = getEditUrl() + cmd;
 
     xhr.open("POST", url, true);
-    
+
     xhr.onreadystatechange = function() {
-	    console.log("State change:"+ xhr.readyState + " status:"+xhr.status);
-	    // readyState 4=HTTP response complete
-	    if(xhr.readyState == 4) {
-	        if (xhr.status == 200) {
-		        
+        console.log("State change:"+ xhr.readyState + " status:"+xhr.status);
+        // readyState 4=HTTP response complete
+        if(xhr.readyState == 4) {
+            if (xhr.status == 200) {
                 xfile = xhr.getResponseHeader("x-file");
                 xopen = xhr.getResponseHeader("x-open");
                 console.log("x-file: "+xfile+" x-open: "+xopen);
 
-		        var update_msg = {
-		            msg: "update",
-		            text: xhr.responseText,
-		            id: id
-		        };
+                var update_msg = {
+                    msg: "update",
+                    text: xhr.responseText,
+                    id: id
+                };
 
-		        updateUserFeedback("Successful edit of "+msg.title);
-		        tab_port.postMessage(update_msg);
+                updateUserFeedback("Successful edit of "+msg.title);
+                tab_port.postMessage(update_msg);
 
-		        msg.text = xhr.responseText;
-		        msg.file = xfile;
-		        if(xopen == "true") {
-		            handleContentMessages(msg, tab_port);
-		        }
-	        } else if (xhr.status == 0) {
-		        // Is the edit server actually running?
-		        updateUserFeedback("Error: is edit server running?", "red");
+                msg.text = xhr.responseText;
+                msg.file = xfile;
+                if(xopen == "true") {
+                    handleContentMessages(msg, tab_port);
+                }
+            } else if (xhr.status === 0) {
+                // Is the edit server actually running?
+                updateUserFeedback("Error: is edit server running?", "red");
 
                 // Also do a notification to draw attention to the failure
                 var notification = webkitNotifications.createNotification(
@@ -137,12 +136,20 @@ function handleContentMessages(msg, tab_port)
                     "Unable to contact an edit server, is it running?"+
                         " I'll take you to the options page when you close this"
                 );
-                notification.onclose = function() { chrome.tabs.create({'url': chrome.extension.getURL('fancy-settings/source/index.html')}) }
+                notification.onclose = function() {
+                    var fs_url =
+                        chrome.extension.getURL('fancy-settings/source/index.html');
+                    chrome.tabs.create(
+                        {
+                            'url': fs_url
+                        }
+                    );
+                };
                 notification.show();
-	        } else {
-		        updateUserFeedback("Un-handled response: "+xhr.status, "red"); 
-	        }
-	    }
+            } else {
+                updateUserFeedback("Un-handled response: "+xhr.status, "red");
+            }
+        }
     };
 
     // reset the display before sending request..
@@ -162,23 +169,23 @@ function handleContentMessages(msg, tab_port)
  */
 function handleTestMessages(msg, tab_port)
 {
-	var url = getEditUrl() + "status";
-	var xhr = new XMLHttpRequest();
-	xhr.open("GET", url, true);
-	xhr.onreadystatechange = function() {
-	    console.log("State change:"+ xhr.readyState + " status:"+xhr.status);
-	    // readyState 4=HTTP response complete
-	    if(xhr.readyState == 4) {
-		    if (xhr.status == 200) {
-		        tab_port.postMessage({msg: "test_result", text: xhr.responseText});
-		    } else if (xhr.status == 0) {
-		        tab_port.postMessage({msg: "test_result", text: "Edit Server Test failed: is it running?"});
-		    } else {
-		        tab_port.postMessage({msg: "test_result", text: "Un-handled response: "+xhr.status}); 
-		    }
-	    }
+    var url = getEditUrl() + "status";
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.onreadystatechange = function() {
+        console.log("State change:"+ xhr.readyState + " status:"+xhr.status);
+        // readyState 4=HTTP response complete
+        if(xhr.readyState == 4) {
+            if (xhr.status == 200) {
+                tab_port.postMessage({msg: "test_result", text: xhr.responseText});
+            } else if (xhr.status === 0) {
+                tab_port.postMessage({msg: "test_result", text: "Edit Server Test failed: is it running?"});
+            } else {
+                tab_port.postMessage({msg: "test_result", text: "Un-handled response: "+xhr.status}); 
+            }
+        }
     };
-	xhr.send();
+    xhr.send();
 }
 
 /*
@@ -217,14 +224,14 @@ function handleForegroundMessage()
 
 function handleConfigMessages(msg, tab_port)
 {
-	var config_msg = {
-	    msg: "config",
-	    enable_button: settings.get("enable_button"),
-	    enable_dblclick: settings.get("enable_dblclick"),
-	    enable_keys: settings.get("enable_keys"),
-	    enable_debug: settings.get("enable_debug")
-	};
-	tab_port.postMessage(config_msg);
+    var config_msg = {
+        msg: "config",
+        enable_button: settings.get("enable_button"),
+        enable_dblclick: settings.get("enable_dblclick"),
+        enable_keys: settings.get("enable_keys"),
+        enable_debug: settings.get("enable_debug")
+    };
+    tab_port.postMessage(config_msg);
 }
 
 
