@@ -1,0 +1,11 @@
+{
+    "name": "Edit  with Emacs",
+    "version": "0.1",
+    "main": "javascript/textareas.js",
+    "scripts": {
+        "test": "test-travis.sh"
+    },
+    "devDependencies": {
+        "jshint": "0.9.1"
+    }
+}
