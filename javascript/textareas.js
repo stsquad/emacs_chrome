@@ -40,7 +40,7 @@ console.log = function() {
 function getTitle()
 {
 	var title = document.title;
-	if (title == null || title.length==0) {
+	if (title === null || title.length === 0) {
 		try {
 			title = document.getElementsByTagName('title').item().innerText;
 		} catch (err) {
@@ -176,8 +176,8 @@ function tagTextArea(text)
 
     var existing_id = text.getAttribute("edit_id");
     if (!existing_id) {
-	    // tag it
-	    pageTextAreas.push(new textAreaTracker(text));
+        // tag it
+        pageTextAreas.push(new textAreaTracker(text));
     } else {
         console.log("Warning: found existing ID when tagging: "+existing_id);
     }
@@ -209,7 +209,7 @@ function updateTextArea(id, content) {
 	window.setTimeout(function() {
             // reset the text to the original without newline
             tracker.setContent(content);
-	    $(tracker.text).animate({ 'backgroundColor': orig }, 2000);
+        $(tracker.text).animate({ 'backgroundColor': orig }, 2000);
 	}, 100);
     }
 }
@@ -251,7 +251,7 @@ function sendTextArea(text_tracker) {
 		// Update UI?
 		var id = this.getAttribute("edit_id");
 		focusedEdit = getTextAreaTracker(id);
-		if (focusedEdit != undefined) {
+		if (focusedEdit !== undefined) {
 			port.postMessage( {msg: "focus", id: id} );
 			this.addEventListener('blur',	function() {
 				port.postMessage( {msg: "focus", id: null} );
@@ -288,29 +288,30 @@ function editTextArea(event) {
 */
 
 function findTextAreas(elements) {
-	console.log("findTextAreas: running over "+elements.length);
+    console.log("findTextAreas: running over "+elements.length);
 
     for (var i=0; i<elements.length; i++) {
         var x = $(elements[i]);
-	    // Process textareas
-	    var texts = x.find("textarea");
-	    for (var j=0; j<texts.length; j++) {
-		    tagTextArea(texts[j]);
-	    }
+        var j, editable;
+        // Process textareas
+        var texts = x.find("textarea");
+        for (j=0; j<texts.length; j++) {
+            tagTextArea(texts[j]);
+        }
 
-	    // lets see if we can find any contenteditable stuff
-	    var editable = x.find("div[contenteditable='true']");
-	    for (var j=0; j<editable.length; j++) {
-		    tagTextArea(editable[j]);
-	    }
+        // lets see if we can find any contenteditable stuff
+        editable = x.find("div[contenteditable='true']");
+        for (j=0; j<editable.length; j++) {
+            tagTextArea(editable[j]);
+        }
 
-	    // According to http://www.w3.org/TR/html5/editing.html#contenteditable
-	    // we should only see true/false or inherit. However G+ seems to ignore
-	    // that so lets look for those here.
-	    var editable = x.find("div[contenteditable='plaintext-only']");
-	    for (var j=0; j<editable.length; j++) {
-		    tagTextArea(editable[j]);
-	    }
+        // According to http://www.w3.org/TR/html5/editing.html#contenteditable
+        // we should only see true/false or inherit. However G+ seems to ignore
+        // that so lets look for those here.
+        editable = x.find("div[contenteditable='plaintext-only']");
+        for (j=0; j<editable.length; j++) {
+            tagTextArea(editable[j]);
+        }
     }
 }
 
@@ -414,19 +415,17 @@ port.postMessage({msg: "config"});
 // Inform the background process whenever the user opens
 // the context menu on an editable element.
 document.addEventListener("contextmenu", (function(event) {
-
-	var elem = event.srcElement;
-	if (elem && elem.getAttribute("edit_id")) {
-	    var request = {
-		    type: "menu_target",
-		    edit_msg: {
-		        msg: "edit",
-		        text: elem.value,
-		        title: getTitle(),
-		        id: elem.getAttribute("edit_id")
-		    }
-	    };
-	    chrome.extension.sendRequest(request);
-	}
-
+    var elem = event.srcElement;
+    if (elem && elem.getAttribute("edit_id")) {
+        var request = {
+            type: "menu_target",
+            edit_msg: {
+                msg: "edit",
+                text: elem.value,
+                title: getTitle(),
+                id: elem.getAttribute("edit_id")
+            }
+        };
+        chrome.extension.sendRequest(request);
+    }
 }));
