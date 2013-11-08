@@ -98,10 +98,23 @@ Current buffer holds the text that is about to be sent back to the client."
   :group 'edit-server
   :type 'hook)
 
+(defcustom edit-server-buffer-closed-hook nil
+  "Hook run after text is sent back to the client and the editing buffer
+has been closed."
+  :group 'edit-server
+  :type 'hook)
+
 (defcustom edit-server-start-hook nil
   "Hook run when starting a editing buffer.  Current buffer is
 the fully prepared editing buffer.  Use this hook to enable
 buffer-specific modes or add key bindings."
+  :group 'edit-server
+  :type 'hook)
+
+(defcustom edit-server-started-hook nil
+  "Hook run after starting an editing buffer.  Current buffer is
+the fully prepared editing buffer. Use this hook for anything that
+requires that the editing frame/window exist."
   :group 'edit-server
   :type 'hook)
 
@@ -548,6 +561,7 @@ and save the network process for the final call back"
       (buffer-enable-undo)
       (setq edit-server-proc proc
 	    edit-server-frame (edit-server-show-edit-buffer buffer))
+      (run-hooks 'edit-server-started-hook)
       (edit-server-edit-mode))))
 
 (defun edit-server-send-response (proc &optional body progress)
@@ -632,7 +646,8 @@ When called interactively, use prefix arg to abort editing."
       (unless nokill
         ; don't run abort twice in a row.
         (remove-hook 'kill-buffer-hook 'edit-server-abort*)
-	(kill-buffer buffer))
+	(kill-buffer buffer)
+	(run-hooks 'edit-server-buffer-closed-hook))
       (edit-server-kill-client proc))))
 
 ;; edit-server-save uses the iterative edit-server option (send a
