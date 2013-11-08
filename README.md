@@ -105,6 +105,7 @@ Mike Shulman
 Matt Walker
 Aaron Schrab
 Adam Spiers
+Dato Simó
 
 Other Code
 ==========

@@ -3,6 +3,7 @@ v1.13
 Extension
 
 * Change the handling of hidden elements (fix bug #78)
+* Add debugging for erroneous hidden text areas (#93) 
 * Add keyboard shortcut to bring Emacs to foreground
 * Pass clipboard contents to foreground request
 
@@ -11,6 +12,8 @@ edit-server.el
 * add advice to save-buffers-kill-emacs to avoid prompting on shutdown
 * add autoload cookies
 * fix bug with format chars in url (#80)
+* don't call kill buffer hooks twice (#92)
+* don't set-buffer-multibyte on process buffer
 * support the "foreground" request with optional clipboard contents
 
 v1.12
