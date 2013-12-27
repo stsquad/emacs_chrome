@@ -11,4 +11,3 @@
   (let ((byte-compile-error-on-warn 't)
         (edit-server-file (find-lisp-object-file-name 'edit-server-start (symbol-function 'edit-server-start))))
     (should (byte-compile-file edit-server-file))))
-
