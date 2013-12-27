@@ -486,6 +486,7 @@ frame."
 				 '(1 0 0)))
 	(raise-frame new-frame)
 	(set-window-buffer (frame-selected-window new-frame) buffer)
+        (select-frame-set-input-focus (window-frame (selected-window)))
 	new-frame)
     (select-frame-set-input-focus (window-frame (selected-window)))
     (pop-to-buffer buffer)
