@@ -467,30 +467,29 @@ The new frame will have a specific frame parameter of
      'edit-server-forground-frame 't)))
 
 (defun edit-server-show-edit-buffer (buffer)
-  "Show edit buffer by creating a frame or raising the selected
-frame."
-  (if edit-server-new-frame
-      (let ((new-frame
-	     (if (memq window-system '(ns mac))
-		 ;; Aquamacs, Emacs NS, Emacs (experimental) Mac port
-		 (make-frame edit-server-new-frame-alist)
-	       (make-frame-on-display (getenv "DISPLAY")
-				      edit-server-new-frame-alist))))
-	(unless edit-server-new-frame-mode-line
-	  (setq mode-line-format nil))
-	(select-frame new-frame)
-	(when (and (eq window-system 'x)
-		   (fboundp 'x-send-client-message))
-	  (x-send-client-message nil 0 nil
-				 "_NET_ACTIVE_WINDOW" 32
-				 '(1 0 0)))
-	(raise-frame new-frame)
-	(set-window-buffer (frame-selected-window new-frame) buffer)
-	new-frame)
+  "Show edit `BUFFER' by creating a frame or raising the selected
+frame. If a frame was created it returns `FRAME'."
+  (let ((edit-frame nil))
+    (when edit-server-new-frame
+      (setq edit-frame
+            (if (memq window-system '(ns mac))
+                ;; Aquamacs, Emacs NS, Emacs (experimental) Mac port
+                (make-frame edit-server-new-frame-alist)
+              (make-frame-on-display (getenv "DISPLAY")
+                                     edit-server-new-frame-alist)))
+      (unless edit-server-new-frame-mode-line
+        (setq mode-line-format nil))
+      (select-frame edit-frame)
+      (when (and (eq window-system 'x)
+                 (fboundp 'x-send-client-message))
+        (x-send-client-message nil 0 nil
+                               "_NET_ACTIVE_WINDOW" 32
+                               '(1 0 0))))
+    (raise-frame edit-frame)
     (select-frame-set-input-focus (window-frame (selected-window)))
     (pop-to-buffer buffer)
     (raise-frame)
-    nil))
+    edit-frame))
 
 (defun edit-server-choose-major-mode ()
   "Use `edit-server-url-major-mode-alist' to choose a major mode
