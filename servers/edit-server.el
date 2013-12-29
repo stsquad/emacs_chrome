@@ -105,6 +105,15 @@ buffer-specific modes or add key bindings."
   :group 'edit-server
   :type 'hook)
 
+(defcustom edit-server-edit-mode-hook nil
+  "Hook run when we enter edit-server-edit-mode.  This is the final step of
+an edit session and is called when all frames and displays have been
+set-up.  You should not set any additional major modes here though as they
+may conflict with the edit-server-edit-mode, use the
+edit-server-start-hook instead."
+  :group 'edit-server
+  :type 'hook)
+
 ;; frame options
 
 (defcustom edit-server-new-frame t
@@ -252,7 +261,11 @@ send a response back to the client."
   :group 'edit-server
   :lighter " EditSrv"
   :init-value nil
-  :keymap edit-server-edit-mode-map)
+  :keymap edit-server-edit-mode-map
+  (when (and
+         (numberp arg)
+         (> arg 0))
+    (run-hooks 'edit-server-edit-mode-hook)))
 
 (defun turn-on-edit-server-edit-mode-if-server ()
   "Turn on `edit-server-edit-mode' if in an edit-server buffer."
