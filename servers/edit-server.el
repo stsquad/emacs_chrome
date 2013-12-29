@@ -485,10 +485,9 @@ frame. If a frame was created it returns `FRAME'."
         (x-send-client-message nil 0 nil
                                "_NET_ACTIVE_WINDOW" 32
                                '(1 0 0))))
+    (pop-to-buffer buffer)
     (raise-frame edit-frame)
     (select-frame-set-input-focus (window-frame (selected-window)))
-    (pop-to-buffer buffer)
-    (raise-frame)
     edit-frame))
 
 (defun edit-server-choose-major-mode ()
