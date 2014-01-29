@@ -6,7 +6,7 @@
 	function menuClicked(info, tab) {
 		if (edit_msg) {
 			var tab_port = chrome.tabs.connect(tab.id);
-			tab_port.tab = tab;
+			tab_port.sender = { tab: tab };
 			handleContentMessages(edit_msg, tab_port);
 		}
 	}
