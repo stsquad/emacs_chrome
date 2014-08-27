@@ -2,6 +2,7 @@
 (function(){
 
 	var edit_msg = {};
+	var page_msg = {};
 
 	function menuClicked(info, tab) {
 		if (edit_msg) {
@@ -11,6 +12,24 @@
 		}
 	}
 
+
+		function viewPageSource(info, tab) {
+				var tab_port = chrome.tabs.connect(tab.id);
+				tab_port.sender = { tab: tab };
+				handleContentMessages(page_msg, tab_port);
+		}
+
+		// Set up context menu tree at install time.
+		chrome.runtime.onInstalled.addListener(function() {
+				// Create one test item for each context type.
+				chrome.contextMenus.create({
+						title: "View source with Emacs",
+						contexts: ["page"],
+						onclick: function(info, tab) {
+								viewPageSource(info, tab);
+						}
+				});
+		});
 
 	var menu_enabled = false;
 
@@ -46,7 +65,9 @@
 	function processRequest(request, sender, sendResponse) {
 		if (request.type === "menu_target") {
 			edit_msg = request.edit_msg;
-		} else if (request.type === "enable_contextmenu") {
+		} else if (request.type === "page_source") {
+				page_msg = request.edit_msg;
+		}	else if (request.type === "enable_contextmenu") {
 			if (request.enabled) {
 				enableContextMenu();
 			} else {
@@ -57,6 +78,4 @@
 	}
 
 	chrome.extension.onRequest.addListener(processRequest);
-
 })();
-

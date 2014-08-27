@@ -7,7 +7,7 @@
 		"default_icon": "icons/emacs23-16x16.png"
 	},
         "background": {
-	    "page": "html/background.html"
+	        "page": "html/background.html"
 	},
 	"permissions": [
 		"tabs",
@@ -31,6 +31,7 @@
 			"css": ["css/textareas.css"],
 			"js": [
 			    "javascript/textareas.js",
+                "javascript/rawSource.js",
 			    "lib/jquery-1.7.min.js",
 			    "lib/jquery.color.min.js",
 			    "lib/mutation_summary.js"
