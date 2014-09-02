@@ -13,23 +13,23 @@
 	}
 
 
-		function viewPageSource(info, tab) {
-				var tab_port = chrome.tabs.connect(tab.id);
-				tab_port.sender = { tab: tab };
-				handleContentMessages(page_msg, tab_port);
-		}
+	function viewPageSource(info, tab) {
+			var tab_port = chrome.tabs.connect(tab.id);
+			tab_port.sender = { tab: tab };
+			handleContentMessages(page_msg, tab_port);
+	}
 
-		// Set up context menu tree at install time.
-		chrome.runtime.onInstalled.addListener(function() {
-				// Create one test item for each context type.
-				chrome.contextMenus.create({
-						title: "View source with Emacs",
-						contexts: ["page"],
-						onclick: function(info, tab) {
-								viewPageSource(info, tab);
-						}
-				});
-		});
+	// Set up context menu tree at install time.
+	chrome.runtime.onInstalled.addListener(function() {
+			// Create one test item for each context type.
+			chrome.contextMenus.create({
+					title: "View source with Emacs",
+					contexts: ["page"],
+					onclick: function(info, tab) {
+							viewPageSource(info, tab);
+					}
+			});
+	});
 
 	var menu_enabled = false;
 

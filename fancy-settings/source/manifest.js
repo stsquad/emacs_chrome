@@ -31,41 +31,48 @@ this.manifest = {
             "type": "text",
             "label": "Edit Server Port:",
         },
-	{
+        {
             "tab": "Configuration",
             "group": "Interface",
-	    "name": "enable_button",
-	    "type": "checkbox",
-	    "label": "Show 'edit' button next to textarea"
-	},
-	{
+            "name": "enable_button",
+            "type": "checkbox",
+            "label": "Show 'edit' button next to textarea"
+        },
+        {
             "tab": "Configuration",
             "group": "Interface",
-	    "name": "enable_contextmenu",
-	    "type": "checkbox",
-	    "label": "Enable context menu item to invoke editor"
-	},
-	{
+            "name": "enable_contextmenu",
+            "type": "checkbox",
+            "label": "Enable context menu item to invoke editor"
+        },
+        {
             "tab": "Configuration",
             "group": "Interface",
-	    "name": "enable_dblclick",
-	    "type": "checkbox",
-	    "label": "Allow double click on textarea to invoke editor"
-	},
-	{
+            "name": "enable_viewsource",
+            "type": "checkbox",
+            "label": "Enable menu item to view page source with editor"
+        },
+        {
             "tab": "Configuration",
             "group": "Interface",
-	    "name": "enable_keys",
-	    "type": "checkbox",
-	    "label": "Enable Alt-Enter Keyboard shortcut to invoke editor"
-	},
+            "name": "enable_dblclick",
+            "type": "checkbox",
+            "label": "Allow double click on textarea to invoke editor"
+        },
+        {
+            "tab": "Configuration",
+            "group": "Interface",
+            "name": "enable_keys",
+            "type": "checkbox",
+            "label": "Enable Alt-Enter Keyboard shortcut to invoke editor"
+        },
         {
             "tab": "Test",
             "group": "Test",
-	    "name": "TestButton",
+            "name": "TestButton",
             "type": "button",
             "label": i18n.get("Test Edit Server"),
-	    "text": i18n.get("Test")
+            "text": i18n.get("Test")
         },
         {
             "tab": "Test",
