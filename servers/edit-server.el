@@ -507,15 +507,12 @@ frame. If a frame was created it returns `FRAME'."
   "Use `edit-server-url-major-mode-alist' to choose a major mode
 initialization function based on `edit-server-url', or fall back
 to `edit-server-default-major-mode'"
-  (let ((pairs edit-server-url-major-mode-alist)
-	(mode edit-server-default-major-mode))
-    (while pairs
-      (let ((entry (car pairs)))
-	(if (string-match (car entry) edit-server-url)
-	    (setq mode (cdr entry)
-		  pairs nil)
-	  (setq pairs (cdr pairs)))))
-    (funcall mode)))
+  (let ((mode
+         (assoc-default
+          edit-server-url
+          edit-server-url-major-mode-alist 'string-match)))
+    (when mode
+      (funcall mode))))
 
 (defun edit-server-find-or-create-edit-buffer(proc &optional existing)
   "Find and existing or create an new edit buffer, place content in it
