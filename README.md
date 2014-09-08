@@ -113,6 +113,8 @@ Matt Walker
 Aaron Schrab
 Adam Spiers
 Dato Simó
+Philippe Vaucher
+
 
 Other Code
 ==========
