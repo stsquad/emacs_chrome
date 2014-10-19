@@ -60,9 +60,9 @@
 ;; example:
 ;;
 ;; (add-hook 'edit-server-start-hook
-;;          (lambda ()
-;;            (when (string-match "github.com" (buffer-name))
-;;              (markdown-mode))))
+;;           (lambda ()
+;;             (when (string-match "github.com" (buffer-name))
+;;               (markdown-mode))))
 
 
 ;;; Code:
@@ -322,7 +322,7 @@ will cause it to be verbose."
       (message "An edit-server process is already running")
     (ad-activate 'save-buffers-kill-emacs)
     (setq edit-server-clients '())
-    (if verbose (get-buffer-create edit-server-log-buffer-name))
+    (when verbose (get-buffer-create edit-server-log-buffer-name))
     (edit-server-log nil "Created a new edit-server process")))
 
 (defun edit-server-stop nil
@@ -347,20 +347,20 @@ will cause it to be verbose."
 This is done for logging purposes.  If `edit-server-verbose' is
 non-nil, then STRING is also echoed to the message line."
   (let ((string (apply 'format fmt args)))
-    (if edit-server-verbose
-	(message string))
-    (if (get-buffer edit-server-log-buffer-name)
-	(with-current-buffer edit-server-log-buffer-name
-	  (goto-char (point-max))
-	  (insert (current-time-string)
-		  " "
-		  (if (processp proc)
-		      (concat
-		       (buffer-name (process-buffer proc))
-		       ": ")
-		    "") ; nil is not acceptable to 'insert
-		  string)
-	  (or (bolp) (newline))))))
+    (when edit-server-verbose
+      (message string))
+    (when (get-buffer edit-server-log-buffer-name)
+      (with-current-buffer edit-server-log-buffer-name
+	(goto-char (point-max))
+	(insert (current-time-string)
+		" "
+		(if (processp proc)
+		    (concat
+		     (buffer-name (process-buffer proc))
+		     ": ")
+		  "") ; nil is not acceptable to 'insert
+		string)
+	(or (bolp) (newline))))))
 
 (defun edit-server-accept (server client msg)
   "Accept a new client connection."
@@ -514,13 +514,14 @@ to `edit-server-default-major-mode'"
     (when mode
       (funcall mode))))
 
-(defun edit-server-find-or-create-edit-buffer(proc &optional existing)
+(defun edit-server-find-or-create-edit-buffer (proc &optional existing)
   "Find and existing or create an new edit buffer, place content in it
 and save the network process for the final call back"
-  (let* ((existing-buffer (get-buffer (or (and (stringp existing) existing) "")))
+  ;; FIXME: `existing' is useless: see issue #104.
+  (let* ((existing-buffer (and (stringp existing) (get-buffer existing)))
 	 (buffer (or existing-buffer (generate-new-buffer
-				     (or edit-server-url
-					 edit-server-edit-buffer-name)))))
+				      (or edit-server-url
+					  edit-server-edit-buffer-name)))))
 
     (edit-server-log proc
 		     "using buffer %s for edit (existing-buffer is %s)"
@@ -534,7 +535,7 @@ and save the network process for the final call back"
     ;; I seem to be working around a bug here :-/
     ;;
     ;; For some reason the copy-to-buffer doesn't blat the existing contents.
-    ;; This screws up formatting as the contents where decoded before being
+    ;; This screws up formatting as the contents were decoded before being
     ;; sent back to the browser. As a kludge I save the returned contents
     ;; in the kill-ring.
     (when existing-buffer
@@ -638,7 +639,7 @@ When called interactively, use prefix arg to abort editing."
 	(delete-frame edit-server-frame))
       ;; delete-frame may change the current buffer
       (unless nokill
-        ; don't run abort twice in a row.
+        ;; don't run abort twice in a row.
         (remove-hook 'kill-buffer-hook 'edit-server-abort*)
 	(kill-buffer buffer))
       (edit-server-kill-client proc))))
