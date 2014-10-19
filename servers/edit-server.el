@@ -163,7 +163,7 @@ major mode. If no pattern matches,
   "Template name of the edit-server process buffers.")
 
 (defconst edit-server-log-buffer-name "*edit-server-log*"
-  "Template name of the edit-server process buffers.")
+  "Name of the edit-server process buffers.")
 
 (defconst edit-server-edit-buffer-name "TEXTAREA"
   "Template name of the edit-server text editing buffers.")
