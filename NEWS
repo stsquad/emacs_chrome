@@ -1,3 +1,9 @@
+v1.15 (PRERELEASE)
+
+edit-server.el
+
+* restore edit-server-default-major-mode if auto-mode lookup fails
+
 v1.14
 
 Extension
