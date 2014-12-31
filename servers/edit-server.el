@@ -485,8 +485,9 @@ frame. If a frame was created it returns `FRAME'."
   (let ((edit-frame nil))
     (when edit-server-new-frame
       (setq edit-frame
-            (if (memq window-system '(ns mac))
-                ;; Aquamacs, Emacs NS, Emacs (experimental) Mac port
+            (if (memq window-system '(ns mac nil))
+                ;; Aquamacs, Emacs NS, Emacs (experimental) Mac port, termcap.
+                ;; matching (nil) avoids use of DISPLAY from TTY environments.
                 (make-frame edit-server-new-frame-alist)
               (make-frame-on-display (getenv "DISPLAY")
                                      edit-server-new-frame-alist)))
