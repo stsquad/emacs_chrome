@@ -24,6 +24,7 @@ import tempfile, time
 import os, sys, re
 import stat
 import optparse
+import hashlib
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 _default_port = 9292
@@ -75,7 +76,11 @@ class Handler(BaseHTTPRequestHandler):
 				print "url:", url
 				prefix = "chrome_"
 				if url:
-					prefix += re.sub("[^.\w]", "_", re.sub("^.*?//","",url))
+					parts = urlparse.urlparse(url)
+					host = parts.netloc.split(':')[0]
+					name = os.path.basename(parts.path) or os.path.basename(os.path.dirname(parts.path))
+					m = hashlib.sha1(url).hexdigest( )
+					prefix += "{0}_{1}_{2}".format(host, name, m)
 				prefix += "_"
 				if temp_has_delete==True:
 					f = tempfile.NamedTemporaryFile(
