@@ -6,6 +6,13 @@
   classes to control them.
  */
 
+.ewe_edit_button {
+    width: 28px;
+    height: 14px;
+    float: right;
+    opacity:0.7;
+}
+
 .ewe_ta_edit_button {
     width: 28px;
     height: 14px;
