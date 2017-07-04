@@ -111,6 +111,8 @@ Adam Spiers
 Dato Simó
 Philippe Vaucher
 Eli Barzilay
+Marc Tamsky
+Attila Lendvai
 
 Other Code
 ==========
