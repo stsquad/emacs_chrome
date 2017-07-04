@@ -70,13 +70,9 @@ Submitting to Store
 History
 =======
 
-Dave Hilley [1] wrote the original proof of concept that showed it
-could be done. I [2] then hacked around with the Javascript to make
-the behaviour more like the classic It's All Text add-on available to
-Firefox.
-
-[1] http://www.thegibson.org/blog/archives/689
-[2] http://www.bennee.com/~alex
+Dave Hilley [wrote the original proof of concept](https://web.archive.org/web/20130719135014/http://www.thegibson.org/blog/archives/689) 
+that showed it could be done. [I](http://www.bennee.com/~alex) then hacked around with the Javascript
+to make the behaviour more like the classic It's All Text add-on available to Firefox.
 
 Authors
 =======
