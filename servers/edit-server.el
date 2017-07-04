@@ -134,6 +134,12 @@ If nil, the new frame will use the existing `default-frame-alist' values."
 		       (symbol :tag "Parameter")
 		       (sexp :tag "Value"))))
 
+(defcustom edit-server-pop-buffer t
+  "If not nil and edit-server-switch-buffer is nil, pop to the buffer;
+otherwise, switch to it."
+  :group 'edit-server
+  :type 'boolean)
+
 (defcustom edit-server-default-major-mode
   'text-mode
   "The default major mode to use in editing buffers, if no other
@@ -499,7 +505,9 @@ frame. If a frame was created it returns `FRAME'."
         (x-send-client-message nil 0 nil
                                "_NET_ACTIVE_WINDOW" 32
                                '(1 0 0))))
-    (pop-to-buffer buffer)
+    (if edit-server-pop-buffer
+        (pop-to-buffer buffer)
+        (switch-to-buffer buffer))
     (raise-frame edit-frame)
     (select-frame-set-input-focus (window-frame (selected-window)))
     edit-frame))
