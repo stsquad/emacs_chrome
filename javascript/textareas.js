@@ -191,26 +191,26 @@ function tagTextArea(text)
 function updateTextArea(id, content) {
     var tracker = getTextAreaTracker(id);
     if (tracker) {
-	tracker.setContent(content);
-	var orig = $(tracker.text).css('background-color');
-	$(tracker.text).css({'background-color': 'yellow'});
-	// mark node as changed
-	var event = document.createEvent("HTMLEvents");
-	event.initEvent('change', true, false);
-	tracker.text.dispatchEvent(event);
+        tracker.setContent(content);
+        var orig = $(tracker.text).css('background-color');
+        $(tracker.text).css({'background-color': 'yellow'});
+        // mark node as changed
+        var event = document.createEvent("HTMLEvents");
+        event.initEvent('change', true, false);
+        tracker.text.dispatchEvent(event);
 
-	// set selection to after end of the text
-	tracker.text.selectionStart = content.length;
-	// send a textInputEvent to append a newline
-	event = document.createEvent("TextEvent");
-	event.initTextEvent('textInput', true, true, null, '\n', 0);
-	tracker.text.dispatchEvent(event);
+        // set selection to after end of the text
+        tracker.text.selectionStart = content.length;
+        // send a textInputEvent to append a newline
+        event = document.createEvent("TextEvent");
+        event.initTextEvent('textInput', true, true, null, '\n', 0);
+        tracker.text.dispatchEvent(event);
 
-	window.setTimeout(function() {
+        window.setTimeout(function() {
             // reset the text to the original without newline
             tracker.setContent(content);
-        $(tracker.text).animate({ 'backgroundColor': orig }, 2000);
-	}, 100);
+            $(tracker.text).animate({ 'backgroundColor': orig }, 2000);
+        }, 100);
     }
 }
 
