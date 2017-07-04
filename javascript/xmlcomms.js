@@ -130,7 +130,7 @@ function handleContentMessages(msg, tab_port)
                 updateUserFeedback("Error: is edit server running?", "red");
 
                 // Also do a notification to draw attention to the failure
-                var notification = webkitNotifications.createNotification(
+                var notification = chrome.notifications.createNotification(
                     'icons/emacs23-16x16-red.png',
                     'Edit Server Error',
                     "Unable to contact an edit server, is it running?"+
