@@ -11,7 +11,7 @@ function localMessageHandler(msg, port) {
 
 // Test for the presence of an Edit Server
 function test_server() {
-	var port = chrome.extension.connect();
+	var port = browser.runtime.connect();
 	port.onMessage.addListener(localMessageHandler);
 	port.postMessage({msg: "test"});
 }

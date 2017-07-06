@@ -10,7 +10,7 @@
  */
 
 var editImgURL = chrome.extension.getURL("icons/gumdrop.png");
-var port = chrome.extension.connect();
+var port = browser.runtime.connect();
 
 // For findTextAreas
 var page_edit_id = 0;
@@ -203,8 +203,10 @@ function updateTextArea(id, content) {
 	tracker.text.selectionStart = content.length;
 	// send a textInputEvent to append a newline
 	event = document.createEvent("TextEvent");
-	event.initTextEvent('textInput', true, true, null, '\n', 0);
-	tracker.text.dispatchEvent(event);
+	if (event.initTextEvent !== undefined) {
+		event.initTextEvent('textInput', true, true, null, '\n', 0);
+		tracker.text.dispatchEvent(event);
+	}
 
 	window.setTimeout(function() {
             // reset the text to the original without newline
@@ -401,8 +403,8 @@ function localMessageHandler(msg, port) {
 // as well as direct messages from main extension.
 
 port.onMessage.addListener(localMessageHandler);
-chrome.extension.onConnect.addListener(function(iport) {
-	iport.onMessage.addListener(localMessageHandler);
+browser.runtime.onConnect.addListener(function(iport) {
+    iport.onMessage.addListener(localMessageHandler);
 });
 
 /*
@@ -426,6 +428,6 @@ document.addEventListener("contextmenu", (function(event) {
                 id: elem.getAttribute("edit_id")
             }
         };
-        chrome.extension.sendRequest(request);
+        browser.runtime.sendMessage(request);
     }
 }));

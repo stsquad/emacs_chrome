@@ -56,7 +56,7 @@
 		sendResponse({});
 	}
 
-	chrome.extension.onRequest.addListener(processRequest);
+	browser.runtime.onMessage.addListener(processRequest);
 
 })();
 
