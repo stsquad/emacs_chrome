@@ -264,4 +264,4 @@ function localMessageHandler(port)
 }
 
 // Hook up whenever someone connects to the extension comms port
-chrome.extension.onConnect.addListener(localMessageHandler);
+browser.runtime.onConnect.addListener(localMessageHandler);
