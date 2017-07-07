@@ -32,7 +32,7 @@
             "matches": ["http://*/*", "https://*/*", "file://*/*"],
             "css": ["css/textareas.css"],
             "js": [
-                "lib/jquery-1.7.min.js",
+                "lib/jquery-3.2.1.min.js",
                 "lib/jquery.color.min.js",
                 "javascript/textareas.js",
                 "lib/mutation_summary.js"
