@@ -31,7 +31,7 @@
 			"css": ["css/textareas.css"],
 			"js": [
 			    "javascript/textareas.js",
-			    "lib/jquery-1.7.min.js",
+			    "lib/jquery-3.2.1.min.js",
 			    "lib/jquery.color.min.js",
 			    "lib/mutation_summary.js"
 			],
