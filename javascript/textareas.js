@@ -156,7 +156,7 @@ function tagTextArea(text) {
             t.position().left,
             t.width(),
             t.position().top,
-            t.height(),
+            t.height()
         );
         return;
     }

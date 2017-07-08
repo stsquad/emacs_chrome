@@ -2,6 +2,6 @@
     "name": "edit_with_emacs",
     "version": "0.0.1",
     "devDependencies": {
-        "jshint": "0.9.1"
+        "jshint": "2.9.5"
     }
 }
