@@ -21,6 +21,7 @@
     },
     "options_ui": {
         "page": "fancy-settings/source/index.html",
+        "browser_style": true,
         "open_in_tab": true
     },
     "web_accessible_resources": [
