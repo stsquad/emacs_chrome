@@ -133,12 +133,6 @@ function handleContentMessages(msg, tab_port) {
                         'Unable to contact an edit server, is it running?' +
                             " I'll take you to the options page when you close this",
                 });
-                notification = chrome.notifications.createNotification(
-                    'icons/emacs23-16x16-red.png',
-                    'Edit Server Error',
-                    'Unable to contact an edit server, is it running?' +
-                        " I'll take you to the options page when you close this"
-                );
                 notification.onclose = function() {
                     var fs_url = chrome.extension.getURL('fancy-settings/source/index.html');
                     chrome.tabs.create({
