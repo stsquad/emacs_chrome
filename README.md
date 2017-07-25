@@ -53,9 +53,16 @@ consistent:
 This tells both emacs use spaces instead of tabs and use a basic indentation
 of 4 spaces.
 
-There is currently a minimal Travis-CI control file which
-essentially ensures the edit-server.el still compiles. Additions to
-the test coverage are always welcome ;-)
+There is also a universal .editorconfig which should enforce this.
+
+The code has a fair amount of whitespace damage. Please don't submit
+mega-patches to clean it up, just fixup the local code as you go. It
+makes history harder to navigate as well as potentially introducing
+changes in the noise.
+
+There is currently a minimal Travis-CI control file which essentially
+ensures the edit-server.el still compiles. Additions to the test
+coverage are always welcome ;-)
 
 [![Build Status](https://travis-ci.org/stsquad/emacs_chrome.png?branch=master)](https://travis-ci.org/stsquad/emacs_chrome)
 
