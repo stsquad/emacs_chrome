@@ -113,6 +113,7 @@ Philippe Vaucher
 Eli Barzilay
 Marc Tamsky
 Attila Lendvai
+Daniel Kraus
 
 Other Code
 ==========
