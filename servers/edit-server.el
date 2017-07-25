@@ -305,25 +305,26 @@ If argument VERBOSE is non-nil, logs all server activity to buffer
 `*edit-server-log*'.  When called interactivity, a prefix argument
 will cause it to be verbose."
   (interactive "P")
-  (if (or (process-status "edit-server")
-	  (null (condition-case err
-                    (let ((proc (make-network-process
-                                 :name "edit-server"
-                                 :buffer edit-server-process-buffer-name
-                                 :family 'ipv4
-                                 :host (or edit-server-host 'local)
-                                 :service edit-server-port
-                                 :log 'edit-server-accept
-                                 :server t
-                                 :noquery t)))
-                      (set-process-coding-system proc 'utf-8 'utf-8)
-                      proc)
-		  (file-error nil))))
+  (if (process-status "edit-server")
       (message "An edit-server process is already running")
-    (ad-activate 'save-buffers-kill-emacs)
-    (setq edit-server-clients '())
-    (when verbose (get-buffer-create edit-server-log-buffer-name))
-    (edit-server-log nil "Created a new edit-server process")))
+    (if (null (condition-case err
+                  (let ((proc (make-network-process
+                               :name "edit-server"
+                               :buffer edit-server-process-buffer-name
+                               :family 'ipv4
+                               :host (or edit-server-host 'local)
+                               :service edit-server-port
+                               :log 'edit-server-accept
+                               :server t
+                               :noquery t)))
+                    (set-process-coding-system proc 'utf-8 'utf-8)
+                    proc)
+                (file-error nil)))
+        (message "Failed to start an edit-server")
+      (ad-activate 'save-buffers-kill-emacs)
+      (setq edit-server-clients '())
+      (when verbose (get-buffer-create edit-server-log-buffer-name))
+      (edit-server-log nil "Created a new edit-server process"))))
 
 (defun edit-server-stop nil
   "Stop the edit server"

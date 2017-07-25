@@ -9,7 +9,6 @@
  * and licensed under the GPLv3. See the COPYING file for details
  */
 
-var editImgURL = chrome.extension.getURL("icons/gumdrop.png");
 var port = chrome.extension.connect();
 
 // For findTextAreas
@@ -52,6 +51,22 @@ function getTitle()
 }
 
 /*
+  getEditButton
+
+  Return an edit button
+*/
+function getEditButton(id)
+{
+    var button = document.createElement('div');
+    button.setAttribute("class", "ewe_edit_button");
+    button.setAttribute("id", id);
+    button.setAttribute("edit_id", id);
+    button.setAttribute("style", 'background-image: url('+chrome.extension.getURL("icons/gumdrop.png")+");");
+    button.addEventListener('click', editTextArea);
+    return button;
+}
+
+/*
   textAreaTracker
 
   This object wraps up all the information about a given text area on the page.
@@ -81,18 +96,10 @@ function textAreaTracker(text)
     if (enable_keys)
         this.text.addEventListener('keydown', this.keydownListener);
 
-    // The img 
+    // The edit button
     if (enable_button) {
-        this.image = document.createElement('img');
-        if (this.text.tagName == "DIV") {
-            this.image.setAttribute("class", "ewe_div_edit_button");
-        } else {
-            this.image.setAttribute("class", "ewe_ta_edit_button");
-        }
-        this.image.setAttribute("edit_id", this.edit_id);
-        this.image.src = editImgURL;
-        this.image.addEventListener('click', editTextArea);
-        this.text.parentNode.insertBefore(this.image, text.nextSibling);
+        this.button = getEditButton(this.edit_id);
+        this.text.parentNode.insertBefore(this.button, text.nextSibling);
     }
 
     // Some methods to get and set content
@@ -191,26 +198,26 @@ function tagTextArea(text)
 function updateTextArea(id, content) {
     var tracker = getTextAreaTracker(id);
     if (tracker) {
-	tracker.setContent(content);
-	var orig = $(tracker.text).css('background-color');
-	$(tracker.text).css({'background-color': 'yellow'});
-	// mark node as changed
-	var event = document.createEvent("HTMLEvents");
-	event.initEvent('change', true, false);
-	tracker.text.dispatchEvent(event);
+        tracker.setContent(content);
+        var orig = $(tracker.text).css('background-color');
+        $(tracker.text).css({'background-color': 'yellow'});
+        // mark node as changed
+        var event = document.createEvent("HTMLEvents");
+        event.initEvent('change', true, false);
+        tracker.text.dispatchEvent(event);
 
-	// set selection to after end of the text
-	tracker.text.selectionStart = content.length;
-	// send a textInputEvent to append a newline
-	event = document.createEvent("TextEvent");
-	event.initTextEvent('textInput', true, true, null, '\n', 0);
-	tracker.text.dispatchEvent(event);
+        // set selection to after end of the text
+        tracker.text.selectionStart = content.length;
+        // send a textInputEvent to append a newline
+        event = document.createEvent("TextEvent");
+        event.initTextEvent('textInput', true, true, null, '\n', 0);
+        tracker.text.dispatchEvent(event);
 
-	window.setTimeout(function() {
+        window.setTimeout(function() {
             // reset the text to the original without newline
             tracker.setContent(content);
-        $(tracker.text).animate({ 'backgroundColor': orig }, 2000);
-	}, 100);
+            $(tracker.text).animate({ 'backgroundColor': orig }, 2000);
+        }, 100);
     }
 }
 
@@ -330,22 +337,25 @@ function handleUpdatedElements(summaries) {
         $(e).remove();
     });
 
+    imgSummary.removed.forEach(function(e) {
+        console.log("button was removed" + e.getAttribute("edit_id"));
+    });
+
     // Process all new textareas
     var allAdded = taSummary.added.concat(div1Summary.added, div2Summary.added);
     allAdded.forEach(function(e) {
-        // If the area was duplicated we want to remote it's ID
+        // If the area was duplicated we want to remove its ID
         if (e.getAttribute("edit_id")) {
             e.removeAttribute("edit_id");
         }
         tagTextArea(e);
     });
 
-    // For now just log removed
-    // TODO: something cleaner...
+    // Handle removed elements
     var allRemoved = taSummary.removed.concat(div1Summary.removed, div2Summary.removed);
     allRemoved.forEach(function(e) {
         if (e.getAttribute("edit_id")) {
-            console.log("tagged element removed, we should probably do something about that");
+            console.log("tagged element removed: " + e.get_attribute("edit_id"));
         }
     });
 }
@@ -372,7 +382,7 @@ function localMessageHandler(msg, port) {
             callback: handleUpdatedElements,
             queries: [
                 {   // we don't want the source page accidently duplicating our tags
-                    element: "img[class='ewe_edit_button']"
+                    element: "div[class='ewe_edit_button']"
                 },
                 {
                     element: "textarea"
