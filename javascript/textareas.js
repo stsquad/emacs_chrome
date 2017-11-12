@@ -355,7 +355,7 @@ function handleUpdatedElements(summaries) {
     var allRemoved = taSummary.removed.concat(div1Summary.removed, div2Summary.removed);
     allRemoved.forEach(function(e) {
         if (e.getAttribute("edit_id")) {
-            console.log("tagged element removed: " + e.get_attribute("edit_id"));
+            console.log("tagged element removed: " + e.getAttribute("edit_id"));
         }
     });
 }
