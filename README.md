@@ -1,11 +1,12 @@
 About
 =====
 
-Edit with Emacs is an extension for Google's Chrome(ium) browser family
-that allows you to edit text areas on your browser in a more full
-featured editor. It does this in conjunction with an "Edit Server"
-which services requests by the browser. This is because extensions
-cannot spawn new processes as a security measure.
+Edit with Emacs is an addon for webextension compatible browsers like
+Google's Chrome(ium), Opera or Firefox that allows you to edit text
+areas on your browser in a more full featured editor. It does this in
+conjunction with an "Edit Server" which services requests by the
+browser. This is because extensions cannot spawn new processes as a
+security measure.
 
 The extension packages native elisp version that can be run inside
 GNU Emacs itself, just follow the instructions from the options page
