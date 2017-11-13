@@ -130,12 +130,11 @@ function handleContentMessages(msg, tab_port)
                 updateUserFeedback("Error: is edit server running?", "red");
 
                 // Also do a notification to draw attention to the failure
-                var notification = chrome.notifications.createNotification(
-                    'icons/emacs23-16x16-red.png',
-                    'Edit Server Error',
-                    "Unable to contact an edit server, is it running?"+
-                        " I'll take you to the options page when you close this"
-                );
+                var notification = new Notification('Edit Server Error', {
+                    icon: 'icons/emacs23-16x16-red.png',
+                    body: 'Unable to contact an edit server, is it running?' +
+                        " I'll take you to the options page when you close this",
+                });
                 notification.onclose = function() {
                     var fs_url =
                         chrome.extension.getURL('fancy-settings/source/index.html');
@@ -264,4 +263,8 @@ function localMessageHandler(port)
 }
 
 // Hook up whenever someone connects to the extension comms port
-chrome.extension.onConnect.addListener(localMessageHandler);
+if (typeof browser !== 'undefined') {  // Check for Firefox compatibility
+    browser.runtime.onConnect.addListener(localMessageHandler);
+} else {
+    chrome.extension.onConnect.addListener(localMessageHandler);
+}
