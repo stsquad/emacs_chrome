@@ -9,7 +9,16 @@
  * and licensed under the GPLv3. See the COPYING file for details
  */
 
-var port = chrome.extension.connect();
+// Shim for Firefox compatibility
+if (typeof browser !== 'undefined') {
+    var browser_runtime = browser.runtime;
+    var browser_sendMessage = browser.runtime.sendMessage;
+} else {
+    browser_runtime = chrome.extension;
+    browser_sendMessage = chrome.extension.sendRequest;
+}
+
+var port = browser_runtime.connect();
 
 // For findTextAreas
 var page_edit_id = 0;
@@ -210,8 +219,10 @@ function updateTextArea(id, content) {
         tracker.text.selectionStart = content.length;
         // send a textInputEvent to append a newline
         event = document.createEvent("TextEvent");
-        event.initTextEvent('textInput', true, true, null, '\n', 0);
-        tracker.text.dispatchEvent(event);
+        if (event.initTextEvent !== undefined) {
+            event.initTextEvent('textInput', true, true, null, '\n', 0);
+            tracker.text.dispatchEvent(event);
+        }
 
         window.setTimeout(function() {
             // reset the text to the original without newline
@@ -411,8 +422,8 @@ function localMessageHandler(msg, port) {
 // as well as direct messages from main extension.
 
 port.onMessage.addListener(localMessageHandler);
-chrome.extension.onConnect.addListener(function(iport) {
-	iport.onMessage.addListener(localMessageHandler);
+browser_runtime.onConnect.addListener(function(iport) {
+    iport.onMessage.addListener(localMessageHandler);
 });
 
 /*
@@ -436,6 +447,6 @@ document.addEventListener("contextmenu", (function(event) {
                 id: elem.getAttribute("edit_id")
             }
         };
-        chrome.extension.sendRequest(request);
+        browser_sendMessage(request);
     }
 }));

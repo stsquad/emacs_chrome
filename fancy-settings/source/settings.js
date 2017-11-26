@@ -11,9 +11,15 @@ function localMessageHandler(msg, port) {
 
 // Test for the presence of an Edit Server
 function test_server() {
-	var port = chrome.extension.connect();
-	port.onMessage.addListener(localMessageHandler);
-	port.postMessage({msg: "test"});
+    // Text for Firefox compatibility
+    if (typeof browser !== 'undefined') {
+        var port = browser.runtime.connect();
+    } else {
+        port = chrome.extension.connect();
+    }
+
+    port.onMessage.addListener(localMessageHandler);
+    port.postMessage({msg: "test"});
 }
 
 window.addEvent("domready", function () {

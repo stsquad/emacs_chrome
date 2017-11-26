@@ -56,7 +56,11 @@
 		sendResponse({});
 	}
 
-	chrome.extension.onRequest.addListener(processRequest);
+    // Check for Firefox compatibility
+    if (typeof browser !== 'undefined') {
+        browser.runtime.onMessage.addListener(processRequest);
+    } else {
+        chrome.extension.onRequest.addListener(processRequest);
+    }
 
 })();
-

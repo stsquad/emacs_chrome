@@ -20,7 +20,10 @@
 	{
 		"128" : "icons/emacs.png"
 	},
-	"options_page": "fancy-settings/source/index.html",
+	"options_ui": {
+		"page": "fancy-settings/source/index.html",
+		"open_in_tab": true
+	},
         "web_accessible_resources": [
 	    "icons/gumdrop.png",
 	    "icons/emacs23-16x16-red.png"
@@ -30,9 +33,9 @@
 			"matches": ["http://*/*", "https://*/*", "file://*/*"],
 			"css": ["css/textareas.css"],
 			"js": [
-			    "javascript/textareas.js",
-			    "lib/jquery-1.7.min.js",
+			    "lib/jquery-3.2.1.min.js",
 			    "lib/jquery.color.min.js",
+			    "javascript/textareas.js",
 			    "lib/mutation_summary.js"
 			],
 			"run_at": "document_idle",
