@@ -1,7 +1,14 @@
 v1.15 (PRERELEASE)
 
+Extension
+
+* Now builds for Firefox using WebExtension hooks
+* Use chrome.notifications instead of webkitNotifications
+* Use <div> with style instead of inline <img> for edit button
+
 edit-server.el
 
+* avoid calling make-frame-on-display for TTY setups
 * restore edit-server-default-major-mode if auto-mode lookup fails
 
 v1.14
@@ -20,7 +27,7 @@ v1.13
 Extension
 
 * Change the handling of hidden elements (fix bug #78)
-* Add debugging for erroneous hidden text areas (#93) 
+* Add debugging for erroneous hidden text areas (#93)
 * Add keyboard shortcut to bring Emacs to foreground
 * Pass clipboard contents to foreground request
 
