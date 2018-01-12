@@ -125,6 +125,10 @@ function textAreaTracker(text)
             this.text.innerHTML = new_text;
         } else {
             this.text.value = new_text;
+            // fix for some sites that maintain and submit a shadow copy of the text area
+            // that gets updated on "input" events to the real one; e.g. fastmail.fm's
+            // "Compose Message" page.
+            this.text.dispatchEvent(new Event("input"));
         }
     };
 }
