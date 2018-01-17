@@ -643,7 +643,9 @@ When called interactively, use prefix arg to abort editing."
       (unless nokill
         ;; don't run abort twice in a row.
         (remove-hook 'kill-buffer-hook 'edit-server-abort*)
-	(kill-buffer buffer))
+	(kill-buffer buffer)
+	(unless edit-server-frame
+	  (delete-window)))
       (edit-server-kill-client proc))))
 
 ;; edit-server-save uses the iterative edit-server option (send a
