@@ -5,11 +5,13 @@ Extension
 * Now builds for Firefox using WebExtension hooks
 * Use chrome.notifications instead of webkitNotifications
 * Use <div> with style instead of inline <img> for edit button
+* fake "input" event to stop active page components overwriting text area
 
 edit-server.el
 
-* avoid calling make-frame-on-display for TTY setups
+* avoid calling make-frame-on-display for TTY setups (#103/#132/#133)
 * restore edit-server-default-major-mode if auto-mode lookup fails
+* delete window when done editing with no new frame
 
 v1.14
 

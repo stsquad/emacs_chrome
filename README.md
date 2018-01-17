@@ -78,7 +78,7 @@ Submitting to Store
 History
 =======
 
-Dave Hilley [wrote the original proof of concept](https://web.archive.org/web/20130719135014/http://www.thegibson.org/blog/archives/689) 
+Dave Hilley [wrote the original proof of concept](https://web.archive.org/web/20130719135014/http://www.thegibson.org/blog/archives/689)
 that showed it could be done. [I](http://www.bennee.com/~alex) then hacked around with the Javascript
 to make the behaviour more like the classic It's All Text add-on available to Firefox.
 
@@ -122,28 +122,23 @@ Eli Barzilay
 Marc Tamsky
 Attila Lendvai
 Daniel Kraus
+John Brzustowski
 
 Other Code
 ==========
 
-This extensions takes advantage of the jQuery library
-to do a lot of the heavy lifting in searching the page
-for elements. You can find it at:
+This extensions takes advantage of the [http://jquery.com/](jQuery
+library) to do a lot of the heavy lifting in searching the page for
+elements.
 
-http://jquery.com/
+It uses John Resig's [https://github.com/jquery/jquery-color](jQuery
+Colour Animation) plug-in to do the colour fades of the elements.
 
-It uses John Resig's jQuery Colour Animation plug-in
-to do the colour fades of the elements. It can be found
-at:
+The settings code uses Frank Kohlhepp's excellent fancy-settings
+library. This has since
+[https://github.com/frankkohlhepp/fancy-settings](been pulled from the
+web).
 
-https://github.com/jquery/jquery-color
-
-The settings code uses Frank Kohlhepp's excellent
-fancy-settings library. This can be found at:
-
-https://github.com/frankkohlhepp/fancy-settings
-
-The textarea code uses the rather nifty mutation summary
-library by Google. This can be found at:
-
-https://code.google.com/p/mutation-summary/
+The textarea code uses the rather nifty
+[https://github.com/rafaelw/mutation-summary](mutation summary
+library) by Google.
