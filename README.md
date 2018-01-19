@@ -74,6 +74,7 @@ coverage are always welcome ;-)
 Submitting to Store
 ===================
 
+* Update NEWS
 * Test
 * Tag vX.Y
 * git archive --format zip --output emacs_chrome_X.Y.zip vX.Y
