@@ -467,7 +467,7 @@ non-nil, then STRING is also echoed to the message line."
   "Create a frame for editing and return it."
   (let ((disp (getenv "DISPLAY")))
     (edit-server-log nil "Creating frame for %s/%s" window-system disp)
-    (if (or (memq window-system '(ns mac))
+    (if (or (memq window-system '(ns mac nil))
             (= 0 (length disp)))
       ;; Aquamacs, Emacs NS, Emacs (experimental) Mac port, termcap.
       ;; matching (nil) avoids use of DISPLAY from TTY environments.
