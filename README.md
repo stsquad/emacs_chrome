@@ -29,6 +29,10 @@ Chrome Store at:
 
 https://chrome.google.com/webstore/detail/edit-with-emacs/ljobjlafonikaiipfkggjbhkghgicgoh
 
+Or if you're using Firefox, visit addons.mozilla.org (AMO) at:
+
+https://addons.mozilla.org/en-US/firefox/addon/edit-with-emacs1/
+
 You then have the option of installing the packaged edit-server from the
 options page or alternatively you can install the latest version from
 MELPA if you have it enabled in Emacs 24+.
