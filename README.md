@@ -132,18 +132,18 @@ John Brzustowski
 Other Code
 ==========
 
-This extensions takes advantage of the [http://jquery.com/](jQuery
-library) to do a lot of the heavy lifting in searching the page for
-elements.
+This extensions takes advantage of the
+[jQuery library](http://jquery.com/) to do a lot of the heavy lifting
+in searching the page for elements.
 
-It uses John Resig's [https://github.com/jquery/jquery-color](jQuery
-Colour Animation) plug-in to do the colour fades of the elements.
+It uses John Resig's
+[jQuery Colour Animation](https://github.com/jquery/jquery-color)
+plug-in to do the colour fades of the elements.
 
 The settings code uses Frank Kohlhepp's excellent fancy-settings
 library. This has since
-[https://github.com/frankkohlhepp/fancy-settings](been pulled from the
-web).
+[been pulled from the web](https://github.com/frankkohlhepp/fancy-settings]().
 
 The textarea code uses the rather nifty
-[https://github.com/rafaelw/mutation-summary](mutation summary
-library) by Google.
+[mutation summary library](https://github.com/rafaelw/mutation-summary)()
+by Google.
