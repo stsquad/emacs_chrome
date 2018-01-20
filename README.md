@@ -142,8 +142,8 @@ plug-in to do the colour fades of the elements.
 
 The settings code uses Frank Kohlhepp's excellent fancy-settings
 library. This has since
-[been pulled from the web](https://github.com/frankkohlhepp/fancy-settings]().
+[been pulled from the web](https://github.com/frankkohlhepp/fancy-settings).
 
 The textarea code uses the rather nifty
-[mutation summary library](https://github.com/rafaelw/mutation-summary)()
+[mutation summary library](https://github.com/rafaelw/mutation-summary)
 by Google.
