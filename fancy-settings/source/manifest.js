@@ -31,6 +31,13 @@ this.manifest = {
             "type": "text",
             "label": "Edit Server Port:",
         },
+        {
+            "tab": "Configuration",
+            "group": "Edit Server",
+            "name": "edit_server_disable_settings",
+            "type": "checkbox",
+            "label": "Disable switch to settings if edit server not found",
+        },
 	{
             "tab": "Configuration",
             "group": "Interface",

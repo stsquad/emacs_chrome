@@ -14,6 +14,7 @@
 var settings = new Store("settings", {
     "edit_server_host": "127.0.0.1",
     "edit_server_port": 9292,
+    "edit_server_disable_settings": false,
     "enable_button": true,
     "enable_dblclick": false,
     "enable_keys": false,
@@ -129,21 +130,32 @@ function handleContentMessages(msg, tab_port)
                 // Is the edit server actually running?
                 updateUserFeedback("Error: is edit server running?", "red");
 
+                var body = 'Unable to contact an edit server, is it running?';
+                var disable_settings = settings.get("edit_server_disable_settings");
+
+                /* Optionally switch to the config pane */
+                if (!disable_settings) {
+                    body = body + " I'll take you to the options page when you close this";
+                }
+
                 // Also do a notification to draw attention to the failure
                 var notification = new Notification('Edit Server Error', {
                     icon: 'icons/emacs23-16x16-red.png',
-                    body: 'Unable to contact an edit server, is it running?' +
-                        " I'll take you to the options page when you close this",
+                    body: body,
                 });
-                notification.onclose = function() {
-                    var fs_url =
-                        chrome.extension.getURL('fancy-settings/source/index.html');
-                    chrome.tabs.create(
-                        {
-                            'url': fs_url
-                        }
-                    );
-                };
+
+                /* Optionally switch to the config pane */
+                if (!disable_settings) {
+                    notification.onclose = function() {
+                        var fs_url = chrome.extension.getURL('fancy-settings/source/index.html');
+                        chrome.tabs.create(
+                            {
+                                'url': fs_url
+                            }
+                        );
+                    };
+                }
+
                 notification.show();
             } else {
                 updateUserFeedback("Un-handled response: "+xhr.status, "red");

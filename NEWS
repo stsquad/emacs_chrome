@@ -2,6 +2,8 @@ v1.16 (PRERELEASE)
 
 Extension
 
+* allow disabling of switch to settings behaviour
+
 edit-server.el
 
 v1.15
