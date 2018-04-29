@@ -39,7 +39,7 @@ MELPA if you have it enabled in Emacs 24+.
 
 If you would like to help with the development of Edit with Emacs the
 easiest way is to fork the github repository (https://github.com/stsquad/emacs_chrome)
-and clone it to your development system. The in Chrome(ium) go to:
+and clone it to your development system. Then in Chrome(ium) go to:
 
 Tools->Extensions
 Select "Developer Mode"
@@ -67,7 +67,7 @@ changes in the noise.
 
 There is currently a minimal Travis-CI control file which essentially
 ensures the edit-server.el still compiles. Additions to the test
-coverage are always welcome ;-)
+coverage are always welcome. ;-)
 
 [![Build Status](https://travis-ci.org/stsquad/emacs_chrome.png?branch=master)](https://travis-ci.org/stsquad/emacs_chrome)
 
