@@ -208,12 +208,20 @@ function tagTextArea(text)
 
   Called when we want to update the text area with our updated text
 */
+
+// method taken from https://gist.github.com/960189
+jQuery.Color.fn.contrastColor = function() {
+	var r = this._rgba[0], g = this._rgba[1], b = this._rgba[2];
+	return (((r*299)+(g*587)+(b*144))/1000) >= 131.5 ? "black" : "white";
+};
+
 function updateTextArea(id, content) {
     var tracker = getTextAreaTracker(id);
     if (tracker) {
         tracker.setContent(content);
         var orig = $(tracker.text).css('background-color');
-        $(tracker.text).css({'background-color': 'yellow'});
+        // $(tracker.text).css({'background-color': 'yellow'});
+        $(tracker.text).css("background-color", jQuery.Color( orig ).contrastColor());
         // mark node as changed
         var event = document.createEvent("HTMLEvents");
         event.initEvent('change', true, false);
