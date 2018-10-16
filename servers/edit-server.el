@@ -465,14 +465,8 @@ non-nil, then STRING is also echoed to the message line."
 
 (defun edit-server-make-frame ()
   "Create a frame for editing and return it."
-  (let ((disp (getenv "DISPLAY")))
-    (edit-server-log nil "Creating frame for %s/%s" window-system disp)
-    (if (or (memq window-system '(ns mac))
-            (= 0 (length disp)))
-      ;; Aquamacs, Emacs NS, Emacs (experimental) Mac port, termcap.
-      ;; matching (nil) avoids use of DISPLAY from TTY environments.
-      (make-frame edit-server-new-frame-alist)
-    (make-frame-on-display disp))))
+  (edit-server-log nil "Creating frame for %s" window-system)
+  (make-frame edit-server-new-frame-alist))
 
 (defun edit-server-foreground-request (buffer)
   "Bring Emacs into the foreground after a request from Chrome.
