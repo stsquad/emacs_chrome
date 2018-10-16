@@ -127,8 +127,11 @@ edit-server-start-hook instead."
     (height . 25)
     (minibuffer . t)
     (menu-bar-lines . t))
-  "Frame parameters for new frames.  See `default-frame-alist' for examples.
-If nil, the new frame will use the existing `default-frame-alist' values."
+  "Frame parameters for new frames.  See `make-frame' for examples.
+You will want to look at the VALUE of 'window-system', 'display' and
+'terminal' if you want to force any particular display type and
+not default to whatever is currently open. If nil, the new
+frame will use the existing `default-frame-alist' values."
   :group 'edit-server
   :type '(repeat (cons :format "%v"
 		       (symbol :tag "Parameter")
