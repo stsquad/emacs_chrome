@@ -2,9 +2,11 @@ v1.16 (PRERELEASE)
 
 Extension
 
-* allow disabling of switch to settings behaviour
+* allow disabling of switch to settings behavior
 
 edit-server.el
+
+* use make-frame (see updated docs for edit-server-new-frame-alist)
 
 v1.15
 
