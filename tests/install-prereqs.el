@@ -15,7 +15,7 @@
 
 (unless (package-installed-p 'ert-async)
   (package-refresh-contents)
-  (package-install 'use-package))
+  (package-install 'ert-async))
 
 (provide 'install-prereqs)
 ;;; install-prereqs.el ends here
