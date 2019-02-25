@@ -6,8 +6,14 @@
 ;;
 ;;; Code:
 
+(add-to-list 'package-archives
+             '("melpa-stable" . "https://stable.melpa.org/packages/"))
+
 (package-initialize)
-(package-install 'ert-async)
+
+(unless (package-installed-p 'ert-async)
+  (package-refresh-contents)
+  (package-install 'use-package))
 
 (provide 'install-prereqs)
 ;;; install-prereqs.el ends here
