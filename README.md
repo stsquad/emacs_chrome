@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/stsquad/emacs_chrome.png?branch=master)](https://travis-ci.org/stsquad/emacs_chrome)
 [![MELPA](https://melpa.org/packages/edit-server-badge.svg)](https://melpa.org/#/edit-server)
+[![MELPA Stable](https://stable.melpa.org/packages/edit-server-badge.svg)](https://stable.melpa.org/#/edit-server)
 [![Webstore](https://developer.chrome.com/webstore/images/ChromeWebStore_Badge_v2_206x58.png)](https://chrome.google.com/webstore/detail/edit-with-emacs/ljobjlafonikaiipfkggjbhkghgicgoh)
 
 About
@@ -15,7 +16,10 @@ security measure.
 The extension packages native elisp version that can be run inside
 GNU Emacs itself, just follow the instructions from the options page
 of the extension. It has been known to work with GNU Emacs and
-Aquamacs (MacOS); it is presently not compatible with XEmacs.
+Aquamacs (MacOS); it is presently not compatible with XEmacs. You can
+also install edit-server.el via MELPA:
+
+    M-x package-install edit-server
 
 Other example edit servers can be found at the project homepage. There
 is no reason why other server scripts could not spawn other editors
