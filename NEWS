@@ -4,6 +4,7 @@ Extension
 
 * allow disabling of switch to settings behaviour
 * whitelist penguin.linux.test for edit server (ChromeOS/Crostini)
+* fix context menu on newer Chromes (#158)
 
 edit-server.el
 
