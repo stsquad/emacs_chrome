@@ -33,7 +33,7 @@ console.log = function() {
 // Get the base URL from which we make all requests to the server..
 function getEditUrl()
 {
-    return "http://127.0.0.1:" + settings.get("edit_server_port") + "/";
+    return "http://" + settings.get("edit_server_host") + ":" + settings.get("edit_server_port") + "/";
 }
 
 /*
