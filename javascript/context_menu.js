@@ -1,15 +1,15 @@
 /* -*- tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 (function(){
 
-	var edit_msg = {};
+    var edit_msg = {};
 
-	function menuClicked(info, tab) {
-		if (edit_msg) {
-			var tab_port = chrome.tabs.connect(tab.id);
-			tab_port.sender = { tab: tab };
-			handleContentMessages(edit_msg, tab_port);
-		}
-	}
+    function menuClicked(info, tab) {
+        if (edit_msg) {
+            var tab_port = chrome.tabs.connect(tab.id);
+            edit_msg.pageUrl = info.pageUrl;
+            handleContentMessages(edit_msg, tab_port);
+        }
+    }
 
 
 	var menu_enabled = false;

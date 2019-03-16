@@ -93,10 +93,8 @@ function handleContentMessages(msg, tab_port)
     var id = msg.id;
     var text = msg.text;
     var file = msg.file;
-
-    var page_url = tab_port.sender.tab.url;
-    var page_port = tab_port.portId_;
-    console.log(" from page:"+page_url+" and tab port:"+page_port);
+    var page_url = msg.pageUrl;
+    console.log(" from page:"+page_url);
 
     var xhr = new XMLHttpRequest();
     var url = getEditUrl() + cmd;
