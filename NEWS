@@ -1,8 +1,9 @@
-v1.16 (PRERELEASE)
+v1.16
 
 Extension
 
-* allow disabling of switch to settings behavior
+* allow disabling of switch to settings behaviour
+* whitelist penguin.linux.test for edit server (ChromeOS/Crostini)
 
 edit-server.el
 

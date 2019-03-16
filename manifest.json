@@ -13,6 +13,7 @@
 		"tabs",
 		"contextMenus",
 		"notifications",
+		"http://penguin.linux.test/edit/*",
 		"http://127.0.0.1/edit/*",
 		"clipboardRead"
 	],
