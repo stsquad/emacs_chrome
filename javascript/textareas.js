@@ -60,6 +60,19 @@ function getTitle()
 }
 
 /*
+  getEmptyMessage
+
+  Return a partially filled message hash with details.
+ */
+function getEmptyMessage()
+{
+    var empty_msg = {
+        pageUrl: document.URL,
+        title: getTitle(),
+    };
+    return empty_msg;
+}
+/*
   getEditButton
 
   Return an edit button
@@ -240,17 +253,15 @@ function updateTextArea(id, content) {
   sendTextArea
 
   Send the text area to the main part of the extension to be passed
-  on to the external editor. Eventually 
+  on to the external editor. Eventually
 */
 
 function sendTextArea(text_tracker) {
 	// And spawn the request
-	var edit_msg = {
-		msg: "edit",
-		text: text_tracker.getContent(),
-		title: getTitle(),
-		id: text_tracker.edit_id
-	};
+	var edit_msg = getEmptyMessage();
+    edit_msg.msg = "edit";
+    edit_msg.text = text_tracker.getContent();
+	edit_msg.id = text_tracker.edit_id;
 	port.postMessage(edit_msg);
 }
 
@@ -258,31 +269,40 @@ function sendTextArea(text_tracker) {
   Handle focused text area
 */
 (function(){
-	var focusedEdit = null;
+    var focusedEdit = null;
 
-	findActiveTextArea = function() {
-		if (focusedEdit) {
-			sendTextArea(focusedEdit);
-		} else {
-			var msg_text = "No textarea in focus in: "+getTitle();
-			port.postMessage( {msg: "error", orig_cmd: "find_edit", text: msg_text} );
-		}
-	};
-
-	setFocused = function(){
-		// Update UI?
-		var id = this.getAttribute("edit_id");
-		focusedEdit = getTextAreaTracker(id);
-		if (focusedEdit !== undefined) {
-			port.postMessage( {msg: "focus", id: id} );
-			this.addEventListener('blur',	function() {
-				port.postMessage( {msg: "focus", id: null} );
-				this.removeEventListener('blur',arguments.callee,false);
-			});
-		} else {
-			console.log ("setFocused: failed to find a tracker for "+id);
+    findActiveTextArea = function() {
+        if (focusedEdit) {
+            sendTextArea(focusedEdit);
+        } else {
+            var no_txt_msg = getEmptyMessage();
+            no_txt_msg.msg = "error";
+            no_txt_msg.text = "No textarea in focus in: "+getTitle();
+            no_txt_msg.orig_cmd = "find_edit";
+            port.postMessage(no_txt_msg);
         }
-	};
+    };
+
+    setFocused = function(){
+        // Update UI?
+        var id = this.getAttribute("edit_id");
+        focusedEdit = getTextAreaTracker(id);
+        if (focusedEdit !== undefined) {
+            var focus_msg = getEmptyMessage();
+            focus_msg.msg = "focus";
+            focus_msg.id = id;
+            port.postMessage( focus_msg );
+            this.addEventListener('blur',	function() {
+                var unfocus_msg = getEmptyMessage();
+                unfocus_msg.msg = "focus";
+                unfocus_msg.id = null;
+                port.postMessage( unfocus_msg );
+                this.removeEventListener('blur',arguments.callee,false);
+            });
+        } else {
+            console.log ("setFocused: failed to find a tracker for "+id);
+        }
+    };
 })();
 
 /*
@@ -388,7 +408,7 @@ function localMessageHandler(msg, port) {
         enable_debug = msg.enable_debug;
         findTextAreas([$('*')]);
 
-        /* 
+        /*
          * The mutation summary is responsible for monitoring all
          * changes to the page and triggering updates.
          *
@@ -442,14 +462,13 @@ port.postMessage({msg: "config"});
 document.addEventListener("contextmenu", (function(event) {
     var elem = event.srcElement;
     if (elem && elem.getAttribute("edit_id")) {
+        var edit_msg = getEmptyMessage();
+        edit_msg.msg = "edit";
+        edit_msg.text = elem.value;
+        edit_msg.id = elem.getAttribute("edit_id");
         var request = {
             type: "menu_target",
-            edit_msg: {
-                msg: "edit",
-                text: elem.value,
-                title: getTitle(),
-                id: elem.getAttribute("edit_id")
-            }
+            edit_msg: edit_msg
         };
         browser_sendMessage(request);
     }
