@@ -48,11 +48,11 @@ this.i18n = {
 	package archive.\
         </p>\
 	<p>\
-        Save the file to somewhere visible to your your Emacs <code>load-path</code> (~/.emacs.d is popular) and add the following\
+        Save the file to somewhere visible to your your Emacs <code>load-path</code> (~/.emacs.d/lisp is popular) and add the following\
         to your <code>.emacs</code>:\
         </p>\
 	<pre>\
-          (add-to-list 'load-path \"~/.emacs.d\")<br>\
+          (add-to-list 'load-path \"~/.emacs.d/lisp\")<br>\
           (require 'edit-server)<br>\
           (edit-server-start)\
 	</pre>\
