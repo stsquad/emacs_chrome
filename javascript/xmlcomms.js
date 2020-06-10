@@ -17,7 +17,6 @@ var settings = new Store("settings", {
     "edit_server_disable_settings": false,
     "enable_button": true,
     "enable_dblclick": false,
-    "enable_keys": false,
     "enable_debug": false
 });
 
@@ -59,18 +58,23 @@ function updateUserFeedback(string, colour)
 // Initial message
 updateUserFeedback("Awaiting edit request", "blue");
 
+function handleEditRequest(tab)
+{
+    var find_msg = {
+        msg: "find_edit"
+    };
+    var tab_port = chrome.tabs.connect(tab.id);
+
+    tab_port.postMessage(find_msg);
+}
+
 // Called when the user clicks on the browser action
 // (or the activate extension key-stroke)
 //
 // When clicked we send a message to the current active tab's
 // content script. If it fails we will never see an answer.
 chrome.browserAction.onClicked.addListener(function(tab) {
-    var find_msg = {
-        msg: "find_edit"
-    };
-    var tab_port = chrome.tabs.connect(tab.id);
- 
-    tab_port.postMessage(find_msg);
+    handleEditRequest(tab);
     updateUserFeedback("sent request to content script", "green");
 });
 
@@ -78,7 +82,15 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 // as defined in manifest.json (or configured in exttensions tab)
 chrome.commands.onCommand.addListener(function(command) {
     console.log('onCommand listener:', command);
-    if (command == "activate-emacs") {
+    if (command == "edit-textbox") {
+        chrome.tabs.query({
+            active: true,
+            currentWindow: true
+        }, function(tabs) {
+            console.log("got tabs for edit-textbox command: ", tabs);
+            handleEditRequest(tabs[0]);
+        });
+    } else if (command == "activate-emacs") {
         handleForegroundMessage();
     }
 });
@@ -190,7 +202,7 @@ function handleTestMessages(msg, tab_port)
             } else if (xhr.status === 0) {
                 tab_port.postMessage({msg: "test_result", text: "Edit Server Test failed: is it running?"});
             } else {
-                tab_port.postMessage({msg: "test_result", text: "Un-handled response: "+xhr.status}); 
+                tab_port.postMessage({msg: "test_result", text: "Un-handled response: "+xhr.status});
             }
         }
     };
@@ -237,7 +249,6 @@ function handleConfigMessages(msg, tab_port)
         msg: "config",
         enable_button: settings.get("enable_button"),
         enable_dblclick: settings.get("enable_dblclick"),
-        enable_keys: settings.get("enable_keys"),
         enable_debug: settings.get("enable_debug")
     };
     tab_port.postMessage(config_msg);
