@@ -13,13 +13,10 @@ conjunction with an "Edit Server" which services requests by the
 browser. This is because extensions cannot spawn new processes as a
 security measure.
 
-The extension packages native elisp version that can be run inside
-GNU Emacs itself, just follow the instructions from the options page
-of the extension. It has been known to work with GNU Emacs and
-Aquamacs (MacOS); it is presently not compatible with XEmacs. You can
-also install edit-server.el via MELPA:
-
-    M-x package-install edit-server
+The extension packages a native elisp version that can be downloaded,
+just follow the instructions from the options page of the extension.
+It has been known to work with GNU Emacs and Aquamacs (MacOS); it is
+presently not compatible with XEmacs.
 
 Other example edit servers can be found at the project homepage. There
 is no reason why other server scripts could not spawn other editors
@@ -31,6 +28,47 @@ can be found at: http://github.com/stsquad/emacs_chrome
 
 Installing
 ==========
+
+As mentioned above there are two parts you will need. The edit server
+which needs to be installed and configured on Emacs and the browser
+extension itself.
+
+Edit Server
+-----------
+
+Perhaps the easiest way to install edit-server.el is via
+[MELPA](https://melpa.org/#/edit-server) which provides a range of
+packages that can be installed via the package manager:
+
+    M-x package-install edit-server
+
+Once installed you will want to update your configuration so the
+server is started before you edit. For example using the popular
+[use-package](https://github.com/jwiegley/use-package) config
+framework you might do something like this:
+
+    (use-package edit-server
+      :ensure t
+      :commands edit-server-start
+      :init (if after-init-time
+                  (edit-server-start)
+                (add-hook 'after-init-hook
+                          #'(lambda() (edit-server-start))))
+      :config (setq edit-server-new-frame-alist
+                    '((name . "Edit with Emacs FRAME")
+                      (top . 200)
+                      (left . 200)
+                      (width . 80)
+                      (height . 25)
+                      (minibuffer . t)
+                      (menu-bar-lines . t)
+                      (window-system . x))))
+
+Please see the built-in help for more information on how to configure
+the edit servers behaviour.
+
+Browser Extension
+-----------------
 
 If you just want to install Edit with Emacs you can simply visit the
 Chrome Store at:
