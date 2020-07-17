@@ -59,13 +59,6 @@ this.manifest = {
 	    "type": "checkbox",
 	    "label": "Allow double click on textarea to invoke editor"
 	},
-	{
-            "tab": "Configuration",
-            "group": "Interface",
-	    "name": "enable_keys",
-	    "type": "checkbox",
-	    "label": "Enable Alt-Enter Keyboard shortcut to invoke editor"
-	},
         {
             "tab": "Test",
             "group": "Test",

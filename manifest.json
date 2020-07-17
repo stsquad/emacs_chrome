@@ -43,14 +43,22 @@
 			"all_frames": true
 		}
 	],
-        "commands": {
-	        "activate-emacs": {
-		    "suggested_key": {
-			"default": "Ctrl+Shift+E",
-			"linux": "Ctrl+Shift+E",
-			"mac": "Command+E"
-		    },
-		    "description": "Activate Emacs with contents of clipboard"
+	"commands": {
+		"edit-textbox": {
+			"suggested_key": {
+				"default": "Alt+E",
+				"linux": "Alt+E",
+				"mac": "Alt+E"
+			},
+			"description": "Edit the current textarea with Emacs"
+		},
+		"activate-emacs": {
+			"suggested_key": {
+				"default": "Ctrl+Shift+E",
+				"linux": "Ctrl+Shift+E",
+				"mac": "Command+E"
+			},
+			"description": "Activate Emacs with contents of clipboard"
 		}
 	}
 }

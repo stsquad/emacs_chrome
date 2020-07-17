@@ -27,7 +27,6 @@ var pageTextAreas = [];
 // via options
 var enable_button = true;
 var enable_dblclick = false;
-var enable_keys = false;
 var enable_debug = false;
 
 // Decorate console.log so that it only logs
@@ -105,18 +104,11 @@ function textAreaTracker(text)
     // The text areas event handlers we attach
     this.focusListener = setFocused;
     this.editEvent = editTextArea;
-    this.keydownListener = function (e) {
-        // Alt-Enter
-        if (e.altKey && e.keyCode == 13)
-            editTextArea(e);
-    };
 
     this.text.addEventListener('focus',  this.focusListener);
 
     if (enable_dblclick)
         this.text.addEventListener('dblclick', this.editEvent);
-    if (enable_keys)
-        this.text.addEventListener('keydown', this.keydownListener);
 
     // The edit button
     if (enable_button) {
@@ -404,7 +396,6 @@ function localMessageHandler(msg, port) {
         console.log("config response: "+msg);
         enable_button = msg.enable_button;
         enable_dblclick = msg.enable_dblclick;
-        enable_keys = msg.enable_keys;
         enable_debug = msg.enable_debug;
         findTextAreas([$('*')]);
 
