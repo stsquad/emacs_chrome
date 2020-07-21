@@ -5,6 +5,8 @@ Extension
 * allow disabling of switch to settings behaviour
 * whitelist penguin.linux.test for edit server (ChromeOS/Crostini)
 * fix context menu on newer Chromes (#158)
+* honour edit_server_host instead of hard-coding 127.0.0.1
+* use the Chrome extension UI to set keyboard shortcuts.
 
 edit-server.el
 
