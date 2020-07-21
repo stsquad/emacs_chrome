@@ -67,18 +67,15 @@ this.i18n = {
     "focus": {
         "en": "A new feature of Edit with Emacs is the ability to bring up a new frame or focus an existing\
                Emacs session. This is triggered by a customisable keyboard shortcut\
-               (see bottom of <a href=\"chrome://extensions/\"extensions\">extensions page</a>).\
+               (see the \"Keyboard Shortcuts\" section of the <a href=\"chrome://extensions/\"extensions\">extensions page</a>).\
                The action <em>Activate Emacs with contents of clipboard</em> will send\
-               a <em>foreground</em> request to the edit server. I wrote this to support running Emacs on\
-               my Chromebook. You will need to have started emacs in a <a href=\"https://github.com/dnschneid/crouton\">\
-               Crouton</a> chroot using the <em>host-x11</em> script. For example:<br>\
-               <pre>\
-                 /usr/local/bin/host-x11 emacs --daemon\
-               </pre>\
-               You may need to experiment with frame configuration settings under ChromeOS as Aura is not a normal X11\
-               window manager. Under non-ChromeOS set-ups it will behave just like an edit request although no buffer\
-               is created for the new frame. However the contents of the clipboard (from the browser) will be copied into\
-               the Emacs kill-ring."
+               a <em>foreground</em> request to the edit server. Originally written to support <a href=\"https://github.com/dnschneid/crouton\">\
+               Crouton</a> on my Chromebook this also works in Crostini and elsewhere where the browser intercepts\
+               system keys. The contents of the clipboard (from the browser) will be copied into\
+               the Emacs kill-ring.\
+               \
+               The browser may also allow you to specify a shortcut for the \"Active the Extension\" which by default\
+               will trigger the edit action. This is the same as clicking the extension icon in the toolbar."
     },
     "logout": {
         "en": "Logout",
