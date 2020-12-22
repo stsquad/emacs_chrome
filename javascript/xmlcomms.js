@@ -60,6 +60,7 @@ updateUserFeedback("Awaiting edit request", "blue");
 
 function handleEditRequest(tab)
 {
+    console.log("handleEditRequest for tab id="+tab.id);
     var find_msg = {
         msg: "find_edit"
     };
