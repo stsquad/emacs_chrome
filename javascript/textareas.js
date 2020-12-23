@@ -101,6 +101,8 @@ function textAreaTracker(text)
     this.text = text;
     this.text.setAttribute("edit_id", this.edit_id);
 
+    console.log("new textAreaTracker %d", page_edit_id);
+
     // The text areas event handlers we attach
     this.focusListener = setFocused;
     this.editEvent = editTextArea;
@@ -192,12 +194,19 @@ function tagTextArea(text)
     }
 
     // If spellcheck is turned off, usually it's just for quick editing, e.g. To: fields in gmail
-    var spellcheck = text.getAttribute("spellcheck");
-    if (spellcheck && spellcheck == "false") return;
+    var spellcheck = t.attr("spellcheck");
+    if (spellcheck && spellcheck == "false" &&
+        t.prop("tagName") === "TEXTAREA") {
+        console.log("tagTextArea: skipping spellcheck disabled textarea");
+        return;
+    }
 
     // No edit for read-only text
     // This also removes annoying edit button that appears under the menu bar in Google Docs viewer.
-    if (text.readOnly) return;
+    if (text.readOnly) {
+        console.log("tagTextArea: skipping readOnly text");
+        return;
+    }
 
     var existing_id = text.getAttribute("edit_id");
     if (!existing_id) {
@@ -365,7 +374,7 @@ function handleUpdatedElements(summaries) {
     });
 
     imgSummary.removed.forEach(function(e) {
-        console.log("button was removed" + e.getAttribute("edit_id"));
+        console.log("button was removed: " + e.getAttribute("edit_id"));
     });
 
     // Process all new textareas
