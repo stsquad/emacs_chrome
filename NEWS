@@ -7,6 +7,7 @@ Extension
 * fix context menu on newer Chromes (#158)
 * honour edit_server_host instead of hard-coding 127.0.0.1
 * use the Chrome extension UI to set keyboard shortcuts.
+* fix handling of spellcheck=false nodes for Gmail (#171, #162)
 
 edit-server.el
 
