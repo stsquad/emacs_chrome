@@ -327,38 +327,6 @@ function editTextArea(event) {
 }
 
 /*
-  This is the main find function for searching for TEXTAREAS and other related divs
-*/
-
-function findTextAreas(elements) {
-    console.log("findTextAreas: running over "+elements.length);
-
-    for (var i=0; i<elements.length; i++) {
-        var x = $(elements[i]);
-        var j, editable;
-        // Process textareas
-        var texts = x.find("textarea");
-        for (j=0; j<texts.length; j++) {
-            tagTextArea(texts[j]);
-        }
-
-        // lets see if we can find any contenteditable stuff
-        editable = x.find("div[contenteditable='true']");
-        for (j=0; j<editable.length; j++) {
-            tagTextArea(editable[j]);
-        }
-
-        // According to http://www.w3.org/TR/html5/editing.html#contenteditable
-        // we should only see true/false or inherit. However G+ seems to ignore
-        // that so lets look for those here.
-        editable = x.find("div[contenteditable='plaintext-only']");
-        for (j=0; j<editable.length; j++) {
-            tagTextArea(editable[j]);
-        }
-    }
-}
-
-/*
   This triggers each time an element is changed.
 */
 function handleUpdatedElements(summaries) {
@@ -396,6 +364,13 @@ function handleUpdatedElements(summaries) {
     });
 }
 
+/*
+ * Selectors for the various things that might be editable. Add new ones here.
+ */
+
+var editable_selectors = [ "textarea",
+                           "div[contenteditable='true']",
+                           "div[contenteditable='plaintext-only']" ];
 
 /* Message handling multiplexer */
 function localMessageHandler(msg, port) {
@@ -406,7 +381,11 @@ function localMessageHandler(msg, port) {
         enable_button = msg.enable_button;
         enable_dblclick = msg.enable_dblclick;
         enable_debug = msg.enable_debug;
-        findTextAreas([$('*')]);
+
+        var all = editable_selectors.join(",");
+        $(all).each(function() {
+            tagTextArea(this);
+        });
 
         /*
          * The mutation summary is responsible for monitoring all
