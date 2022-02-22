@@ -19,6 +19,7 @@
 	],
 	"icons":
 	{
+		"48" : "icons/emacs-48x48.png",
 		"128" : "icons/emacs.png"
 	},
 	"options_ui": {
