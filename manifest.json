@@ -23,7 +23,8 @@
 	},
 	"options_ui": {
 		"page": "fancy-settings/source/index.html",
-		"open_in_tab": true
+		"open_in_tab": true,
+		"browser_style": true
 	},
         "web_accessible_resources": [
 	    "icons/gumdrop.png",
