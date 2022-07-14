@@ -102,6 +102,7 @@ chrome.commands.onCommand.addListener(function(command) {
 function handleContentMessages(msg, tab_port)
 {
     console.log("handleContentMessages called:"+JSON.stringify(msg));
+    console.assert(msg.text);
     var cmd = msg.msg;
     var id = msg.id;
     var text = msg.text;
