@@ -14,11 +14,10 @@
         }
     }
 
-
-	var menu_enabled = false;
+	var menu_is_installed = false;
 
 	function enableContextMenu() {
-		if (!menu_enabled) {
+		if (!menu_is_installed) {
 			chrome.contextMenus.removeAll();
 			chrome.contextMenus.create({
 				title: "Edit with Emacs",
@@ -27,13 +26,13 @@
 					menuClicked(info, tab);
 				}
 			});
-			menu_enabled = true;
+			menu_is_installed = true;
 		}
 	}
 
 	function disableContextMenu() {
 		chrome.contextMenus.removeAll();
-		menu_enabled = false;
+		menu_is_installed = false;
 	}
 
 	// Initialize the context menu based on stored options.
