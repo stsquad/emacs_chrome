@@ -101,7 +101,7 @@ chrome.commands.onCommand.addListener(function(command) {
 // Package up the text to be edited and send it to the edit server
 function handleContentMessages(msg, tab_port)
 {
-    console.log("handleContentMessages called:"+JSON.stringify(msg));
+    console.debug("handleContentMessages called:", msg);
     console.assert(msg.text);
     var cmd = msg.msg;
     var id = msg.id;

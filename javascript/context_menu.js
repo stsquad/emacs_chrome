@@ -7,6 +7,7 @@
         if (edit_msg) {
             var tab_port = chrome.tabs.connect(tab.id);
             edit_msg.pageUrl = info.pageUrl;
+            console.debug("menuClicked with edit_msg:", edit_msg);
             handleContentMessages(edit_msg, tab_port);
             edit_msg = null;
         } else {
