@@ -1,13 +1,16 @@
 /* -*- tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 (function(){
 
-    var edit_msg = {};
+    var edit_msg = null;
 
     function menuClicked(info, tab) {
         if (edit_msg) {
             var tab_port = chrome.tabs.connect(tab.id);
             edit_msg.pageUrl = info.pageUrl;
             handleContentMessages(edit_msg, tab_port);
+            edit_msg = null;
+        } else {
+            console.error("menuClicked called while edit_msg is null");
         }
     }
 
