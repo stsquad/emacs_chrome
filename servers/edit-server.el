@@ -352,7 +352,7 @@ This is done for logging purposes.  If `edit-server-verbose' is
 non-nil, then STRING is also echoed to the message line."
   (let ((string (apply 'format fmt args)))
     (when edit-server-verbose
-      (message string))
+      (message "%s" string))
     (when (get-buffer edit-server-log-buffer-name)
       (with-current-buffer edit-server-log-buffer-name
 	(goto-char (point-max))
