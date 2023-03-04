@@ -17,7 +17,8 @@ var settings = new Store("settings", {
     "edit_server_disable_settings": false,
     "enable_button": true,
     "enable_dblclick": false,
-    "enable_debug": false
+    "enable_debug": false,
+    "enable_for_no_spellcheck": false
 });
 
 // Decorate console.log so that it only logs
@@ -250,7 +251,8 @@ function handleConfigMessages(msg, tab_port)
         msg: "config",
         enable_button: settings.get("enable_button"),
         enable_dblclick: settings.get("enable_dblclick"),
-        enable_debug: settings.get("enable_debug")
+        enable_debug: settings.get("enable_debug"),
+        enable_for_no_spellcheck: settings.get("enable_for_no_spellcheck")
     };
     tab_port.postMessage(config_msg);
 }

@@ -59,6 +59,13 @@ this.manifest = {
 	    "type": "checkbox",
 	    "label": "Allow double click on textarea to invoke editor"
 	},
+	{
+            "tab": "Configuration",
+            "group": "Interface",
+	    "name": "enable_for_no_spellcheck",
+	    "type": "checkbox",
+	    "label": "Allow editing textareas where spell check has been disabled"
+	},
         {
             "tab": "Test",
             "group": "Test",
