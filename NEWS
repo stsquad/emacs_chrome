@@ -1,3 +1,11 @@
+v1.17
+
+Extension
+
+* fix CSS bug causing repeating edit tags
+* add a 48x48 icon for the Chrome web store
+* remove unneeded tabs/storage permission
+
 v1.16
 
 Extension
