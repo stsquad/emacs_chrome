@@ -14,8 +14,7 @@
 		"contextMenus",
 		"http://127.0.0.1/edit/*",
 		"http://penguin.linux.test/edit/*",
-		"notifications",
-		"storage"
+		"notifications"
 	],
 	"icons":
 	{
