@@ -120,6 +120,7 @@ Submitting to Store
 
 * Update NEWS
 * Test
+* Update version in manifest.json
 * Tag vX.Y
 * git archive --format zip --output emacs_chrome_X.Y.zip vX.Y
 * Upload that
