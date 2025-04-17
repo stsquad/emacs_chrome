@@ -1,4 +1,4 @@
-;;; edit-server.el --- server that responds to edit requests from Chrome
+;;; edit-server.el --- server that responds to edit requests from Chrome  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2009-2013  Alex Bennée
 ;; Copyright (C) 2010-2011  Riccardo Murri
