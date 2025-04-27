@@ -28,6 +28,7 @@ var pageTextAreas = [];
 var enable_button = true;
 var enable_dblclick = false;
 var enable_debug = false;
+var enable_for_no_spellcheck = false;
 
 // Decorate console.log so that it only logs
 // when the enable_debug setting is true
@@ -194,11 +195,14 @@ function tagTextArea(text)
     }
 
     // If spellcheck is turned off, usually it's just for quick editing, e.g. To: fields in gmail
-    var spellcheck = t.attr("spellcheck");
-    if (spellcheck && spellcheck == "false" &&
-        t.prop("tagName") === "TEXTAREA") {
-        console.log("tagTextArea: skipping spellcheck disabled textarea");
-        return;
+    if (!enable_for_no_spellcheck) {
+        var spellcheck = t.attr("spellcheck");
+
+        if (spellcheck && spellcheck == "false" &&
+            t.prop("tagName") === "TEXTAREA") {
+            console.log("tagTextArea: skipping spellcheck disabled textarea");
+            return;
+        }
     }
 
     // No edit for read-only text
@@ -381,6 +385,7 @@ function localMessageHandler(msg, port) {
         enable_button = msg.enable_button;
         enable_dblclick = msg.enable_dblclick;
         enable_debug = msg.enable_debug;
+        enable_for_no_spellcheck  = msg.enable_for_no_spellcheck;
 
         var all = editable_selectors.join(",");
         $(all).each(function() {
