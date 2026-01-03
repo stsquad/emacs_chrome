@@ -1,17 +1,15 @@
 [![Build Status](https://travis-ci.org/stsquad/emacs_chrome.png?branch=master)](https://travis-ci.org/stsquad/emacs_chrome)
 [![MELPA](https://melpa.org/packages/edit-server-badge.svg)](https://melpa.org/#/edit-server)
 [![MELPA Stable](https://stable.melpa.org/packages/edit-server-badge.svg)](https://stable.melpa.org/#/edit-server)
-[![Webstore](https://developer.chrome.com/webstore/images/ChromeWebStore_Badge_v2_206x58.png)](https://chrome.google.com/webstore/detail/edit-with-emacs/ljobjlafonikaiipfkggjbhkghgicgoh)
 
 About
 =====
 
 Edit with Emacs is an addon for webextension compatible browsers like
-Google's Chrome(ium), Opera or Firefox that allows you to edit text
-areas on your browser in a more full featured editor. It does this in
-conjunction with an "Edit Server" which services requests by the
-browser. This is because extensions cannot spawn new processes as a
-security measure.
+Opera or Firefox that allows you to edit text areas on your browser in
+a more full featured editor. It does this in conjunction with an "Edit
+Server" which services requests by the browser. This is because
+extensions cannot spawn new processes as a security measure.
 
 The extension packages a native elisp version that can be downloaded,
 just follow the instructions from the options page of the extension.
@@ -70,12 +68,8 @@ the edit servers behaviour.
 Browser Extension
 -----------------
 
-If you just want to install Edit with Emacs you can simply visit the
-Chrome Store at:
-
-https://chrome.google.com/webstore/detail/edit-with-emacs/ljobjlafonikaiipfkggjbhkghgicgoh
-
-Or if you're using Firefox, visit addons.mozilla.org (AMO) at:
+If you just want to install Edit with Emacs you can simply visit
+addons.mozilla.org (AMO) at:
 
 https://addons.mozilla.org/en-US/firefox/addon/edit-with-emacs1/
 
@@ -131,6 +125,10 @@ History
 Dave Hilley [wrote the original proof of concept](https://web.archive.org/web/20130719135014/http://www.thegibson.org/blog/archives/689)
 that showed it could be done. [I](http://www.bennee.com/~alex) then hacked around with the Javascript
 to make the behaviour more like the classic It's All Text add-on available to Firefox.
+
+This extension used to work with Chrome(ium) but since the migration
+away from Manifest v2 it no longer works and has been removed from the
+extension store.
 
 Authors
 =======
