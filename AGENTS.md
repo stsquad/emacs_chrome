@@ -20,6 +20,7 @@ The project is licensed under the GPL v3.
 - `/javascript/`: the javascript for the browser extension
 - `/lib/`: mini-fied copies of supporting javascript libs
 - `/servers/`: example servers including the main Emacs `edit-server.el`
+- `/tests/`: support for testing including some example html frames
 
 This file contains instructions for AI agents to understand and interact with this project.
 
