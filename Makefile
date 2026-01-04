@@ -24,6 +24,7 @@ FILES = \
 	NEWS
 
 test:
+	emacs -Q --batch -l tests/install-prereqs.el
 	emacs -Q --batch -l ert -l servers/edit-server.el -l servers/edit-server-ert.el -f ert-run-tests-batch-and-exit
 
 release:
