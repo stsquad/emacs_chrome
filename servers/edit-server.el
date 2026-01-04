@@ -295,11 +295,12 @@ send a response back to the client."
 ;; to avoid when edit-server has no active clients.  So it seems that
 ;; advice is the only solution until save-buffers-kill-emacs offers an
 ;; earlier hook.
-(defadvice save-buffers-kill-emacs
-      (before edit-server-stop-before-kill-emacs)
-      "Call `edit-server-stop' if there are no active clients, to
+(defun edit-server-stop-before-kill-emacs (&rest _)
+  "Call `edit-server-stop' if there are no active clients, to
 avoid the user being prompted to kill the edit-server process."
-      (or edit-server-clients (edit-server-stop)))
+  (or edit-server-clients (edit-server-stop)))
+
+(advice-add 'save-buffers-kill-emacs :before #'edit-server-stop-before-kill-emacs)
 
 ;;;###autoload
 (defun edit-server-start (&optional verbose)
@@ -311,7 +312,7 @@ will cause it to be verbose."
   (interactive "P")
   (if (process-status "edit-server")
       (message "An edit-server process is already running")
-    (if (null (condition-case err
+    (unless (null (condition-case err
                   (let ((proc (make-network-process
                                :name "edit-server"
                                :buffer edit-server-process-buffer-name
@@ -323,9 +324,10 @@ will cause it to be verbose."
                                :noquery t)))
                     (set-process-coding-system proc 'utf-8 'utf-8)
                     proc)
-                (file-error nil)))
-        (message "Failed to start an edit-server")
-      (ad-activate 'save-buffers-kill-emacs)
+                  (file-error
+                   (message "Failed to start an edit-server:%s" err)
+                   nil)))
+      (advice-add 'save-buffers-kill-emacs :before #'edit-server-stop-before-kill-emacs)
       (setq edit-server-clients '())
       (when verbose (get-buffer-create edit-server-log-buffer-name))
       (edit-server-log nil "Created a new edit-server process"))))
@@ -341,11 +343,7 @@ will cause it to be verbose."
     (message "No edit server running"))
   (when (get-buffer edit-server-process-buffer-name)
     (kill-buffer edit-server-process-buffer-name))
-  (ad-disable-advice 'save-buffers-kill-emacs
-                     'before 'edit-server-stop-before-kill-emacs)
-  ;; Disabling advice doesn't take effect until you (re-)activate
-  ;; all advice for the function.
-  (ad-activate 'save-buffers-kill-emacs))
+  (advice-remove 'save-buffers-kill-emacs #'edit-server-stop-before-kill-emacs))
 
 (defun edit-server-log (proc fmt &rest args)
   "If a `*edit-server-log*' buffer exists, write STRING to it.
