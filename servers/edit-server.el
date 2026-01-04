@@ -276,7 +276,8 @@ send a response back to the client."
     (edit-server-edit-mode t)))
 
 (define-globalized-minor-mode global-edit-server-edit-mode
-  edit-server-edit-mode turn-on-edit-server-edit-mode-if-server)
+  edit-server-edit-mode turn-on-edit-server-edit-mode-if-server
+  :group 'edit-server)
 (global-edit-server-edit-mode t)
 
 
