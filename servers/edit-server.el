@@ -367,7 +367,7 @@ non-nil, then STRING is also echoed to the message line."
 		string)
 	(or (bolp) (newline))))))
 
-(defun edit-server-accept (server client msg)
+(defun edit-server-accept (_server client msg)
   "Accept a new client connection."
   (let ((buffer (generate-new-buffer edit-server-process-buffer-name)))
     (buffer-disable-undo buffer)
