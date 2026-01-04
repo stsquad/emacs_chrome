@@ -1,7 +1,7 @@
 Developer Notes
 ===============
 
-Keybaord Shortcuts
+Keyboard Shortcuts
 ------------------
 
 Currently Firefox and Chrome both interperet the manifest.json
