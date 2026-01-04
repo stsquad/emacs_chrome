@@ -478,14 +478,14 @@ non-nil, then STRING is also echoed to the message line."
 to be passed into the kill ring.
 
 The new frame will have a specific frame parameter of
-  `edit-server-forground-frame' set to 't"
+  `edit-server-foreground-frame' set to `t'."
   (when (bufferp buffer)
     (with-current-buffer buffer
       (kill-ring-save (point-min) (point-max))))
 
   (when edit-server-new-frame
     (set-frame-parameter
-     (edit-server-make-frame) 'edit-server-forground-frame 't)))
+     (edit-server-make-frame) 'edit-server-foreground-frame 't)))
 
 (defun edit-server-show-edit-buffer (buffer)
   "Show edit `BUFFER' by creating a frame or raising the selected
