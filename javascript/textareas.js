@@ -263,6 +263,7 @@ function sendTextArea(text_tracker) {
     edit_msg.msg = "edit";
     edit_msg.text = text_tracker.getContent();
 	edit_msg.id = text_tracker.edit_id;
+    console.debug("sendTextArea: sending message:", edit_msg);
 	port.postMessage(edit_msg);
 }
 
@@ -429,17 +430,21 @@ browser_runtime.onConnect.addListener(function(iport) {
     iport.onMessage.addListener(localMessageHandler);
 });
 
+console.debug("About to fetch our configuration from the background process");
+
 /*
   To start the whole process off we first need to fetch our configuration
   from the background process.
 */
 port.postMessage({msg: "config"});
 
+console.debug("About to install contextmenu event listener on document");
 
 // Inform the background process whenever the user opens
 // the context menu on an editable element.
 document.addEventListener("contextmenu", (function(event) {
     var elem = event.srcElement;
+    console.debug("contextmenu event called on elem: ", elem);
     if (elem && elem.getAttribute("edit_id")) {
         var edit_msg = getEmptyMessage();
         edit_msg.msg = "edit";
@@ -452,3 +457,5 @@ document.addEventListener("contextmenu", (function(event) {
         browser_sendMessage(request);
     }
 }));
+
+console.debug("Edit with Emacs has finished initializing");

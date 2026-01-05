@@ -391,6 +391,7 @@ non-nil, then STRING is also echoed to the message line."
   ;; data in the buffer and process it in different phases, which
   ;; requires us to keep track of the processing state.
   (with-current-buffer (process-buffer proc)
+    (edit-server-log proc "Got HTTP request string of length `%s'" (length string))
     (insert string)
     (setq edit-server-received
 	  (+ edit-server-received (string-bytes string)))
@@ -414,6 +415,7 @@ non-nil, then STRING is also echoed to the message line."
       (save-excursion
 	(goto-char (point-min))
 	(when (re-search-forward "^Content-Length:\\s-+\\([0-9]+\\)" nil t)
+	  (edit-server-log proc "Found Content-Length: %s" (match-string 1))
 	  (setq edit-server-content-length
 		(string-to-number (match-string 1)))))
       ;; look for "x-url" header
@@ -433,6 +435,7 @@ non-nil, then STRING is also echoed to the message line."
 	(when (re-search-forward "\\(\r?\n\\)\\{2\\}" nil t)
 	  ;; HTTP headers are pure ASCII (1 char = 1 byte), so we can subtract
 	  ;; the buffer position from the count of received bytes
+	  (edit-server-log proc "Found body offset at: %s" (match-end 0))
 	  (setq edit-server-received
 		(- edit-server-received (- (match-end 0) (point-min))))
 	  ;; discard headers - keep only HTTP content in buffer
@@ -539,7 +542,8 @@ and save the network process for the final call back"
     (when existing-buffer
       (kill-ring-save (point-min) (point-max)))
 
-    (edit-server-log proc "copying new data into buffer")
+    (edit-server-log proc "copying new data into buffer, length: %s"
+                     (- (point-max) (point-min)))
     (copy-to-buffer buffer (point-min) (point-max))
 
     (with-current-buffer buffer
